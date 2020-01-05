@@ -1,0 +1,86 @@
+<template>
+  <v-app>
+    <v-navigation-drawer
+      v-if="userStatus"
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      app
+    >
+      <v-list dense>
+        <template v-for="item in items">
+          <v-list-item :key="item.text" link>
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.text }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" dark>
+      <v-app-bar-nav-icon v-if="userStatus" @click="drawer = !drawer" />
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
+        <span class="hidden-sm-and-down">ポケモンGOチャット</span>
+      </v-toolbar-title>
+      <v-spacer />
+      <v-toolbar-items v-if="userStatus">
+        <v-btn @click="doLogout" text>ログアウト</v-btn>
+      </v-toolbar-items>
+      <v-toolbar-items v-else>
+        <v-btn text to="/signIn">ログイン</v-btn>
+        <v-btn text to="/signUp">登録</v-btn>
+      </v-toolbar-items>
+    </v-app-bar>
+    <router-view />
+  </v-app>
+</template>
+<script>
+import Firebase from "../plugins/firebase";
+import firebase from "@firebase/app";
+
+export default {
+  name: "navigation",
+  created: function() {
+    Firebase.onAuth();
+  },
+  computed: {
+    userStatus() {
+      // ログインするとtrue
+      return this.$store.getters.isSignedIn;
+    }
+  },
+  data() {
+    return {
+      islogin: Boolean,
+      drawer: true,
+      items: [
+        { icon: "mdi-settings-outline", text: "プロフィール編集" },
+        { icon: "mdi-account-group-outline", text: "フレンド一覧" },
+        { icon: "mdi-magnify", text: "フレンド検索" }
+      ]
+    };
+  },
+  methods: {
+    // ログイン処理
+    doLogin() {
+      Firebase.login();
+    },
+    // ログアウト処理
+    doLogout() {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          this.$router.push("/about");
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    }
+  }
+};
+</script>
+<style scoped>
+</style>

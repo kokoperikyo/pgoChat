@@ -24,9 +24,6 @@ export default {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
   },
-  logout() {
-    firebase.auth().signOut()
-  },
   onAuth() {
     firebase.auth().onAuthStateChanged(user => {
       user = user ? user : {};

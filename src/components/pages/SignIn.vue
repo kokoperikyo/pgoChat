@@ -1,0 +1,40 @@
+<template>
+  <v-app>
+    <v-content>
+      <v-container class="grey lighten-5">
+        <v-row class="mt-10" no-gutters>
+          <v-spacer></v-spacer>ログイン
+          <v-spacer></v-spacer>
+        </v-row>
+        <v-row class="mt-10" no-gutters>
+          <v-spacer></v-spacer>
+          <v-btn to="/signInEmail">メールアドレス</v-btn>
+          <v-spacer></v-spacer>
+        </v-row>
+        <v-row class="mt-10" no-gutters>
+          <v-spacer></v-spacer>
+          <v-btn @click="signInGoogle">google</v-btn>
+          <v-spacer></v-spacer>
+        </v-row>
+      </v-container>
+    </v-content>
+  </v-app>
+</template>
+<script>
+import firebase from "@firebase/app";
+
+export default {
+  methods: {
+    signInGoogle: function() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(() => {
+          this.$router.push("/profile");
+        })
+        .catch(error => alert(error.message));
+    }
+  }
+};
+</script>
