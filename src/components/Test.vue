@@ -1,18 +1,33 @@
 <template>
   <v-app>
-    <v-content>
-      <v-container class="grey lighten-5">
-        <v-row class="mt-10" no-gutters>
-          <v-spacer></v-spacer>
-          <v-btn>メールアドレス</v-btn>
-          <v-spacer></v-spacer>
-        </v-row>
-        <v-row class="mt-10" no-gutters>
-          <v-spacer></v-spacer>
-          <v-btn>google</v-btn>
-          <v-spacer></v-spacer>
-        </v-row>
-      </v-container>
-    </v-content>
+    <v-container></v-container>
   </v-app>
 </template>
+
+<script>
+// import { db } from "@/plugins/firebase";
+// import firebase from "@firebase/app";
+// import "@firebase/firestore";
+
+export default {
+  data() {
+    return {};
+  },
+  mounted() {
+    // setTimeout(() => {
+    //   db.collection("userss")
+    //     .doc(this.$store.getters.user.uid)
+    //     .collection("messages")
+    //     .add({
+    //       message: "testcccc",
+    //       toWho: "c",
+    //       createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+    //     });
+    //   // eslint-disable-next-line no-console
+    //   console.log(this.$store.getters.user.uid);
+    // }, 3000);
+  },
+  methods: {},
+  created() {}
+};
+</script>

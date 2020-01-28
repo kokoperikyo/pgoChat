@@ -8,7 +8,7 @@
     >
       <v-list dense>
         <template v-for="item in items">
-          <v-list-item :key="item.text" link>
+          <v-list-item :key="item.text" :to="item.link">
             <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-action>
@@ -33,7 +33,11 @@
         <v-btn text to="/signUp">登録</v-btn>
       </v-toolbar-items>
     </v-app-bar>
-    <router-view />
+    <v-content>
+      <v-container>
+        <router-view />
+      </v-container>
+    </v-content>
   </v-app>
 </template>
 <script>
@@ -56,9 +60,21 @@ export default {
       islogin: Boolean,
       drawer: true,
       items: [
-        { icon: "mdi-settings-outline", text: "プロフィール編集" },
-        { icon: "mdi-account-group-outline", text: "フレンド一覧" },
-        { icon: "mdi-magnify", text: "フレンド検索" }
+        {
+          icon: "mdi-account-circle-outline",
+          text: "プロフィール",
+          link: { name: "profile" }
+        },
+        {
+          icon: "mdi-account-group-outline",
+          text: "フレンド一覧",
+          link: { name: "friendList" }
+        },
+        {
+          icon: "mdi-magnify",
+          text: "フレンド検索",
+          link: { name: "friendSearch" }
+        }
       ]
     };
   },
@@ -73,7 +89,7 @@ export default {
         .auth()
         .signOut()
         .then(() => {
-          this.$router.push("/about");
+          this.$router.push("/signIn");
         })
         .catch(error => {
           alert(error.message);

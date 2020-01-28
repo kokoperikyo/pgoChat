@@ -22,6 +22,7 @@
 </template>
 <script>
 import firebase from "@firebase/app";
+// import { db } from "@/plugins/firebase";
 
 export default {
   methods: {
@@ -35,6 +36,12 @@ export default {
         })
         .catch(error => alert(error.message));
     }
+  },
+  data() {
+    return {
+      uid: this.$store.getters.user.uid,
+      users: this.$store.getters.user
+    };
   }
 };
 </script>
