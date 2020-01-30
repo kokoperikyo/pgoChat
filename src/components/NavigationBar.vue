@@ -24,6 +24,7 @@
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">ポケモンGOチャット</span>
       </v-toolbar-title>
+
       <v-spacer />
       <v-toolbar-items v-if="userStatus">
         <v-btn @click="doLogout" text>ログアウト</v-btn>
@@ -41,8 +42,9 @@
   </v-app>
 </template>
 <script>
-import Firebase from "../plugins/firebase";
+import Firebase from "@/plugins/firebase";
 import firebase from "@firebase/app";
+// import { db } from "@/plugins/firebase";
 
 export default {
   name: "navigation",
@@ -96,6 +98,19 @@ export default {
         });
     }
   }
+  // mounted() {
+  //   setTimeout(() => {
+  //     db.collection("users")
+  //       .doc(this.$store.getters.user.uid)
+  //       .get()
+  //       .then(doc => {
+  //         // eslint-disable-next-line no-console
+  //         console.log(doc);
+  //       });
+  //     // eslint-disable-next-line no-console
+  //     console.log(this.$store.getters.user.uid);
+  //   }, 5000);
+  // }
 };
 </script>
 <style scoped>

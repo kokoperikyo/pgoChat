@@ -10,7 +10,10 @@
         @change="desplayImg"
       ></v-file-input>
     </div>
-    <v-img v-else :src="displayHeaderImg" :aspect-ratio="4"></v-img>
+    <div v-else>
+      <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
+      <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
+    </div>
     <v-list-item>
       <v-list-item-avatar size="80">
         <div v-if="isEdit">
@@ -23,7 +26,10 @@
             @change="desplayAvatar"
           ></v-file-input>
         </div>
-        <v-img v-else :src="displayAvatar"></v-img>
+        <div v-else>
+          <v-img v-if="isMypage" :src="displayAvatar"></v-img>
+          <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+        </div>
       </v-list-item-avatar>
       <v-list-item-content v-if="isEdit">
         <v-list-item-title class="headline">
@@ -31,13 +37,17 @@
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-content v-else>
-        <v-list-item-title class="headline">{{displayUserName}}</v-list-item-title>
+        <v-list-item-title v-if="isMypage" class="headline">{{displayUserName}}</v-list-item-title>
+        <v-list-item-title v-else class="headline">{{displayFriendUserInfo.name}}</v-list-item-title>
       </v-list-item-content>
       <v-spacer></v-spacer>
-      <v-btn v-if="isEdit" @click="save">保存</v-btn>
-      <v-btn v-else @click="edit">編集</v-btn>
+      <!-- フレンドリストからフレンドのプロフィールに行った場合は編集機能は非表示 -->
+      <div v-if="isMypage">
+        <v-btn v-if="isEdit" @click="save">保存</v-btn>
+        <v-btn v-else @click="edit">編集</v-btn>
+      </div>
+      <v-btn v-else @click="goChat()">チャット</v-btn>
     </v-list-item>
-
     <v-card-text v-if="isEdit">
       <v-textarea
         v-model="displaySelfIntroduction"
@@ -47,8 +57,10 @@
         value="This is clearable text."
       ></v-textarea>
     </v-card-text>
-
-    <v-card-text v-else style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
+    <div v-else>
+      <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
+      <v-card-text v-else style="white-space:pre-wrap; ">{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
+    </div>
 
     <v-card-actions>
       <v-row>
@@ -94,34 +106,42 @@ export default {
           value.match(/[0-9A-Za-z]/g) ||
           "ポケモンGOのニックネームを入力してください"
       ],
+      param: this.$route.params["uid"],
       isEdit: false,
       displayUserName: null,
-      editUserName: null,
       displaySelfIntroduction: null,
       headerFile: null,
       avatarFile: null,
       displayHeaderImg: "",
       displayDamyHeaderImg: "",
       displayAvatar: "",
-      displayDemoAvatar: ""
+      displayDemoAvatar: "",
+      displayFriendUserInfo: null
     };
   },
   mounted() {
+    //最終ログインを更新
+    db.collection("users")
+      .doc(this.$store.getters.user.uid)
+      .update({
+        lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
+      });
     //2秒くらい待たないとstoreが空になってしまう
     //と思ったがそんなこともないかも
+    // ここのユーザーデータ取得はfirestore()に移したいが、フレンドプロフィールを表示するために"this.$route.params["uid"]"を呼んでいてユーザーのプロフィールの際にはfirestore()を呼べない
     // setTimeout(() => {
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .get()
       .then(doc => {
         this.user = doc.data();
-
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
-              id: this.$store.getters.user.uid
+              id: this.$store.getters.user.uid,
+              lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
@@ -133,12 +153,6 @@ export default {
           this.displaySelfIntroduction = doc.data().selfIntroduction;
           this.displayHeaderImg = doc.data().imageHeaderUrl;
           this.displayAvatar = doc.data().avatarUrl;
-
-          db.collection("users")
-            .doc(this.$store.getters.user.uid)
-            .update({
-              lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
-            });
         }
       });
     // }, 3000);
@@ -188,6 +202,12 @@ export default {
       }
       this.isEdit = false;
     },
+    goChat() {
+      this.$router.push({
+        name: "chat",
+        params: { uid: this.$route.params["uid"] }
+      });
+    },
     //編集中にアップした画像を一時的に表示
     desplayImg(file) {
       var blobUrl = window.URL.createObjectURL(file);
@@ -201,6 +221,22 @@ export default {
       this.displayDemoAvatar = blobUrl;
       this.avatarFile = file;
     }
+  },
+  computed: {
+    isMypage: function() {
+      if (this.$route.params["uid"] == undefined) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+  firestore() {
+    return {
+      displayFriendUserInfo: db
+        .collection("users")
+        .doc(this.$route.params["uid"])
+    };
   }
 };
 </script>

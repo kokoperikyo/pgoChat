@@ -58,6 +58,14 @@ const routes = [{
     }
   },
   {
+    path: '/profile/:uid',
+    name: 'friendProfile',
+    component: Profile,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/friendList',
     name: 'friendList',
     component: FriendList,

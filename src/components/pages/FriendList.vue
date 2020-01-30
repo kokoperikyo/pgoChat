@@ -7,7 +7,7 @@
         hide-details
         clearable
         clear-icon="mdi-close-circle"
-        background-color="#BDE7F9"
+        background-color="white"
       ></v-text-field>
       <v-checkbox v-model="caseSensitive" dark hide-details label="完全一致検索"></v-checkbox>
     </v-sheet>
@@ -21,7 +21,8 @@
         </template>
         <template v-slot:append="{ item }">
           <span class="mr-5">{{getLastLogin(item.lastLogin)}}</span>
-          <v-btn outlined @click="goChat(item.id)">対戦</v-btn>
+          <v-btn outlined @click="goProfile(item.id)">詳細</v-btn>
+          <v-btn outlined class="ml-2" @click="goChat(item.id)">チャット</v-btn>
         </template>
       </v-treeview>
       <v-card class="mx-2 mt-5">
@@ -32,6 +33,8 @@
 </template>
 <script>
 import { db } from "@/plugins/firebase";
+import firebase from "@firebase/app";
+import "@firebase/firestore";
 
 export default {
   data: () => ({
@@ -41,8 +44,16 @@ export default {
     caseSensitive: false
   }),
   mounted() {
+    //最終ログインを更新
+    db.collection("users")
+      .doc(this.$store.getters.user.uid)
+      .update({
+        lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
+      });
     //ふれんどのuidをリストに保存
     // setTimeout(() => {
+    // eslint-disable-next-line no-console
+
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .get()
@@ -96,6 +107,9 @@ export default {
       } else {
         return false;
       }
+    },
+    goProfile: function(uid) {
+      this.$router.push({ name: "friendProfile", params: { uid: uid } });
     },
     goChat(uid) {
       this.$router.push({ name: "chat", params: { uid: uid } });
