@@ -12,7 +12,11 @@
             <v-img :src="chatUser.avatarUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title v-if="isOthersMessage(message.ref)" v-text="message.message"></v-list-item-title>
+            <v-list-item-title
+              v-if="isOthersMessage(message.ref)"
+              style="white-space:pre-wrap; "
+              v-text="message.message"
+            ></v-list-item-title>
           </v-list-item-content>
           <div
             v-if="!isOthersMessage(message.ref)"

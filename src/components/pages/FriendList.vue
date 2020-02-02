@@ -12,7 +12,7 @@
       <v-checkbox v-model="caseSensitive" dark hide-details label="完全一致検索"></v-checkbox>
     </v-sheet>
     <v-list>
-      <v-treeview :items="items" :search="search" :filter="filter">
+      <v-treeview :items="friendList.friends" :search="search" :filter="filter">
         <template v-slot:prepend="{ item }">
           <v-list-item-avatar size="10" :color="isOnline(item.lastLogin) ? '#04F620' : 'grey'"></v-list-item-avatar>
           <v-list-item-avatar class="mr-5">
@@ -41,7 +41,8 @@ export default {
     friendIdList: [],
     items: [],
     search: null,
-    caseSensitive: false
+    caseSensitive: false,
+    friendList: Object
   }),
   mounted() {
     //最終ログインを更新
@@ -51,32 +52,6 @@ export default {
         lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
       });
     //ふれんどのuidをリストに保存
-    // setTimeout(() => {
-    // eslint-disable-next-line no-console
-
-    db.collection("users")
-      .doc(this.$store.getters.user.uid)
-      .get()
-      .then(doc => {
-        const array = [];
-        doc.data().friend.forEach(item => {
-          array.push(item.id);
-        });
-        this.friendIdList = array;
-
-        //フレンド一覧取得
-        db.collection("users")
-          .where("id", "in", this.friendIdList)
-          .get()
-          .then(snap => {
-            const array = [];
-            snap.forEach(doc => {
-              array.push(doc.data());
-              this.items.push(doc.data());
-            });
-          });
-      });
-    // }, 3000);
   },
   methods: {
     getLastLogin: function(loginDate) {
@@ -121,6 +96,11 @@ export default {
         ? (item, search, textKey) => item[textKey].indexOf(search) > -1
         : undefined;
     }
+  },
+  firestore() {
+    return {
+      friendList: db.collection("users").doc(this.$store.getters.user.uid)
+    };
   }
 };
 </script>

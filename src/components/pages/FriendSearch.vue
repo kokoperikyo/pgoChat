@@ -49,36 +49,34 @@ export default {
       .doc(this.$store.getters.user.uid)
       .get()
       .then(doc => {
-        doc.data().friend.forEach(item => {
-          this.friendIdList.push(item.id);
-        });
-        //フレンドネーム一覧取得
-        db.collection("users")
-          .where("id", "in", this.friendIdList)
-          .get()
-          .then(snap => {
-            snap.forEach(doc => {
-              this.friendNameList.push(doc.data().name);
-            });
+        //Cannot read property 'forEach' させないため
+        if (doc.data().friends != undefined) {
+          doc.data().friends.forEach(item => {
+            this.friendIdList.push(item.id);
           });
+          //フレンドネーム一覧取得
+          db.collection("users")
+            .where("id", "in", this.friendIdList)
+            .get()
+            .then(snap => {
+              snap.forEach(doc => {
+                this.friendNameList.push(doc.data().name);
+              });
+            });
+        }
       });
   },
   methods: {
-    //フレンド追加
+    //フレンド申請
     addFriend: function(id) {
-      // const users = db.collection("users");
-      // users.doc(this.$store.getters.user.uid).update({
-      //   friend: firebase.firestore.FieldValue.arrayUnion(users.doc(id))
-      // });
-      // this.$router.push({ name: "friendProfile", params: { uid: id } });
       const users = db.collection("users");
       users.doc(id).update({
         friendRequestList: firebase.firestore.FieldValue.arrayUnion({
           id: this.$store.getters.user.uid,
-          userName: "s"
+          userName: this.user.name,
+          avatarUrl: this.user.avatarUrl
         })
       });
-      // this.$router.push({ name: "friendProfile", params: { uid: id } });
 
       this.addFriendSuccess = true;
       setTimeout(() => {
@@ -95,6 +93,7 @@ export default {
         .get()
         .then(snap => {
           const array = [];
+
           snap.forEach(doc => {
             // 自分と既存フレンドはフレンド検索から排除
             if (
@@ -113,6 +112,7 @@ export default {
         });
     }
   },
+  //なぜかこれを消すと検索ができなくなる
   firestore() {
     return {
       user: db.collection("users").doc(this.$store.getters.user.uid)

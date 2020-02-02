@@ -137,11 +137,15 @@ export default {
         this.user = doc.data();
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
+          this.displayAvatar =
+            "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
               id: this.$store.getters.user.uid,
-              lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
+              lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
+              avatarUrl:
+                "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8"
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
@@ -168,6 +172,9 @@ export default {
         selfIntroduction: this.displaySelfIntroduction
       });
       const storageRef = firebase.storage().ref();
+      // eslint-disable-next-line no-console
+      console.log(storageRef);
+
       if (this.headerFile) {
         const imageRef = storageRef.child(
           `headerImg/${this.$store.getters.user.uid}`

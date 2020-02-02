@@ -24,8 +24,72 @@
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">ポケモンGOチャット</span>
       </v-toolbar-title>
-
+      {{test.friendRequestList}}
       <v-spacer />
+      <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
+        <template v-slot:activator="{ on }">
+          <v-btn
+            v-if="isRequest(getFriendRequestLists.length)"
+            x-small
+            depressed
+            color="error"
+            min-height="32"
+            v-on="on"
+          >{{getFriendRequestLists.length}}</v-btn>
+          <v-btn
+            v-else
+            outlined
+            dark
+            x-small
+            min-height="32"
+            v-on="on"
+          >{{getFriendRequestLists.length}}</v-btn>
+        </template>
+        <v-list v-if="lastReject">
+          <v-subheader v-if="isRequest(getFriendRequestLists.length)">フレンド申請が届いています</v-subheader>
+          <v-subheader v-else>フレンド申請はありません</v-subheader>
+          <v-list-group
+            v-for="(friendRequest, i) in getFriendRequestLists"
+            :key="i"
+            @click="() => {}"
+          >
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <v-list-item-avatar>
+                    <v-img :src="friendRequest.avatarUrl"></v-img>
+                  </v-list-item-avatar>
+                  <span class="indigo--text">{{ friendRequest.userName }}</span>
+                  からフレンド申請が届いています
+                </v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <v-list-item>
+              <v-row>
+                <v-col col="4">
+                  <v-btn
+                    block
+                    @click="acceptFriendRequest(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName)"
+                    outlined
+                    color="warning"
+                  >フレンドになる</v-btn>
+                </v-col>
+                <v-col col="4">
+                  <v-btn
+                    block
+                    @click="rejectFriendRequest(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName)"
+                    outlined
+                    color="warning"
+                  >拒否</v-btn>
+                </v-col>
+                <v-col col="4">
+                  <v-btn block @click="フレンドになる" outlined color="warning">プロフィール</v-btn>
+                </v-col>
+              </v-row>
+            </v-list-item>
+          </v-list-group>
+        </v-list>
+      </v-menu>
       <v-toolbar-items v-if="userStatus">
         <v-btn @click="doLogout" text>ログアウト</v-btn>
       </v-toolbar-items>
@@ -42,15 +106,10 @@
   </v-app>
 </template>
 <script>
-import Firebase from "@/plugins/firebase";
 import firebase from "@firebase/app";
-// import { db } from "@/plugins/firebase";
+import { db } from "@/plugins/firebase";
 
 export default {
-  name: "navigation",
-  created: function() {
-    Firebase.onAuth();
-  },
   computed: {
     userStatus() {
       // ログインするとtrue
@@ -77,14 +136,13 @@ export default {
           text: "フレンド検索",
           link: { name: "friendSearch" }
         }
-      ]
+      ],
+      getFriendRequestLists: [],
+      lastReject: true,
+      test: []
     };
   },
   methods: {
-    // ログイン処理
-    doLogin() {
-      Firebase.login();
-    },
     // ログアウト処理
     doLogout() {
       firebase
@@ -96,21 +154,77 @@ export default {
         .catch(error => {
           alert(error.message);
         });
+    },
+    isRequest(leng) {
+      if (leng != 0) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    rejectFriendRequest(avatarUrl, id, name) {
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          friendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: avatarUrl,
+            id: id,
+            userName: name
+          })
+        });
+      //申請一覧の再描画
+      setTimeout(() => {
+        this.getFriendRequestLists = [];
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .get()
+          .then(doc => {
+            //最後のフレンド申請を消したときに変な場所にドロップメニューが残る、このtrueで監視できているのでどうにかしたい
+            //今のところ最善策はリロード、もしくはv-listを非表示にしちゃう
+            if (doc.data().friendRequestList.length == 0) {
+              this.lastReject = false;
+              // window.location.reload();
+            } else {
+              doc.data().friendRequestList.forEach(item => {
+                this.getFriendRequestLists.push(item);
+              });
+            }
+          });
+      }, 300);
+    },
+    acceptFriendRequest(avatarUrl, friendId, name) {
+      //ログイン中のユーザーのDBにフレンド追加
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        friends: firebase.firestore.FieldValue.arrayUnion(users.doc(friendId))
+      });
+      //申請を投げていたユーザーのDBにフレンド追加
+      users.doc(friendId).update({
+        friends: firebase.firestore.FieldValue.arrayUnion(
+          users.doc(this.$store.getters.user.uid)
+        )
+      });
+      this.rejectFriendRequest(avatarUrl, friendId, name);
+      //フレンド追加後に画面遷移するならこれ使う
+      // this.$router.push({ name: "friendProfile", params: { uid: friendId } });
     }
+  },
+  mounted() {
+    //フレンド申請の受け取り
+    setTimeout(() => {
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .get()
+        .then(doc => {
+          //Cannot read property 'forEach' させないため
+          if (doc.data().friendRequestList != undefined) {
+            doc.data().friendRequestList.forEach(item => {
+              this.getFriendRequestLists.push(item);
+            });
+          }
+        });
+    }, 5000);
   }
-  // mounted() {
-  //   setTimeout(() => {
-  //     db.collection("users")
-  //       .doc(this.$store.getters.user.uid)
-  //       .get()
-  //       .then(doc => {
-  //         // eslint-disable-next-line no-console
-  //         console.log(doc);
-  //       });
-  //     // eslint-disable-next-line no-console
-  //     console.log(this.$store.getters.user.uid);
-  //   }, 5000);
-  // }
 };
 </script>
 <style scoped>
