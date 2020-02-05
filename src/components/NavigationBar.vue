@@ -24,7 +24,6 @@
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">ポケモンGOチャット</span>
       </v-toolbar-title>
-      {{test.friendRequestList}}
       <v-spacer />
       <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
         <template v-slot:activator="{ on }">
@@ -83,7 +82,7 @@
                   >拒否</v-btn>
                 </v-col>
                 <v-col col="4">
-                  <v-btn block @click="フレンドになる" outlined color="warning">プロフィール</v-btn>
+                  <v-btn block @click="goProfile(friendRequest.id)" outlined color="warning">プロフィール</v-btn>
                 </v-col>
               </v-row>
             </v-list-item>
@@ -108,6 +107,7 @@
 <script>
 import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
+import "@firebase/firestore";
 
 export default {
   computed: {
@@ -137,9 +137,10 @@ export default {
           link: { name: "friendSearch" }
         }
       ],
+      userName: null,
+      avatarUrl: null,
       getFriendRequestLists: [],
-      lastReject: true,
-      test: []
+      lastReject: true
     };
   },
   methods: {
@@ -163,6 +164,7 @@ export default {
       }
     },
     rejectFriendRequest(avatarUrl, id, name) {
+      //申請の削除
       db.collection("users")
         .doc(this.$store.getters.user.uid)
         .update({
@@ -171,6 +173,23 @@ export default {
             id: id,
             userName: name
           })
+        });
+      //申請元の申請の削除
+      db.collection("users")
+        .doc(id)
+        .update({
+          sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.avatarUrl,
+            friendId: this.$store.getters.user.uid,
+            friendName: this.userName
+          })
+        });
+      db.collection("users")
+        .doc(id)
+        .update({
+          sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
+            this.userName
+          )
         });
       //申請一覧の再描画
       setTimeout(() => {
@@ -198,15 +217,36 @@ export default {
       users.doc(this.$store.getters.user.uid).update({
         friends: firebase.firestore.FieldValue.arrayUnion(users.doc(friendId))
       });
+      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+      users.doc(this.$store.getters.user.uid).update({
+        friendIdList: firebase.firestore.FieldValue.arrayUnion(friendId)
+      });
       //申請を投げていたユーザーのDBにフレンド追加
       users.doc(friendId).update({
         friends: firebase.firestore.FieldValue.arrayUnion(
           users.doc(this.$store.getters.user.uid)
         )
       });
+      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+      users.doc(friendId).update({
+        friendIdList: firebase.firestore.FieldValue.arrayUnion(
+          this.$store.getters.user.uid
+        )
+      });
       this.rejectFriendRequest(avatarUrl, friendId, name);
       //フレンド追加後に画面遷移するならこれ使う
       // this.$router.push({ name: "friendProfile", params: { uid: friendId } });
+    },
+    goProfile(friendId) {
+      this.$router.push({
+        name: "friendProfile",
+        params: { uid: friendId }
+      });
+      setTimeout(() => {
+        this.$router.go({
+          force: true
+        });
+      }, 500);
     }
   },
   mounted() {
@@ -216,6 +256,9 @@ export default {
         .doc(this.$store.getters.user.uid)
         .get()
         .then(doc => {
+          this.userName = doc.data().name;
+          this.avatarUrl = doc.data().avatarUrl;
+
           //Cannot read property 'forEach' させないため
           if (doc.data().friendRequestList != undefined) {
             doc.data().friendRequestList.forEach(item => {
@@ -227,5 +270,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-</style>

@@ -1,25 +1,20 @@
 <template>
-  <v-card class="mx-auto" width="300">
-    <v-list>
-      <v-list-group no-action value="true">
-        <template v-slot:activator>
-          <v-list-item-content>
-            <v-list-item-title>Admin</v-list-item-title>
-          </v-list-item-content>
-        </template>
+  <v-row justify="center">
+    <v-btn color="primary" dark @click.stop="dialog = true">Open Dialog</v-btn>
 
-        <v-list-item>aa</v-list-item>
-      </v-list-group>
-    </v-list>
-  </v-card>
+    <v-dialog v-model="dialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Use Google's location service?</v-card-title>
+      </v-card>
+    </v-dialog>
+  </v-row>
 </template>
 <script>
 export default {
-  data: () => ({
-    admins: [
-      ["Management", "people_outline"],
-      ["Settings", "settings"]
-    ]
-  })
+  data() {
+    return {
+      dialog: false
+    };
+  }
 };
 </script>

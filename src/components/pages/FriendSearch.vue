@@ -8,7 +8,7 @@
         <v-list-item
           v-for="(serchedUser, i) in serchedUsers"
           :key="i"
-          @click="addFriend(serchedUser.id)"
+          @click="sendFriendRequest(serchedUser.id,serchedUser.name,serchedUser.avatarUrl)"
         >
           <v-list-item-avatar>
             <v-img :src="serchedUser.avatarUrl"></v-img>
@@ -16,6 +16,40 @@
           <v-list-item-content>
             <v-list-item-title v-text="serchedUser.name"></v-list-item-title>
           </v-list-item-content>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-on:click.stop="sendFriendRequest"
+            @click="goProfile(serchedUser.id)"
+            class="mr-2"
+          >プロフィール</v-btn>
+          <v-btn class="mr-2">フレンド申請</v-btn>
+        </v-list-item>
+      </v-list>
+    </v-card>
+    <v-card class="mt-5">
+      <v-toolbar color="indigo" dark>
+        <v-spacer></v-spacer>
+        <v-toolbar-title>申請中ユーザー</v-toolbar-title>
+        <v-spacer></v-spacer>
+      </v-toolbar>
+      <v-list>
+        <v-list-item v-for="(sendFriendRequest, i) in user.sendFriendRequestList" :key="i">
+          <v-list-item-avatar>
+            <v-img :src="sendFriendRequest.avatarUrl"></v-img>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title v-text="sendFriendRequest.friendName"></v-list-item-title>
+          </v-list-item-content>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-on:click.stop="sendFriendRequest"
+            @click="goProfile(sendFriendRequest.friendId)"
+            class="mr-2"
+          >プロフィール</v-btn>
+
+          <v-btn
+            @click="rejectFriendRequest(sendFriendRequest.avatarUrl,sendFriendRequest.friendId,sendFriendRequest.friendName)"
+          >申請取り消し</v-btn>
         </v-list-item>
       </v-list>
     </v-card>
@@ -34,7 +68,8 @@ export default {
       user: null,
       friendIdList: [],
       friendNameList: [],
-      addFriendSuccess: false
+      addFriendSuccess: false,
+      sendFriendNameList: []
     };
   },
   mounted() {
@@ -68,7 +103,8 @@ export default {
   },
   methods: {
     //フレンド申請
-    addFriend: function(id) {
+    sendFriendRequest: function(id, friendName, firendAvatarUrl) {
+      //申請を申請相手のDBに保存する
       const users = db.collection("users");
       users.doc(id).update({
         friendRequestList: firebase.firestore.FieldValue.arrayUnion({
@@ -77,11 +113,57 @@ export default {
           avatarUrl: this.user.avatarUrl
         })
       });
-
+      //申請を申請したユーザーのDBに保存する（申請中ユーザー表示のため）
+      users.doc(this.$store.getters.user.uid).update({
+        sendFriendRequestList: firebase.firestore.FieldValue.arrayUnion({
+          friendId: id,
+          friendName: friendName,
+          avatarUrl: firendAvatarUrl
+        })
+      });
+      //申請した相手のユーザー名を申請したユーザーのDBに保存する（検索から除外するため）
+      users.doc(this.$store.getters.user.uid).update({
+        sendFriendRequestNameList: firebase.firestore.FieldValue.arrayUnion(
+          friendName
+        )
+      });
+      this.searchUserName = "";
       this.addFriendSuccess = true;
       setTimeout(() => {
         this.addFriendSuccess = false;
       }, 3000);
+    },
+    goProfile(friendId) {
+      this.$router.push({ name: "friendProfile", params: { uid: friendId } });
+    },
+    rejectFriendRequest(avatarUrl, friendId, friendName) {
+      //申請先側
+      db.collection("users")
+        .doc(friendId)
+        .update({
+          friendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.user.avatarUrl,
+            id: this.$store.getters.user.uid,
+            userName: this.user.name
+          })
+        });
+      //申請側
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: avatarUrl,
+            friendId: friendId,
+            friendName: friendName
+          })
+        });
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
+            friendName
+          )
+        });
     }
   },
   watch: {
@@ -93,12 +175,12 @@ export default {
         .get()
         .then(snap => {
           const array = [];
-
           snap.forEach(doc => {
             // 自分と既存フレンドはフレンド検索から排除
             if (
               !this.friendNameList.includes(doc.data().name) &&
-              doc.data().name != this.user.name
+              doc.data().name != this.user.name &&
+              !this.user.sendFriendRequestNameList.includes(doc.data().name)
             ) {
               array.push(doc.data());
             }
@@ -112,7 +194,6 @@ export default {
         });
     }
   },
-  //なぜかこれを消すと検索ができなくなる
   firestore() {
     return {
       user: db.collection("users").doc(this.$store.getters.user.uid)

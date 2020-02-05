@@ -1,5 +1,15 @@
 <template>
   <v-card max-width="1000" class="mx-auto">
+    <v-dialog v-model="acceptFriendRequestModal" max-width="350">
+      <v-card min-height="250">
+        <v-card-title class="headline">フレンドになりました！</v-card-title>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="rejectFriendRequestModal" max-width="350">
+      <v-card>
+        <v-card-title class="headline">フレンド申請を拒否しました</v-card-title>
+      </v-card>
+    </v-dialog>
     <div v-if="isEdit">
       <v-img :src="displayDamyHeaderImg" :aspect-ratio="4"></v-img>
       <v-file-input
@@ -41,12 +51,25 @@
         <v-list-item-title v-else class="headline">{{displayFriendUserInfo.name}}</v-list-item-title>
       </v-list-item-content>
       <v-spacer></v-spacer>
-      <!-- フレンドリストからフレンドのプロフィールに行った場合は編集機能は非表示 -->
+      <!-- 相手ユーザーとのステータスの表示 -->
+      <div v-if="!isMypage" class="mr-3">
+        <div v-if="isFriend">友達</div>
+        <div v-else-if="isRequest">申請が来てる</div>
+        <div v-else-if="isSendRequest">申請中</div>
+      </div>
       <div v-if="isMypage">
         <v-btn v-if="isEdit" @click="save">保存</v-btn>
         <v-btn v-else @click="edit">編集</v-btn>
       </div>
-      <v-btn v-else @click="goChat()">チャット</v-btn>
+      <div v-else>
+        <v-btn v-if="isFriend" @click="goChat()">チャット</v-btn>
+        <div v-else-if="isRequest">
+          <v-btn class="mr-3" @click="acceptFriendRequest(0)">フレンドになる</v-btn>
+          <v-btn @click="rejectFriendRequest(1)">拒否</v-btn>
+        </div>
+        <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()">申請を取り消す</v-btn>
+        <v-btn v-else @click="sendFriendRequest()">フレンド申請</v-btn>
+      </div>
     </v-list-item>
     <v-card-text v-if="isEdit">
       <v-textarea
@@ -116,7 +139,11 @@ export default {
       displayDamyHeaderImg: "",
       displayAvatar: "",
       displayDemoAvatar: "",
-      displayFriendUserInfo: null
+      displayFriendUserInfo: null,
+      friendIdList: [],
+      sendFriendRequestNameList: [],
+      acceptFriendRequestModal: false,
+      rejectFriendRequestModal: false
     };
   },
   mounted() {
@@ -137,6 +164,7 @@ export default {
         this.user = doc.data();
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
+          //初期アバターのセット
           this.displayAvatar =
             "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8";
           db.collection("users")
@@ -144,6 +172,10 @@ export default {
             .set({
               id: this.$store.getters.user.uid,
               lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
+              //リスト系は入れておかないとフレンド検索でエラー吐いちゃう
+              sendFriendRequestNameList: [],
+              friendIdList: [],
+              //初期アバターのDB登録
               avatarUrl:
                 "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8"
             });
@@ -155,8 +187,11 @@ export default {
             this.displayUserName = doc.data().name;
           }
           this.displaySelfIntroduction = doc.data().selfIntroduction;
+          this.disId = doc.data().id;
           this.displayHeaderImg = doc.data().imageHeaderUrl;
           this.displayAvatar = doc.data().avatarUrl;
+          this.friendIdList = doc.data().friendIdList;
+          this.sendFriendRequestNameList = doc.data().sendFriendRequestNameList;
         }
       });
     // }, 3000);
@@ -172,8 +207,6 @@ export default {
         selfIntroduction: this.displaySelfIntroduction
       });
       const storageRef = firebase.storage().ref();
-      // eslint-disable-next-line no-console
-      console.log(storageRef);
 
       if (this.headerFile) {
         const imageRef = storageRef.child(
@@ -215,6 +248,139 @@ export default {
         params: { uid: this.$route.params["uid"] }
       });
     },
+    acceptFriendRequest(status) {
+      //ログイン中のユーザーのDBにフレンド追加
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        friends: firebase.firestore.FieldValue.arrayUnion(
+          users.doc(this.displayFriendUserInfo.id)
+        )
+      });
+      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+      users.doc(this.$store.getters.user.uid).update({
+        friendIdList: firebase.firestore.FieldValue.arrayUnion(
+          this.displayFriendUserInfo.id
+        )
+      });
+      //申請を投げていたユーザーのDBにフレンド追加
+      users.doc(this.displayFriendUserInfo.id).update({
+        friends: firebase.firestore.FieldValue.arrayUnion(
+          users.doc(this.$store.getters.user.uid)
+        )
+      });
+      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+      users.doc(this.displayFriendUserInfo.id).update({
+        friendIdList: firebase.firestore.FieldValue.arrayUnion(
+          this.$store.getters.user.uid
+        )
+      });
+      //以下申請の削除
+      this.rejectFriendRequest(status);
+    },
+    rejectFriendRequest(status) {
+      //申請先側
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          friendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.displayFriendUserInfo.avatarUrl,
+            id: this.displayFriendUserInfo.id,
+            userName: this.displayFriendUserInfo.name
+          })
+        });
+      //申請側
+      db.collection("users")
+        .doc(this.displayFriendUserInfo.id)
+        .update({
+          sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.displayAvatar,
+            friendId: this.disId,
+            friendName: this.displayUserName
+          })
+        });
+      db.collection("users")
+        .doc(this.displayFriendUserInfo.id)
+        .update({
+          sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
+            this.displayUserName
+          )
+        });
+      if (status == 0) {
+        this.acceptFriendRequestModal = true;
+        setTimeout(() => {
+          this.acceptFriendRequestModal = false;
+        }, 1500);
+        setTimeout(() => {
+          this.$router.go({
+            force: true
+          });
+        }, 2000);
+      } else {
+        this.rejectFriendRequestModal = true;
+        setTimeout(() => {
+          this.rejectFriendRequestModal = false;
+        }, 1500);
+        setTimeout(() => {
+          this.$router.go({
+            force: true
+          });
+        }, 2000);
+      }
+    },
+    cancelFriendRequest() {
+      //申請先側
+      db.collection("users")
+        .doc(this.displayFriendUserInfo.id)
+        .update({
+          friendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.displayAvatar,
+            id: this.disId,
+            userName: this.displayUserName
+          })
+        });
+      //申請側
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.displayFriendUserInfo.avatarUrl,
+            friendId: this.displayFriendUserInfo.id,
+            friendName: this.displayFriendUserInfo.name
+          })
+        });
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .update({
+          sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
+            this.displayFriendUserInfo.name
+          )
+        });
+    },
+    sendFriendRequest() {
+      //申請を申請相手のDBに保存する
+      const users = db.collection("users");
+      users.doc(this.displayFriendUserInfo.id).update({
+        friendRequestList: firebase.firestore.FieldValue.arrayUnion({
+          id: this.$store.getters.user.uid,
+          userName: this.displayUserName,
+          avatarUrl: this.displayAvatar
+        })
+      });
+      //申請したユーザーのDBに保存する（申請中ユーザー表示のため）
+      users.doc(this.$store.getters.user.uid).update({
+        sendFriendRequestList: firebase.firestore.FieldValue.arrayUnion({
+          friendId: this.displayFriendUserInfo.id,
+          friendName: this.displayFriendUserInfo.name,
+          avatarUrl: this.displayFriendUserInfo.avatarUrl
+        })
+      });
+      //申請した相手のユーザー名を申請したユーザーのDBに保存する（検索から除外するため）
+      users.doc(this.$store.getters.user.uid).update({
+        sendFriendRequestNameList: firebase.firestore.FieldValue.arrayUnion(
+          this.displayFriendUserInfo.name
+        )
+      });
+    },
     //編集中にアップした画像を一時的に表示
     desplayImg(file) {
       var blobUrl = window.URL.createObjectURL(file);
@@ -232,6 +398,34 @@ export default {
   computed: {
     isMypage: function() {
       if (this.$route.params["uid"] == undefined) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isFriend: function() {
+      if (this.friendIdList.includes(this.$route.params["uid"])) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isRequest: function() {
+      //sendFriendRequestNameListのままだとincludsが使えない
+      const arr = [];
+      this.displayFriendUserInfo.sendFriendRequestNameList.forEach(items => {
+        arr.push(items);
+      });
+      if (arr.includes(this.displayUserName)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isSendRequest: function() {
+      if (
+        this.sendFriendRequestNameList.includes(this.displayFriendUserInfo.name)
+      ) {
         return true;
       } else {
         return false;

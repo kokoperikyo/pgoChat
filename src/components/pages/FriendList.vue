@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" max-width="500">
+  <v-card class="mx-auto" max-width>
     <v-sheet class="pa-4 primary lighten-2">
       <v-text-field
         v-model="search"
@@ -21,8 +21,9 @@
         </template>
         <template v-slot:append="{ item }">
           <span class="mr-5">{{getLastLogin(item.lastLogin)}}</span>
-          <v-btn outlined @click="goProfile(item.id)">詳細</v-btn>
+          <v-btn outlined @click="goProfile(item.id)">プロフィール</v-btn>
           <v-btn outlined class="ml-2" @click="goChat(item.id)">チャット</v-btn>
+          <v-btn outlined dark class="ml-2 red" @click="deleteFriend(item.id)">削除</v-btn>
         </template>
       </v-treeview>
       <v-card class="mx-2 mt-5">
@@ -88,6 +89,27 @@ export default {
     },
     goChat(uid) {
       this.$router.push({ name: "chat", params: { uid: uid } });
+    },
+    deleteFriend(friendId) {
+      //ログイン中のユーザーのDB
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        friends: firebase.firestore.FieldValue.arrayRemove(users.doc(friendId))
+      });
+      users.doc(this.$store.getters.user.uid).update({
+        friendIdList: firebase.firestore.FieldValue.arrayRemove(friendId)
+      });
+      //フレンドのDB
+      users.doc(friendId).update({
+        friends: firebase.firestore.FieldValue.arrayRemove(
+          users.doc(this.$store.getters.user.uid)
+        )
+      });
+      users.doc(friendId).update({
+        friendIdList: firebase.firestore.FieldValue.arrayRemove(
+          this.$store.getters.user.uid
+        )
+      });
     }
   },
   computed: {
