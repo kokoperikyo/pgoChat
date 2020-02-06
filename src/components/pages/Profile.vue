@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="1000" class="mx-auto">
+  <v-card max-width="1000">
     <v-dialog v-model="acceptFriendRequestModal" max-width="350">
       <v-card min-height="250">
         <v-card-title class="headline">フレンドになりました！</v-card-title>
@@ -37,8 +37,10 @@
           ></v-file-input>
         </div>
         <div v-else>
-          <v-img v-if="isMypage" :src="displayAvatar"></v-img>
-          <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+          <v-avatar>
+            <v-img v-if="isMypage" :src="displayAvatar"></v-img>
+            <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+          </v-avatar>
         </div>
       </v-list-item-avatar>
       <v-list-item-content v-if="isEdit">

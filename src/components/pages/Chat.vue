@@ -1,45 +1,114 @@
 <template>
   <v-app>
     <v-container>
-      <v-card class="mx-auto" max-width="1100px">
+      <v-btn @click="te">aa</v-btn>
+      <v-dialog v-model="editingModal" class="mx-auto">
+        <v-card class="mx-auto">
+          <v-container>
+            <v-row>
+              <v-textarea
+                rows="1"
+                auto-grow
+                clearable
+                clear-icon="cancel"
+                v-model="editMes"
+                outlined
+                row-height="10"
+                background-color="#f5a37d"
+              ></v-textarea>
+              <v-btn @click="updateMes" class="ml-3">更新</v-btn>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-dialog>
+
+      <v-card max-width="1100px" class="mx-auto" id="chatCard">
         <v-toolbar color="gray" dark>
           <v-spacer></v-spacer>
           <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
-        <v-list disabled>
-          <v-list-item v-for="(message, i) in messages" :key="i">
-            <v-list-item-avatar v-if="isOthersMessage(message.ref)">
-              <v-img :src="chatUser.avatarUrl"></v-img>
-            </v-list-item-avatar>
-            <v-list-item-content
-              v-if="isOthersMessage(message.ref)"
-              :style="{ 'margin-right': getMarginRight(message.message)}"
-              :class="{ 'other_message': isOthersMessage(message.ref) }"
-              class="mt-2"
-            >
-              <v-list-item-title
-                style="white-space:pre-wrap;"
-                v-text="message.message"
-                class="pl-5"
-              ></v-list-item-title>
-            </v-list-item-content>
-            <v-spacer></v-spacer>
-            <div
-              v-if="!isOthersMessage(message.ref)"
-              style="white-space:pre-wrap; "
-              class="my_message px-5 py-2 mt-2"
-            >{{message.message}}</div>
-          </v-list-item>
-        </v-list>
-        <v-row>
-          <v-col cols="10">
-            <v-textarea clearable clear-icon="cancel" v-model="inputMessage"></v-textarea>
-          </v-col>
-          <v-col cols="1">
-            <v-btn @click="regMessage" :disabled="canSend">送信</v-btn>
-          </v-col>
-        </v-row>
+        <v-card class="overflow-y-auto scroll" style="max-height: 400px">
+          <v-list color="#FFFAFA">
+            <v-list-item style="white-space:pre-wrap; " v-for="(message, i) in messages" :key="i">
+              <v-list-item-avatar v-if="isOthersMessage(message.ref)">
+                <v-img :src="chatUser.avatarUrl"></v-img>
+              </v-list-item-avatar>
+              <div
+                v-if="isOthersMessage(message.ref)"
+                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+                class="other_message px-5 py-2"
+              >{{message.message}}</div>
+              <div
+                v-if="isOthersMessage(message.ref)"
+                class="display-get-time"
+              >{{displaySendTime(message.createdAt)}}</div>
+              <v-spacer></v-spacer>
+              <div
+                v-if="!isOthersMessage(message.ref)"
+                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+                class="my_message px-5 pt-2"
+              >
+                {{message.message}}
+                <div class="display-send-time">{{displaySendTime(message.createdAt)}}</div>
+              </div>
+              <div v-if="!editStatus">
+                <v-btn
+                  v-if="!isOthersMessage(message.ref)"
+                  @click="editMesAction(message.message,message.uid)"
+                  class="ml-3"
+                  outlined
+                  x-small
+                  fab
+                  color="indigo"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="!isOthersMessage(message.ref)"
+                  @click="deleteMesAction(message.uid)"
+                  class="ml-1"
+                  outlined
+                  x-small
+                  fab
+                  color="error"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </div>
+              <div
+                v-if="isFristMes(message.createdAt,i)"
+                class="first-mes-position"
+                :style="{right: getChatCardWidth + 'px' }"
+              >{{firstMes(message.createdAt)}}</div>
+            </v-list-item>
+          </v-list>
+        </v-card>
+        <v-card color="#C0C0C0">
+          <v-row>
+            <v-col cols="10">
+              <v-textarea
+                class="ml-2 mt-5"
+                ml-2
+                rows="1"
+                auto-grow
+                clearable
+                clear-icon="cancel"
+                v-model="inputMessage"
+                background-color="white"
+                outlined
+                row-height="10"
+              ></v-textarea>
+            </v-col>
+            <v-col cols="1" class="mt-5">
+              <v-btn v-if="!canSend" @click="regMessage">送信</v-btn>
+              <div v-else>
+                <v-btn v-if="editStatus" @click="editStatus = false">編集</v-btn>
+                <v-btn v-else @click="editStatus = true,editingModal = false">完了</v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card>
       </v-card>
     </v-container>
   </v-app>
@@ -49,14 +118,19 @@
 import { db } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
+import { format } from "date-fns";
 
 export default {
   data() {
     return {
+      chatCardWidth: 0,
       messages: [],
       inputMessage: "",
       chatUser: "",
-      test: "600px"
+      editMes: "",
+      mesUid: "",
+      editStatus: true,
+      editingModal: false
     };
   },
   computed: {
@@ -66,6 +140,10 @@ export default {
       } else {
         return true;
       }
+    },
+    getChatCardWidth: function() {
+      //80っのはfirst-mes-positionで定義してある
+      return (this.chatCardWidth - 80) / 2;
     }
   },
   methods: {
@@ -77,13 +155,21 @@ export default {
       }
     },
     regMessage() {
+      var len = 12;
+      var str = "abcdefghijklmnopqrstuvwxyz";
+      var strLen = str.length;
+      var result = "";
+      for (var i = 0; i < len; i++) {
+        result += str[Math.floor(Math.random() * strLen)];
+      }
       db.collection("users")
         .doc(this.$store.getters.user.uid)
         .collection("messages")
         .add({
           message: this.inputMessage,
           ref: this.$route.params["uid"],
-          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          uid: result
         });
       db.collection("users")
         .doc(this.$route.params["uid"])
@@ -91,67 +177,140 @@ export default {
         .add({
           message: this.inputMessage,
           ref: this.$route.params["uid"] + this.$store.getters.user.uid,
-          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          uid: result
         });
       this.inputMessage = "";
+      setTimeout(() => {
+        this.scrollToEnd();
+      }, 100);
     },
-    getMarginRight(message) {
-      const spaceIndexNumberList = [];
-      const mesLengthList = [];
-      var lastRowMes = 0;
-      // var messageLength = 0;
-
-      // const chatWidth = 1100;
-      // const avatarAndPad = 80;
-      // const mesLeftPad = 20;
-      // var paddingRight = 0;
-
-      if (message.includes("\n")) {
-        Array.prototype.forEach.call(message, function(str, index) {
-          if (str.includes("\n")) {
-            spaceIndexNumberList.push(index);
-          }
+    scrollToEnd() {
+      var container = document.querySelector(".scroll");
+      var scrollHeight = container.scrollHeight;
+      container.scrollTop = scrollHeight;
+    },
+    displaySendTime(date) {
+      return format(new Date(date.toDate()), "HH:mm");
+    },
+    editMesAction(mes, uid) {
+      this.editMes = mes;
+      this.mesUid = uid;
+      this.editingModal = true;
+    },
+    updateMes() {
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("messages")
+        .where("uid", "==", this.mesUid)
+        .get()
+        .then(doc => {
+          var editingMesMyDocId;
+          editingMesMyDocId = doc.docs[0].id;
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("messages")
+            .doc(editingMesMyDocId)
+            .update({
+              message: this.editMes,
+              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
+            });
         });
-        spaceIndexNumberList.forEach((items, index) => {
-          // eslint-disable-next-line no-console
-          console.log(spaceIndexNumberList);
-
-          if (index == 0) {
-            mesLengthList.push(items);
-            // eslint-disable-next-line no-console
-            console.log(items);
-          } else {
-            mesLengthList.push(
-              spaceIndexNumberList[index] - spaceIndexNumberList[index - 1] - 1
-            );
-            lastRowMes = message.length - spaceIndexNumberList[index] - 1;
-            mesLengthList.push(lastRowMes);
-          }
+      db.collection("users")
+        .doc(this.$route.params["uid"])
+        .collection("messages")
+        .where("uid", "==", this.mesUid)
+        .get()
+        .then(doc => {
+          var editingMesOtherDocId;
+          editingMesOtherDocId = doc.docs[0].id;
+          db.collection("users")
+            .doc(this.$route.params["uid"])
+            .collection("messages")
+            .doc(editingMesOtherDocId)
+            .update({
+              message: this.editMes,
+              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
+            });
         });
-        // eslint-disable-next-line no-console
-        // console.log(mesLengthList);
-        // messageLength = Math.max.apply(null, mesLengthList);
-      } else {
-        // messageLength = message.length;
+      this.editingModal = false;
+    },
+    deleteMesAction(uid) {
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("messages")
+        .where("uid", "==", uid)
+        .get()
+        .then(doc => {
+          var editingMesMyDocId;
+          editingMesMyDocId = doc.docs[0].id;
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("messages")
+            .doc(editingMesMyDocId)
+            .delete();
+        });
+      db.collection("users")
+        .doc(this.$route.params["uid"])
+        .collection("messages")
+        .where("uid", "==", uid)
+        .get()
+        .then(doc => {
+          var editingMesOtherDocId;
+          editingMesOtherDocId = doc.docs[0].id;
+          db.collection("users")
+            .doc(this.$route.params["uid"])
+            .collection("messages")
+            .doc(editingMesOtherDocId)
+            .delete();
+        });
+    },
+    isFristMes(date, i) {
+      if (i != 0) {
+        const thisTimeDate = date.toDate().getDate();
+        const oneBeforeTimeDate = this.messages[i - 1].createdAt
+          .toDate()
+          .getDate();
+        if (thisTimeDate - oneBeforeTimeDate == 0) {
+          return false;
+        } else {
+          return true;
+        }
       }
-
-      // ここのかける１７について
-      // 全角文字が１文字１６.５くらい
-      // 本来なら半角と全角も厳密に判定するべし
-      // paddingRight =
-      // chatWidth - avatarAndPad - mesLeftPad * 3 - messageLength * 16.8;
-
-      return 100 + "px";
+      return false;
+    },
+    firstMes(date) {
+      const weekArray = ["", "日", "月", "火", "水", "木", "金", "土"];
+      const today = new Date().getDate();
+      if (today - date.toDate().getDate() == 1) {
+        return "昨日";
+      } else {
+        return (
+          format(new Date(date.toDate()), "M/d") +
+          "(" +
+          weekArray[format(new Date(date.toDate()), "c")] +
+          ")"
+        );
+      }
+    },
+    adjustFirstMesPosition() {
+      this.chatCardWidth = document.getElementById("chatCard").clientWidth;
     }
   },
   mounted() {
+    this.chatCardWidth = document.getElementById("chatCard").clientWidth;
+    window.addEventListener("resize", this.adjustFirstMesPosition);
     //最終ログインを更新
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .update({
         lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
       });
+    setTimeout(() => {
+      this.scrollToEnd();
+    }, 1000);
   },
+
   firestore() {
     return {
       messages: db
@@ -169,9 +328,6 @@ export default {
 };
 </script>
 <style>
-/* :root {
-  --padding-right: 200px;
-} */
 .other_message {
   background: #6cfcfc;
   border: 1px solid;
@@ -182,6 +338,37 @@ export default {
   background: #f5a37d;
   border: 1px solid;
   /* border-color: white; */
-  border-radius: 10px 0px 10px 10px; /*左下だけ尖らせて吹き出し感を出す*/
+  border-radius: 10px 0px 10px 10px;
+  /*左下だけ尖らせて吹き出し感を出す*/
+}
+.submit-area {
+  border: 1px solid;
+}
+.display-send-time {
+  position: relative;
+  right: 70px;
+}
+.display-get-time {
+  position: relative;
+  top: 20px;
+  left: 15px;
+}
+.editBtn {
+  border: 3px solid;
+  color: red;
+}
+.first-mes-position {
+  position: absolute;
+  bottom: 74px;
+  font-size: 12px;
+  width: 80px;
+  /* background-color: #6cfcfc; */
+  text-align: center;
+}
+.firstMesMargin {
+  margin-top: 70px;
+}
+.notFirstMesMargin {
+  margin-top: 10px;
 }
 </style>

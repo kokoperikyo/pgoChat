@@ -1,20 +1,30 @@
 <template>
-  <v-row justify="center">
-    <v-btn color="primary" dark @click.stop="dialog = true">Open Dialog</v-btn>
-
-    <v-dialog v-model="dialog" max-width="290">
-      <v-card>
-        <v-card-title class="headline">Use Google's location service?</v-card-title>
-      </v-card>
-    </v-dialog>
-  </v-row>
+  <div>
+    <p>window width: {{ width }}</p>
+    <p>window height: {{ height }}</p>
+  </div>
 </template>
+
 <script>
 export default {
-  data() {
+  data: function() {
     return {
-      dialog: false
+      width: window.innerWidth,
+      height: window.innerHeight
     };
+  },
+  methods: {
+    handleResize: function() {
+      // resizeのたびにこいつが発火するので、ここでやりたいことをやる
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+    }
+  },
+  mounted: function() {
+    window.addEventListener("resize", this.handleResize);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener("resize", this.handleResize);
   }
 };
 </script>
