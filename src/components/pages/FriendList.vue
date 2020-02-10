@@ -1,34 +1,67 @@
 <template>
-  <v-card class="mx-auto" max-width>
-    <v-sheet class="pa-4 primary lighten-2">
-      <v-text-field
-        v-model="search"
-        dense
-        hide-details
-        clearable
-        clear-icon="mdi-close-circle"
-        background-color="white"
-      ></v-text-field>
-      <v-checkbox v-model="caseSensitive" dark hide-details label="完全一致検索"></v-checkbox>
-    </v-sheet>
-    <v-list>
-      <v-treeview :items="friendList.friends" :search="search" :filter="filter">
-        <template v-slot:prepend="{ item }">
-          <v-list-item-avatar size="10" :color="isOnline(item.lastLogin) ? '#04F620' : 'grey'"></v-list-item-avatar>
-          <v-list-item-avatar class="mr-5">
-            <v-img :src="item.avatarUrl"></v-img>
-          </v-list-item-avatar>
-        </template>
-        <template v-slot:append="{ item }">
-          <span class="mr-5">{{getLastLogin(item.lastLogin)}}</span>
-          <v-btn outlined @click="goProfile(item.id)">プロフィール</v-btn>
-          <v-btn outlined class="ml-2" @click="goChat(item.id)">チャット</v-btn>
-          <v-btn outlined dark class="ml-2 red" @click="deleteFriend(item.id)">削除</v-btn>
-        </template>
-      </v-treeview>
-      <v-card class="mx-2 mt-5">
-        <v-btn block outlined color="light-blue" dark to="/friendSearch">新しいフレンドを探す</v-btn>
+  <v-card class="mx-auto" tile>
+    <v-dialog v-model="addNicknameModal" max-width="350">
+      <v-card>
+        <v-card-title class="headline">
+          <div>ニックネームを入力</div>
+          <v-text-field v-model="inputNickname"></v-text-field>
+          <v-btn @click="addNickname()">登録</v-btn>
+        </v-card-title>
       </v-card>
+    </v-dialog>
+    <v-dialog v-model="editNicknameModal" max-width="350">
+      <v-card>
+        <v-card-title class="headline">
+          <div>ニックネームを編集</div>
+          <v-text-field v-model="inputEditNickname"></v-text-field>
+          <v-btn @click="editNickname()">更新</v-btn>
+        </v-card-title>
+      </v-card>
+    </v-dialog>
+    <v-list>
+      <v-list-item v-for="(friendList, i) in friendLists.friends" :key="i">
+        <v-list-item-avatar size="10" :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"></v-list-item-avatar>
+        <v-list-item-avatar class="mr-5">
+          <v-img :src="friendList.avatarUrl"></v-img>
+        </v-list-item-avatar>
+        <div class="mr-2">{{friendList.name}}</div>
+
+        <v-tooltip right v-if="isNickNameExist(friendList.nicknameList)">
+          <template v-slot:activator="{ on }">
+            <v-btn
+              @click="addNicknameModalDis(friendList.id)"
+              v-on="on"
+              x-small
+              fab
+              dark
+              color="primary"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>ニックネームを追加できます</span>
+        </v-tooltip>
+        <div v-else>
+          ({{getNickname(friendList.nicknameList)}})
+          <v-btn
+            @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
+            x-small
+            fab
+            dark
+            color="primary"
+          >
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </div>
+        <v-spacer></v-spacer>
+        <div
+          class="mr-5"
+          style="width:162px; text-align:center;"
+        >{{getLastLogin(friendList.lastLogin)}}</div>
+        <v-btn outlined @click="goProfile(friendList.id)" class="mr-2">プロフィール</v-btn>
+        <v-btn outlined @click="goChat(friendList.id)" class="mr-2">チャット</v-btn>
+        <v-btn @click="deleteFriend(friendList.id)" class="red" dark>削除</v-btn>
+      </v-list-item>
     </v-list>
   </v-card>
 </template>
@@ -39,11 +72,17 @@ import "@firebase/firestore";
 
 export default {
   data: () => ({
-    friendIdList: [],
+    friendIdLists: [],
     items: [],
     search: null,
     caseSensitive: false,
-    friendList: Object
+    friendLists: Object,
+    friendId: null,
+    addNicknameModal: false,
+    editNicknameModal: false,
+    inputNickname: null,
+    inputEditNickname: null,
+    beforeNickname: null
   }),
   mounted() {
     //最終ログインを更新
@@ -52,7 +91,6 @@ export default {
       .update({
         lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
       });
-    //ふれんどのuidをリストに保存
   },
   methods: {
     getLastLogin: function(loginDate) {
@@ -110,6 +148,60 @@ export default {
           this.$store.getters.user.uid
         )
       });
+    },
+    addNicknameModalDis(friendId) {
+      this.addNicknameModal = true;
+      this.friendId = friendId;
+    },
+    editNicknameModalDis(friendId, beforeNickname) {
+      this.editNicknameModal = true;
+      this.friendId = friendId;
+      this.beforeNickname = beforeNickname;
+      this.inputEditNickname = beforeNickname;
+    },
+    addNickname() {
+      db.collection("users")
+        .doc(this.friendId)
+        .update({
+          nicknameList: firebase.firestore.FieldValue.arrayUnion({
+            nickname: this.inputNickname,
+            ref: this.$store.getters.user.uid
+          })
+        });
+      this.addNicknameModal = false;
+    },
+    editNickname() {
+      const user = db.collection("users").doc(this.friendId);
+      user.update({
+        nicknameList: firebase.firestore.FieldValue.arrayUnion({
+          nickname: this.inputEditNickname,
+          ref: this.$store.getters.user.uid
+        })
+      });
+      user.update({
+        nicknameList: firebase.firestore.FieldValue.arrayRemove({
+          nickname: this.beforeNickname,
+          ref: this.$store.getters.user.uid
+        })
+      });
+      this.editNicknameModal = false;
+    },
+    getNickname(nicknameList) {
+      if (nicknameList.length != 0) {
+        const target = nicknameList.find(items => {
+          return items.ref === this.$store.getters.user.uid;
+        });
+        if (target != undefined) {
+          return target.nickname;
+        }
+      }
+    },
+    isNickNameExist(nicknameList) {
+      if (nicknameList.length != 0) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
   computed: {
@@ -121,8 +213,10 @@ export default {
   },
   firestore() {
     return {
-      friendList: db.collection("users").doc(this.$store.getters.user.uid)
+      friendLists: db.collection("users").doc(this.$store.getters.user.uid)
     };
   }
 };
 </script>
+<style>
+</style>

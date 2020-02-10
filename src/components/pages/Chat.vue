@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <v-container>
-      <v-btn @click="te">aa</v-btn>
       <v-dialog v-model="editingModal" class="mx-auto">
         <v-card class="mx-auto">
           <v-container>
@@ -56,6 +55,7 @@
                 <v-btn
                   v-if="!isOthersMessage(message.ref)"
                   @click="editMesAction(message.message,message.uid)"
+                  :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
                   class="ml-3"
                   outlined
                   x-small
@@ -67,6 +67,7 @@
                 <v-btn
                   v-if="!isOthersMessage(message.ref)"
                   @click="deleteMesAction(message.uid)"
+                  :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
                   class="ml-1"
                   outlined
                   x-small
@@ -80,7 +81,12 @@
                 v-if="isFristMes(message.createdAt,i)"
                 class="first-mes-position"
                 :style="{right: getChatCardWidth + 'px' }"
-              >{{firstMes(message.createdAt)}}</div>
+              >{{firstMes(message.createdAt,i)}}</div>
+              <div
+                v-else-if="i == 0"
+                class="first-first-mes-position"
+                :style="{right: getChatCardWidth + 'px' }"
+              >{{firstMes(message.createdAt,i)}}</div>
             </v-list-item>
           </v-list>
         </v-card>
@@ -279,10 +285,17 @@ export default {
       }
       return false;
     },
-    firstMes(date) {
+    firstMes(date, i) {
       const weekArray = ["", "日", "月", "火", "水", "木", "金", "土"];
       const today = new Date().getDate();
-      if (today - date.toDate().getDate() == 1) {
+      if (i == 0) {
+        return (
+          format(new Date(date.toDate()), "M/d") +
+          "(" +
+          weekArray[format(new Date(date.toDate()), "c")] +
+          ")"
+        );
+      } else if (today - date.toDate().getDate() == 1) {
         return "昨日";
       } else {
         return (
@@ -362,7 +375,13 @@ export default {
   bottom: 74px;
   font-size: 12px;
   width: 80px;
-  /* background-color: #6cfcfc; */
+  text-align: center;
+}
+.first-first-mes-position {
+  position: absolute;
+  bottom: 50px;
+  font-size: 12px;
+  width: 80px;
   text-align: center;
 }
 .firstMesMargin {

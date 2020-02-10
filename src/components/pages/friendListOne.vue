@@ -20,7 +20,7 @@
           </v-list-item-avatar>
         </template>
         <template v-slot:append="{ item }">
-          <div class="mr-5">{{getLastLogin(item.lastLogin)}}</div>
+          <di class="mr-5">{{getLastLogin(item.lastLogin)}}</di>
           <v-btn outlined @click="goProfile(item.id)">プロフィール</v-btn>
           <v-btn outlined class="ml-2" @click="goChat(item.id)">チャット</v-btn>
           <v-btn outlined dark class="ml-2 red" @click="deleteFriend(item.id)">削除</v-btn>
