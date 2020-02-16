@@ -33,7 +33,8 @@
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-list>
-        <v-list-item v-for="(sendFriendRequest, i) in user.sendFriendRequestList" :key="i">
+        <div v-if="user.sendFriendRequestList.length == 0">申請中のユーザーはいません</div>
+        <v-list-item v-else v-for="(sendFriendRequest, i) in user.sendFriendRequestList" :key="i">
           <v-list-item-avatar>
             <v-img :src="sendFriendRequest.avatarUrl"></v-img>
           </v-list-item-avatar>

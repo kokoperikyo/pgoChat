@@ -4,7 +4,13 @@
       <v-card>
         <v-card-title class="headline">
           <div>ニックネームを入力</div>
-          <v-text-field v-model="inputNickname"></v-text-field>
+          <v-text-field
+            @keydown.enter="addNicknameByEnter"
+            v-model="inputNickname"
+            class="mr-2"
+            clearable
+            clear-icon="cancel"
+          ></v-text-field>
           <v-btn @click="addNickname()">登録</v-btn>
         </v-card-title>
       </v-card>
@@ -13,20 +19,35 @@
       <v-card>
         <v-card-title class="headline">
           <div>ニックネームを編集</div>
-          <v-text-field v-model="inputEditNickname"></v-text-field>
+          <v-text-field
+            @keydown.enter="editNicknameByEnter"
+            v-model="inputEditNickname"
+            class="mr-2"
+            clearable
+            clear-icon="cancel"
+          ></v-text-field>
           <v-btn @click="editNickname()">更新</v-btn>
         </v-card-title>
       </v-card>
     </v-dialog>
+    <v-toolbar color="light-blue" dark>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>フレンドリスト</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+    </v-toolbar>
     <v-list>
-      <v-list-item v-for="(friendList, i) in friendLists.friends" :key="i">
+      <div v-if="friendLists.friends.length == 0">フレンドはいません</div>
+      <v-list-item v-else v-for="(friendList, i) in friendLists.friends" :key="i">
         <v-list-item-avatar size="10" :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"></v-list-item-avatar>
         <v-list-item-avatar class="mr-5">
           <v-img :src="friendList.avatarUrl"></v-img>
         </v-list-item-avatar>
         <div class="mr-2">{{friendList.name}}</div>
 
-        <v-tooltip right v-if="isNickNameExist(friendList.nicknameList)">
+        <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
           <template v-slot:activator="{ on }">
             <v-btn
               @click="addNicknameModalDis(friendList.id)"
@@ -35,6 +56,7 @@
               fab
               dark
               color="primary"
+              class="ml-1"
             >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
@@ -49,6 +71,7 @@
             fab
             dark
             color="primary"
+            class="ml-1"
           >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
@@ -56,11 +79,17 @@
         <v-spacer></v-spacer>
         <div
           class="mr-5"
-          style="width:162px; text-align:center;"
+          style="width:80px; text-align:center;"
         >{{getLastLogin(friendList.lastLogin)}}</div>
-        <v-btn outlined @click="goProfile(friendList.id)" class="mr-2">プロフィール</v-btn>
-        <v-btn outlined @click="goChat(friendList.id)" class="mr-2">チャット</v-btn>
-        <v-btn @click="deleteFriend(friendList.id)" class="red" dark>削除</v-btn>
+        <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
+          <v-icon>mdi-shield-account-outline</v-icon>
+        </v-btn>
+        <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
+          <v-icon>mdi-chat-processing-outline</v-icon>
+        </v-btn>
+        <v-btn @click="deleteFriend(friendList.id)" class="red" small dark fab>
+          <v-icon>mdi-trash-can-outline</v-icon>
+        </v-btn>
       </v-list-item>
     </v-list>
   </v-card>
@@ -196,12 +225,24 @@ export default {
         }
       }
     },
-    isNickNameExist(nicknameList) {
-      if (nicknameList.length != 0) {
-        return false;
-      } else {
+    isNickNameExist(nickname) {
+      if (nickname == undefined) {
         return true;
+      } else {
+        return false;
       }
+    },
+    addNicknameByEnter() {
+      // 日本語入力中のEnterキー操作は無効にする
+      if (event.keyCode !== 13) return;
+
+      this.addNickname();
+    },
+    editNicknameByEnter() {
+      // 日本語入力中のEnterキー操作は無効にする
+      if (event.keyCode !== 13) return;
+
+      this.editNickname();
     }
   },
   computed: {

@@ -3,8 +3,6 @@ import VueRouter from 'vue-router'
 import firebase from "@firebase/app";
 import SignUp from '../components/pages/SignUp.vue'
 import SignIn from '../components/pages/SignIn.vue'
-import SignInEmail from '../components/pages/SignInEmail.vue'
-import SignUpEmail from '../components/pages/SignUpEmail.vue'
 import Test from '../components/Test.vue'
 import TestTwo from '../components/TestTwo.vue'
 import Profile from '../components/pages/Profile.vue'
@@ -27,17 +25,6 @@ const routes = [{
     path: '/signIn',
     name: 'signIn',
     component: SignIn
-  },
-  {
-    path: '/signInEmail',
-    name: 'signInEmail',
-    component: SignInEmail
-  },
-  {
-    path: '/signUpEmail',
-    name: 'signUpEmail',
-    component: SignUpEmail
-
   },
   {
     path: '/test',

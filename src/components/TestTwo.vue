@@ -1,68 +1,119 @@
 <template>
-  <div>
-    <div id="file_upload">
-      <div class="form-group uploadForm">
-        <input type="file" class="form-control" @change="selectFile" />
-        <button type="submit" class="btn btn-outline-success" v-on:click="upload">登録</button>
-        <div id="errArea">{{ infoMsg }}</div>
-      </div>
-    </div>
-  </div>
+  <v-app>
+    <v-content>
+      <v-container>
+        <v-card color="#ECEFF1" class="mx-auto" max-width="400px">
+          <v-list-item>
+            <v-spacer></v-spacer>
+            <div class="mt-3">
+              <v-btn fab class="mr-2" color="#01579B">
+                <v-icon large color="white" class="fab fa-facebook-square" @click="test"></v-icon>
+              </v-btn>
+              <v-btn fab class="mr-2" color="error">
+                <v-icon large color="white" class="fab fa-google-plus-square" @click="test"></v-icon>
+              </v-btn>
+              <v-btn fab color="primary">
+                <v-icon large color="white" class="fab fa-twitter-square" @click="test"></v-icon>
+              </v-btn>
+            </div>
+            <v-spacer></v-spacer>
+          </v-list-item>
+          <v-card-text>
+            <v-form>
+              <v-text-field
+                v-model="email"
+                :error-messages="emailErrors"
+                prepend-inner-icon="mail"
+                placeholder="E-mail"
+                solo
+                required
+                @input="$v.email.$touch()"
+                @blur="$v.email.$touch()"
+                background-color="white"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                :error-messages="passwordErrors"
+                :counter="10"
+                prepend-inner-icon="lock"
+                placeholder="password"
+                solo
+                required
+                @input="$v.password.$touch()"
+                @blur="$v.password.$touch()"
+                background-color="white"
+                clearable
+              ></v-text-field>
+            </v-form>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" @click="signIn">ログイン</v-btn>
+            </v-card-actions>
+          </v-card-text>
+          <v-divider></v-divider>
+          <div class="mb-3">
+            <v-list-item>
+              <v-spacer></v-spacer>初めての方
+              <v-btn color="primary" @click="goSignUp">新規登録</v-btn>
+            </v-list-item>
+          </div>
+          <v-divider></v-divider>
+        </v-card>
+      </v-container>
+    </v-content>
+  </v-app>
 </template>
 <script>
-//このdamyは実際には使用しない、ここで呼んでおかないと
-import damy from "@firebase/storage";
+import { validationMixin } from "vuelidate";
+import { required, minLength, email } from "vuelidate/lib/validators";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
+
 export default {
-  data: () => ({
-    uploadFile: null,
-    infoMsg: null
-  }),
-  mounted() {
-    // setTimeout(() => {
-    // eslint-disable-next-line no-console
-    console.log(
-      firebase
-        .storage()
-        .ref()
-        .child("tmp/IMG_1724.jpg")
-    );
-    // eslint-disable-next-line no-console
-    console.log(damy.storage().ref());
-    // }, 3000);
+  mixins: [validationMixin],
+
+  validations: {
+    password: { required, maxLength: minLength(6) },
+    email: { required, email }
   },
-  methods: {
-    selectFile: function(e) {
-      e.preventDefault();
-      let files = e.target.files;
-      this.uploadFile = files[0];
-      // eslint-disable-next-line no-console
-      console.log(this.uploadFile);
+
+  data: () => ({
+    email: "",
+    password: ""
+  }),
+
+  computed: {
+    passwordErrors() {
+      const errors = [];
+      if (!this.$v.password.$dirty) return errors;
+      !this.$v.password.maxLength && errors.push("パスワードは6文字以上です");
+      !this.$v.password.required && errors.push("パスワードは必須です");
+      return errors;
     },
-    upload: function() {
-      if (!this.uploadFile) {
-        this.infoMsg = "選択してください";
-        return;
-      }
-      var storageRef = firebase
-        .storage()
-        .ref()
-        .child("tmp/" + this.uploadFile.name);
-      storageRef.put(this.uploadFile).then(function(snapshot) {
-        // eslint-disable-next-line no-console
-        console.log(snapshot);
-      });
+    emailErrors() {
+      const errors = [];
+      if (!this.$v.email.$dirty) return errors;
+      !this.$v.email.email && errors.push("メールアドレスを入力してください");
+      !this.$v.email.required && errors.push("メールアドレスは必須です");
+      return errors;
+    }
+  },
+
+  methods: {
+    signIn: function() {
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(this.email, this.password)
+        .then(() => {
+          this.$router.push("/profile");
+        })
+        .catch(error => {
+          alert(error.message);
+        });
     }
   }
-  // methods: {
-  //   a: function() {
-  //     // eslint-disable-next-line no-console
-  //     console.log(firebase.storage().ref().bucket);
-  //     const storageRef = firebase.storage().ref();
-  //     const imageRef = storageRef.child("uid");
-  //     imageRef.put("IMG_1724.jpg");
-  //   }
-  // }
 };
 </script>
+<style>
+</style>

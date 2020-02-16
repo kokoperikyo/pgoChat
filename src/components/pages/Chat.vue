@@ -1,123 +1,118 @@
 <template>
-  <v-app>
-    <v-container>
-      <v-dialog v-model="editingModal" class="mx-auto">
-        <v-card class="mx-auto">
-          <v-container>
-            <v-row>
-              <v-textarea
-                rows="1"
-                auto-grow
-                clearable
-                clear-icon="cancel"
-                v-model="editMes"
-                outlined
-                row-height="10"
-                background-color="#f5a37d"
-              ></v-textarea>
-              <v-btn @click="updateMes" class="ml-3">更新</v-btn>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-dialog>
-
-      <v-card max-width="1100px" class="mx-auto" id="chatCard">
-        <v-toolbar color="gray" dark>
-          <v-spacer></v-spacer>
-          <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-card class="overflow-y-auto scroll" style="max-height: 400px">
-          <v-list color="#FFFAFA">
-            <v-list-item style="white-space:pre-wrap; " v-for="(message, i) in messages" :key="i">
-              <v-list-item-avatar v-if="isOthersMessage(message.ref)">
-                <v-img :src="chatUser.avatarUrl"></v-img>
-              </v-list-item-avatar>
-              <div
-                v-if="isOthersMessage(message.ref)"
-                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                class="other_message px-5 py-2"
-              >{{message.message}}</div>
-              <div
-                v-if="isOthersMessage(message.ref)"
-                class="display-get-time"
-              >{{displaySendTime(message.createdAt)}}</div>
-              <v-spacer></v-spacer>
-              <div
-                v-if="!isOthersMessage(message.ref)"
-                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                class="my_message px-5 pt-2"
-              >
-                {{message.message}}
-                <div class="display-send-time">{{displaySendTime(message.createdAt)}}</div>
-              </div>
-              <div v-if="!editStatus">
-                <v-btn
-                  v-if="!isOthersMessage(message.ref)"
-                  @click="editMesAction(message.message,message.uid)"
-                  :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                  class="ml-3"
-                  outlined
-                  x-small
-                  fab
-                  color="indigo"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn
-                  v-if="!isOthersMessage(message.ref)"
-                  @click="deleteMesAction(message.uid)"
-                  :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                  class="ml-1"
-                  outlined
-                  x-small
-                  fab
-                  color="error"
-                >
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </div>
-              <div
-                v-if="isFristMes(message.createdAt,i)"
-                class="first-mes-position"
-                :style="{right: getChatCardWidth + 'px' }"
-              >{{firstMes(message.createdAt,i)}}</div>
-              <div
-                v-else-if="i == 0"
-                class="first-first-mes-position"
-                :style="{right: getChatCardWidth + 'px' }"
-              >{{firstMes(message.createdAt,i)}}</div>
-            </v-list-item>
-          </v-list>
-        </v-card>
-        <v-card color="#C0C0C0">
+  <div>
+    <v-dialog v-model="editingModal" class="mx-auto">
+      <v-card class="mx-auto">
+        <v-container>
           <v-row>
-            <v-col cols="10">
-              <v-textarea
-                class="ml-2 mt-5"
-                ml-2
-                rows="1"
-                auto-grow
-                clearable
-                clear-icon="cancel"
-                v-model="inputMessage"
-                background-color="white"
-                outlined
-                row-height="10"
-              ></v-textarea>
-            </v-col>
-            <v-col cols="1" class="mt-5">
-              <v-btn v-if="!canSend" @click="regMessage">送信</v-btn>
-              <div v-else>
-                <v-btn v-if="editStatus" @click="editStatus = false">編集</v-btn>
-                <v-btn v-else @click="editStatus = true,editingModal = false">完了</v-btn>
-              </div>
-            </v-col>
+            <v-textarea
+              rows="1"
+              auto-grow
+              clearable
+              clear-icon="cancel"
+              v-model="editMes"
+              outlined
+              row-height="10"
+              background-color="#f5a37d"
+            ></v-textarea>
+            <v-btn @click="updateMes" class="ml-3">更新</v-btn>
           </v-row>
-        </v-card>
+        </v-container>
       </v-card>
-    </v-container>
-  </v-app>
+    </v-dialog>
+
+    <v-card max-width="1100px" class="mx-auto" id="chatCard">
+      <v-toolbar color="gray" dark>
+        <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn v-if="editStatus" @click="editStatus = false" fab>
+          <v-icon large>mdi-comment-edit-outline</v-icon>
+        </v-btn>
+        <v-btn v-else @click="editStatus = true,editingModal = false" fab>
+          <v-icon large>mdi-content-save-edit-outline</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card class="overflow-y-auto scroll" style="max-height: 400px">
+        <v-list color="#FFFAFA">
+          <v-list-item style="white-space:pre-wrap; " v-for="(message, i) in messages" :key="i">
+            <v-list-item-avatar v-if="isOthersMessage(message.ref)">
+              <v-img :src="chatUser.avatarUrl"></v-img>
+            </v-list-item-avatar>
+            <div
+              v-if="isOthersMessage(message.ref)"
+              :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+              class="other_message px-5 py-2"
+            >{{message.message}}</div>
+            <div
+              v-if="isOthersMessage(message.ref)"
+              class="display-get-time"
+            >{{displaySendTime(message.createdAt)}}</div>
+            <v-spacer></v-spacer>
+            <div
+              v-if="!isOthersMessage(message.ref)"
+              :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+              class="my_message px-5 pt-2"
+            >
+              {{message.message}}
+              <div class="display-send-time">{{displaySendTime(message.createdAt)}}</div>
+            </div>
+            <div v-if="!editStatus">
+              <v-btn
+                v-if="!isOthersMessage(message.ref)"
+                @click="editMesAction(message.message,message.uid)"
+                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+                class="ml-3"
+                outlined
+                x-small
+                fab
+                color="indigo"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn
+                v-if="!isOthersMessage(message.ref)"
+                @click="deleteMesAction(message.uid)"
+                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
+                class="ml-1"
+                outlined
+                x-small
+                fab
+                color="error"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </div>
+            <div
+              v-if="isFristMes(message.createdAt,i)"
+              class="first-mes-position"
+              :style="{right: getChatCardWidth + 'px' }"
+            >{{firstMes(message.createdAt,i)}}</div>
+            <div
+              v-else-if="i == 0"
+              class="first-first-mes-position"
+              :style="{right: getChatCardWidth + 'px' }"
+            >{{firstMes(message.createdAt,i)}}</div>
+          </v-list-item>
+        </v-list>
+      </v-card>
+      <v-card color="#C0C0C0">
+        <v-row>
+          <v-col>
+            <v-textarea
+              class="mx-2 mt-5"
+              rows="1"
+              auto-grow
+              v-model="inputMessage"
+              background-color="white"
+              outlined
+              row-height="10"
+              append-icon="send"
+              @click:append="regMessage"
+            ></v-textarea>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -323,7 +318,6 @@ export default {
       this.scrollToEnd();
     }, 1000);
   },
-
   firestore() {
     return {
       messages: db

@@ -94,7 +94,7 @@
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
-        <v-btn text to="/signUp">登録</v-btn>
+        <v-btn text to="/signUp">新規登録</v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <v-content>

@@ -1,124 +1,145 @@
 <template>
-  <v-card max-width="1000">
-    <v-dialog v-model="acceptFriendRequestModal" max-width="350">
-      <v-card min-height="250">
-        <v-card-title class="headline">フレンドになりました！</v-card-title>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="rejectFriendRequestModal" max-width="350">
-      <v-card>
-        <v-card-title class="headline">フレンド申請を拒否しました</v-card-title>
-      </v-card>
-    </v-dialog>
-    <div v-if="isEdit">
-      <v-img :src="displayDamyHeaderImg" :aspect-ratio="4"></v-img>
-      <v-file-input
-        accept="image/*"
-        show-size
-        label="ヘッダー画像ファイルをアップロードしてください"
-        prepend-icon="mdi-image"
-        @change="desplayImg"
-      ></v-file-input>
-    </div>
-    <div v-else>
-      <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
-      <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
-    </div>
-    <v-list-item>
-      <v-list-item-avatar size="80">
-        <div v-if="isEdit">
-          <v-img :src="displayDemoAvatar"></v-img>
-          <v-file-input
-            accept="image/*"
-            show-size
-            label="アイコン画像ファイルをアップロードしてください"
-            prepend-icon="mdi-image"
-            @change="desplayAvatar"
-          ></v-file-input>
-        </div>
-        <div v-else>
-          <v-avatar>
-            <v-img v-if="isMypage" :src="displayAvatar"></v-img>
-            <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
-          </v-avatar>
-        </div>
-      </v-list-item-avatar>
-      <v-list-item-content v-if="isEdit">
-        <v-list-item-title class="headline">
-          <v-text-field placeholder="ポケGOのユーザー名を入力してください" v-model="displayUserName" :rules="rules"></v-text-field>
-        </v-list-item-title>
-      </v-list-item-content>
-      <v-list-item-content v-else>
-        <v-list-item-title v-if="isMypage" class="headline">{{displayUserName}}</v-list-item-title>
-        <v-list-item-title v-else class="headline">{{displayFriendUserInfo.name}}</v-list-item-title>
-      </v-list-item-content>
-      <v-spacer></v-spacer>
-      <!-- 相手ユーザーとのステータスの表示 -->
-      <div v-if="!isMypage" class="mr-3">
-        <div v-if="isFriend">友達</div>
-        <div v-else-if="isRequest">申請が来てる</div>
-        <div v-else-if="isSendRequest">申請中</div>
-      </div>
-      <div v-if="isMypage">
-        <v-btn v-if="isEdit" @click="save">保存</v-btn>
-        <v-btn v-else @click="edit">編集</v-btn>
+  <v-app>
+    <v-card class="mx-auto">
+      <v-dialog v-model="acceptFriendRequestModal" max-width="350">
+        <v-card min-height="250">
+          <v-card-title class="headline">フレンドになりました！</v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="rejectFriendRequestModal" max-width="350">
+        <v-card>
+          <v-card-title class="headline">フレンド申請を拒否しました</v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="sendFriendRequestModal" max-width="350">
+        <v-card>
+          <v-card-title class="headline">フレンド申請をしました</v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="cancelFriendRequestModal" max-width="450">
+        <v-card>
+          <v-card-title class="headline">フレンド申請を取り消しました</v-card-title>
+        </v-card>
+      </v-dialog>
+      <div v-if="isEdit">
+        <v-img :src="displayDamyHeaderImg" :aspect-ratio="4"></v-img>
+        <v-file-input
+          accept="image/*"
+          show-size
+          label="ヘッダー画像ファイルをアップロードしてください"
+          prepend-icon="mdi-image"
+          @change="desplayImg"
+        ></v-file-input>
       </div>
       <div v-else>
-        <v-btn v-if="isFriend" @click="goChat()">チャット</v-btn>
-        <div v-else-if="isRequest">
-          <v-btn class="mr-3" @click="acceptFriendRequest(0)">フレンドになる</v-btn>
-          <v-btn @click="rejectFriendRequest(1)">拒否</v-btn>
-        </div>
-        <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()">申請を取り消す</v-btn>
-        <v-btn v-else @click="sendFriendRequest()">フレンド申請</v-btn>
+        <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
+        <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
       </div>
-    </v-list-item>
-    <v-card-text v-if="isEdit">
-      <v-textarea
-        v-model="displaySelfIntroduction"
-        clearable
-        clear-icon="cancel"
-        label="Text"
-        value="This is clearable text."
-      ></v-textarea>
-    </v-card-text>
-    <div v-else>
-      <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
-      <v-card-text v-else style="white-space:pre-wrap; ">{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
-    </div>
+      <v-list-item>
+        <v-list-item-avatar size="80">
+          <div v-if="isEdit">
+            <v-img :src="displayDemoAvatar"></v-img>
+            <v-file-input
+              accept="image/*"
+              show-size
+              label="アイコン画像ファイルをアップロードしてください"
+              prepend-icon="mdi-image"
+              @change="desplayAvatar"
+            ></v-file-input>
+          </div>
+          <div v-else>
+            <v-avatar>
+              <v-img v-if="isMypage" :src="displayAvatar"></v-img>
+              <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+            </v-avatar>
+          </div>
+        </v-list-item-avatar>
+        <v-list-item-content v-if="isEdit">
+          <v-list-item-title class="headline">
+            <v-text-field
+              @keydown.enter="saveByEnter"
+              placeholder="ポケGOのユーザー名を入力してください"
+              v-model="displayUserName"
+              :rules="rules"
+            ></v-text-field>
+          </v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-content v-else>
+          <v-list-item-title v-if="isMypage" class="headline">{{displayUserName}}</v-list-item-title>
+          <v-list-item-title v-else class="headline">{{displayFriendUserInfo.name}}</v-list-item-title>
+        </v-list-item-content>
+        <v-spacer></v-spacer>
+        <!-- 相手ユーザーとのステータスの表示 -->
+        <div v-if="!isMypage" class="mr-3 friendStatus">
+          <div v-if="isFriend">友達</div>
+          <div v-else-if="isRequest">申請が来てる</div>
+          <div v-else-if="isSendRequest">申請中</div>
+        </div>
+        <div v-if="isMypage">
+          <v-btn v-if="isEdit" @click="save">保存</v-btn>
+          <v-btn v-else @click="edit">編集</v-btn>
+        </div>
+        <div v-else>
+          <v-btn v-if="isFriend" @click="goChat()">チャット</v-btn>
+          <div v-else-if="isRequest">
+            <v-btn class="mr-3" @click="acceptFriendRequest(0)">フレンドになる</v-btn>
+            <v-btn @click="rejectFriendRequest(1)">拒否</v-btn>
+          </div>
+          <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()">申請を取り消す</v-btn>
+          <v-btn v-else @click="sendFriendRequest()">フレンド申請</v-btn>
+        </div>
+      </v-list-item>
+      <v-card-text v-if="isEdit">
+        <v-textarea
+          v-model="displaySelfIntroduction"
+          clearable
+          clear-icon="cancel"
+          label="Text"
+          value="This is clearable text."
+        ></v-textarea>
+      </v-card-text>
+      <div v-else>
+        <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
+        <v-card-text
+          v-else
+          style="white-space:pre-wrap; "
+        >{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
+      </div>
 
-    <v-card-actions>
-      <v-row>
-        <v-col align="center">
-          <v-btn text color="deep-purple accent-4" @click="status = 1">対戦情報</v-btn>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col align="center">
-          <v-btn text color="deep-purple accent-4" @click="status = 2">対戦成績</v-btn>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col align="center">
-          <v-btn text color="deep-purple accent-4" @click="status = 3">あああ</v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-    <v-divider></v-divider>
-    <v-card-text>
-      <span v-if="status === 1">対戦情報</span>
-      <span v-if="status === 2">
-        対戦成績
-        <v-list v-for="item in items" v-bind:key="item">{{item}}</v-list>
-      </span>
-      <span v-if="status === 3">あああ</span>
-    </v-card-text>
-  </v-card>
+      <v-card-actions>
+        <v-row>
+          <v-col align="center">
+            <v-btn text color="deep-purple accent-4" @click="status = 1">対戦情報</v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col align="center">
+            <v-btn text color="deep-purple accent-4" @click="status = 2">対戦成績</v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col align="center">
+            <v-btn text color="deep-purple accent-4" @click="status = 3">あああ</v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+      <v-divider></v-divider>
+      <v-card-text>
+        <span v-if="status === 1">対戦情報</span>
+        <span v-if="status === 2">
+          対戦成績
+          <v-list v-for="item in items" v-bind:key="item">{{item}}</v-list>
+        </span>
+        <span v-if="status === 3">あああ</span>
+      </v-card-text>
+    </v-card>
+  </v-app>
 </template>
 <script>
 import { db } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
+import "firebase/storage";
 
 export default {
   data() {
@@ -145,7 +166,9 @@ export default {
       friendIdList: [],
       sendFriendRequestNameList: [],
       acceptFriendRequestModal: false,
-      rejectFriendRequestModal: false
+      rejectFriendRequestModal: false,
+      cancelFriendRequestModal: false,
+      sendFriendRequestModal: false
     };
   },
   mounted() {
@@ -175,8 +198,11 @@ export default {
               id: this.$store.getters.user.uid,
               lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
               //リスト系は入れておかないとフレンド検索でエラー吐いちゃう
+              friends: [],
               sendFriendRequestNameList: [],
+              sendFriendRequestList: [],
               friendIdList: [],
+              nicknameList: [],
               //初期アバターのDB登録
               avatarUrl:
                 "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8"
@@ -243,6 +269,12 @@ export default {
         });
       }
       this.isEdit = false;
+    },
+    saveByEnter() {
+      // 日本語入力中のEnterキー操作は無効にする
+      if (event.keyCode !== 13) return;
+
+      this.save();
     },
     goChat() {
       this.$router.push({
@@ -357,6 +389,15 @@ export default {
             this.displayFriendUserInfo.name
           )
         });
+      this.cancelFriendRequestModal = true;
+      setTimeout(() => {
+        this.cancelFriendRequestModal = false;
+      }, 1500);
+      setTimeout(() => {
+        this.$router.go({
+          force: true
+        });
+      }, 2000);
     },
     sendFriendRequest() {
       //申請を申請相手のDBに保存する
@@ -382,6 +423,15 @@ export default {
           this.displayFriendUserInfo.name
         )
       });
+      this.sendFriendRequestModal = true;
+      setTimeout(() => {
+        this.sendFriendRequestModal = false;
+      }, 1500);
+      setTimeout(() => {
+        this.$router.go({
+          force: true
+        });
+      }, 2000);
     },
     //編集中にアップした画像を一時的に表示
     desplayImg(file) {
@@ -443,3 +493,11 @@ export default {
   }
 };
 </script>
+<style>
+.friendStatus {
+  font-size: 10px;
+  color: rgb(150, 150, 153);
+  position: relative;
+  bottom: 10px;
+}
+</style>
