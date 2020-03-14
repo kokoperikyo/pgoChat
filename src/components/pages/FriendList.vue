@@ -7,11 +7,13 @@
           <v-text-field
             @keydown.enter="addNicknameByEnter"
             v-model="inputNickname"
-            class="mr-2"
+            class="mr-5"
             clearable
             clear-icon="cancel"
           ></v-text-field>
-          <v-btn @click="addNickname()">登録</v-btn>
+          <v-btn @click="addNickname()" small fab>
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
         </v-card-title>
       </v-card>
     </v-dialog>
@@ -22,11 +24,13 @@
           <v-text-field
             @keydown.enter="editNicknameByEnter"
             v-model="inputEditNickname"
-            class="mr-2"
+            class="mr-5"
             clearable
             clear-icon="cancel"
           ></v-text-field>
-          <v-btn @click="editNickname()">更新</v-btn>
+          <v-btn @click="editNickname()" small fab>
+            <v-icon>mdi-autorenew</v-icon>
+          </v-btn>
         </v-card-title>
       </v-card>
     </v-dialog>
@@ -207,12 +211,14 @@ export default {
           ref: this.$store.getters.user.uid
         })
       });
-      user.update({
-        nicknameList: firebase.firestore.FieldValue.arrayRemove({
-          nickname: this.beforeNickname,
-          ref: this.$store.getters.user.uid
-        })
-      });
+      if (this.inputEditNickname != this.beforeNickname) {
+        user.update({
+          nicknameList: firebase.firestore.FieldValue.arrayRemove({
+            nickname: this.beforeNickname,
+            ref: this.$store.getters.user.uid
+          })
+        });
+      }
       this.editNicknameModal = false;
     },
     getNickname(nicknameList) {

@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <v-card class="mx-auto">
       <v-dialog v-model="acceptFriendRequestModal" max-width="350">
         <v-card min-height="250">
@@ -133,7 +133,7 @@
         <span v-if="status === 3">あああ</span>
       </v-card-text>
     </v-card>
-  </v-app>
+  </div>
 </template>
 <script>
 import { db } from "@/plugins/firebase";
