@@ -1,24 +1,94 @@
 <template>
   <div>
     <v-card class="mx-auto" color="#E3F2FD">
+      <!-- フレンド許可 -->
+      <v-dialog v-model="requestAcceptDialog" max-width="290">
+        <v-card>
+          <v-card-title class="pb-0">フレンドになりますか？</v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn rounded color="primary" @click="acceptFriendRequest(0)" class="mr-5">なる</v-btn>
+            <v-btn rounded color="primary" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <!-- フレンド申請拒否 -->
+      <v-dialog v-model="requestRejectDialog" max-width="290">
+        <v-card>
+          <v-card-title class="pb-0">お断りしますか？</v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn rounded color="primary" @click="rejectFriendRequest(1)" class="mr-5">断る</v-btn>
+            <v-btn rounded color="primary" outlined @click="requestRejectDialog = false">閉じる</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="addNicknameModal" max-width="350">
+        <v-card>
+          <v-card-title class="headline">
+            <div>ニックネームを入力</div>
+            <v-text-field
+              @keydown.enter="addNicknameByEnter"
+              v-model="inputNickname"
+              class="mr-5"
+              clearable
+              clear-icon="cancel"
+            ></v-text-field>
+            <v-btn @click="addNickname()" small fab>
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="editNicknameModal" max-width="350">
+        <v-card>
+          <v-card-title class="headline">
+            <div>ニックネームを編集</div>
+            <v-text-field
+              @keydown.enter="editNicknameByEnter"
+              v-model="inputEditNickname"
+              class="mr-5"
+              clearable
+              clear-icon="cancel"
+            ></v-text-field>
+            <v-btn @click="editNickname()" small fab>
+              <v-icon>mdi-autorenew</v-icon>
+            </v-btn>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
       <v-dialog v-model="acceptFriendRequestModal" max-width="350">
-        <v-card min-height="250">
-          <v-card-title class="headline">フレンドになりました！</v-card-title>
+        <v-card>
+          <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
+          <v-row justify="center">
+            <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+          </v-row>
         </v-card>
       </v-dialog>
       <v-dialog v-model="rejectFriendRequestModal" max-width="350">
         <v-card>
           <v-card-title class="headline">フレンド申請を拒否しました</v-card-title>
+          <v-row justify="center">
+            <v-icon color="#FF3D00" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+          </v-row>
         </v-card>
       </v-dialog>
       <v-dialog v-model="sendFriendRequestModal" max-width="350">
         <v-card>
           <v-card-title class="headline">フレンド申請をしました</v-card-title>
+          <v-row justify="center">
+            <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+          </v-row>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="cancelFriendRequestModal" max-width="450">
+      <v-dialog v-model="cancelFriendRequestModal" max-width="400">
         <v-card>
           <v-card-title class="headline">フレンド申請を取り消しました</v-card-title>
+          <v-row justify="center">
+            <v-icon color="#FF3D00" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+          </v-row>
         </v-card>
       </v-dialog>
       <div v-if="isEdit" class="headerImg">
@@ -38,7 +108,7 @@
         <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
         <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
       </div>
-      <v-list-item class="mt-5">
+      <v-list-item class="mt-5 pr-1">
         <v-list-item-avatar class="ml-1 mr-5">
           <div v-if="isEdit" class="avatarImg">
             <v-avatar v-if="displayDemoAvatar" size="60">
@@ -62,6 +132,7 @@
             </v-avatar>
           </div>
         </v-list-item-avatar>
+        <!-- 編集中 -->
         <v-list-item-content v-if="isEdit">
           <v-list-item-title class="headline">
             <v-text-field
@@ -72,29 +143,83 @@
             ></v-text-field>
           </v-list-item-title>
         </v-list-item-content>
+        <!-- 編集中ではない -->
         <v-list-item-content v-else>
-          <v-list-item-title v-if="isMypage" class="headline">{{displayUserName}}</v-list-item-title>
-          <v-list-item-title v-else class="headline">{{displayFriendUserInfo.name}}</v-list-item-title>
+          <div v-if="isMypage">
+            <v-list-item-title v-if="$vuetify.breakpoint.smAndDown" v-text="displayUserName"></v-list-item-title>
+            <v-list-item-title v-else style="font-size:24px;" v-text="displayUserName"></v-list-item-title>
+          </div>
+          <div v-else-if="isFriend">
+            <v-list-item-title>
+              {{displayFriendUserInfo.name}}
+              <v-btn
+                v-if="!getNickname(displayFriendUserInfo.nicknameList)"
+                @click="addNicknameModalDis(displayFriendUserInfo.id)"
+                x-small
+                fab
+                color="primary"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </v-list-item-title>
+            <v-list-item-subtitle v-if="getNickname(displayFriendUserInfo.nicknameList)">
+              {{getNickname(displayFriendUserInfo.nicknameList)}}
+              <v-btn
+                @click="editNicknameModalDis(displayFriendUserInfo.id,getNickname(displayFriendUserInfo.nicknameList))"
+                x-small
+                fab
+                color="primary"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </v-list-item-subtitle>
+          </div>
+          <div v-else>
+            <v-list-item-title
+              v-if="$vuetify.breakpoint.smAndDown"
+              v-text="displayUserName"
+              style="font-size:20px;"
+            ></v-list-item-title>
+            <v-list-item-title v-else style="font-size:24px;" v-text="displayUserName"></v-list-item-title>
+          </div>
         </v-list-item-content>
-        <v-spacer></v-spacer>
         <!-- 相手ユーザーとのステータスの表示 -->
-        <div v-if="!isMypage" class="mr-3 friendStatus">
+        <div v-if="!isMypage" class="mr-2 friendStatus">
           <div v-if="isFriend">友達</div>
           <div v-else-if="isRequest">申請が来てる</div>
           <div v-else-if="isSendRequest">申請中</div>
         </div>
         <div v-if="isMypage">
-          <v-btn v-if="isEdit" @click="save">保存</v-btn>
-          <v-btn v-else @click="edit">編集</v-btn>
+          <v-btn v-if="isEdit" @click="save" fab small outlined color="#AB47BC">
+            <v-icon>mdi-content-save-edit</v-icon>
+          </v-btn>
+          <v-btn v-else @click="edit" fab small outlined color="#AB47BC">
+            <v-icon>mdi-account-edit</v-icon>
+          </v-btn>
         </div>
         <div v-else>
-          <v-btn v-if="isFriend" @click="goChat()">チャット</v-btn>
+          <v-btn v-if="isFriend" @click="goChat()" fab small outlined color="#AB47BC">
+            <v-icon>mdi-chat-processing-outline</v-icon>
+          </v-btn>
           <div v-else-if="isRequest">
-            <v-btn class="mr-3" @click="acceptFriendRequest(0)">フレンドになる</v-btn>
-            <v-btn @click="rejectFriendRequest(1)">拒否</v-btn>
+            <v-btn class="mr-1" @click="requestAcceptDialog = true" fab small outlined>
+              <v-icon>mdi-handshake</v-icon>
+            </v-btn>
+            <v-btn @click="requestRejectDialog = true" fab small outlined>
+              <v-icon>mdi-account-cancel</v-icon>
+            </v-btn>
           </div>
-          <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()">申請を取り消す</v-btn>
-          <v-btn v-else @click="sendFriendRequest()">フレンド申請</v-btn>
+          <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()" fab small outlined>
+            <v-icon>mdi-account-cancel</v-icon>
+          </v-btn>
+          <v-tooltip v-else left>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" @click="sendFriendRequest()" fab small outlined>
+                <v-icon>mdi-account-multiple-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>フレンド申請</span>
+          </v-tooltip>
         </div>
       </v-list-item>
       <v-card-text v-if="isEdit">
@@ -106,7 +231,7 @@
           value="This is clearable text."
         ></v-textarea>
       </v-card-text>
-      <div v-else>
+      <div v-else class="mt-5">
         <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
         <v-card-text
           v-else
@@ -176,7 +301,14 @@ export default {
       acceptFriendRequestModal: false,
       rejectFriendRequestModal: false,
       cancelFriendRequestModal: false,
-      sendFriendRequestModal: false
+      sendFriendRequestModal: false,
+      addNicknameModal: false,
+      editNicknameModal: false,
+      friendId: null,
+      beforeNickname: null,
+      inputEditNickname: null,
+      requestAcceptDialog: false,
+      requestRejectDialog: false
     };
   },
   mounted() {
@@ -286,6 +418,76 @@ export default {
 
       this.save();
     },
+    getNickname(nicknameList) {
+      if (nicknameList.length != 0) {
+        const target = nicknameList.find(items => {
+          return items.ref === this.$store.getters.user.uid;
+        });
+        if (target != undefined) {
+          return target.nickname;
+        }
+      }
+    },
+    addNicknameModalDis(friendId) {
+      this.addNicknameModal = true;
+      this.friendId = friendId;
+    },
+    editNicknameModalDis(friendId, beforeNickname) {
+      this.editNicknameModal = true;
+      this.friendId = friendId;
+      this.beforeNickname = beforeNickname;
+      this.inputEditNickname = beforeNickname;
+    },
+    addNickname() {
+      if (
+        this.inputNickname == null ||
+        this.inputNickname == "" ||
+        this.inputNickname == " "
+      ) {
+        this.addNicknameModal = false;
+      } else {
+        db.collection("users")
+          .doc(this.friendId)
+          .update({
+            nicknameList: firebase.firestore.FieldValue.arrayUnion({
+              nickname: this.inputNickname,
+              ref: this.$store.getters.user.uid
+            })
+          });
+        this.addNicknameModal = false;
+      }
+    },
+    editNickname() {
+      const user = db.collection("users").doc(this.friendId);
+      if (
+        this.inputEditNickname == null ||
+        this.inputEditNickname == "" ||
+        this.inputEditNickname == " "
+      ) {
+        user.update({
+          nicknameList: firebase.firestore.FieldValue.arrayRemove({
+            nickname: this.beforeNickname,
+            ref: this.$store.getters.user.uid
+          })
+        });
+      } else {
+        user.update({
+          nicknameList: firebase.firestore.FieldValue.arrayUnion({
+            nickname: this.inputEditNickname,
+            ref: this.$store.getters.user.uid
+          })
+        });
+        if (this.inputEditNickname != this.beforeNickname) {
+          user.update({
+            nicknameList: firebase.firestore.FieldValue.arrayRemove({
+              nickname: this.beforeNickname,
+              ref: this.$store.getters.user.uid
+            })
+          });
+        }
+      }
+      this.editNicknameModal = false;
+    },
     goChat() {
       this.$router.push({
         name: "chat",
@@ -293,35 +495,39 @@ export default {
       });
     },
     acceptFriendRequest(status) {
-      //ログイン中のユーザーのDBにフレンド追加
-      const users = db.collection("users");
-      users.doc(this.$store.getters.user.uid).update({
-        friends: firebase.firestore.FieldValue.arrayUnion(
-          users.doc(this.displayFriendUserInfo.id)
-        )
-      });
-      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
-      users.doc(this.$store.getters.user.uid).update({
-        friendIdList: firebase.firestore.FieldValue.arrayUnion(
-          this.displayFriendUserInfo.id
-        )
-      });
-      //申請を投げていたユーザーのDBにフレンド追加
-      users.doc(this.displayFriendUserInfo.id).update({
-        friends: firebase.firestore.FieldValue.arrayUnion(
-          users.doc(this.$store.getters.user.uid)
-        )
-      });
-      //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
-      users.doc(this.displayFriendUserInfo.id).update({
-        friendIdList: firebase.firestore.FieldValue.arrayUnion(
-          this.$store.getters.user.uid
-        )
-      });
-      //以下申請の削除
-      this.rejectFriendRequest(status);
+      this.requestAcceptDialog = false;
+      setTimeout(() => {
+        //ログイン中のユーザーのDBにフレンド追加
+        const users = db.collection("users");
+        users.doc(this.$store.getters.user.uid).update({
+          friends: firebase.firestore.FieldValue.arrayUnion(
+            users.doc(this.displayFriendUserInfo.id)
+          )
+        });
+        //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+        users.doc(this.$store.getters.user.uid).update({
+          friendIdList: firebase.firestore.FieldValue.arrayUnion(
+            this.displayFriendUserInfo.id
+          )
+        });
+        //申請を投げていたユーザーのDBにフレンド追加
+        users.doc(this.displayFriendUserInfo.id).update({
+          friends: firebase.firestore.FieldValue.arrayUnion(
+            users.doc(this.$store.getters.user.uid)
+          )
+        });
+        //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
+        users.doc(this.displayFriendUserInfo.id).update({
+          friendIdList: firebase.firestore.FieldValue.arrayUnion(
+            this.$store.getters.user.uid
+          )
+        });
+        //以下申請の削除
+        this.rejectFriendRequest(status);
+      }, 500);
     },
     rejectFriendRequest(status) {
+      this.requestRejectDialog = false;
       //申請先側
       db.collection("users")
         .doc(this.$store.getters.user.uid)

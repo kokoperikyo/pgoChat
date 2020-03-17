@@ -1,5 +1,45 @@
 <template>
   <v-app>
+    <!-- フレンド許可 -->
+    <v-dialog v-model="requestAcceptDialog" max-width="290">
+      <v-card>
+        <v-card-title class="pb-0">フレンドになりますか？</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn rounded color="primary" @click="acceptFriendRequest" class="mr-5">なる</v-btn>
+          <v-btn rounded color="primary" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- フレンド申請拒否 -->
+    <v-dialog v-model="requestRejectDialog" max-width="290">
+      <v-card>
+        <v-card-title class="pb-0">お断りしますか？</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn rounded color="primary" @click="rejectFriendRequest" class="mr-5">断る</v-btn>
+          <v-btn rounded color="primary" outlined @click="requestRejectDialog = false">閉じる</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="acceptFriendRequestModal" max-width="350">
+      <v-card>
+        <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
+        <v-row justify="center">
+          <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+        </v-row>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="rejectFriendRequestModal" max-width="350">
+      <v-card>
+        <v-card-title class="headline">フレンド申請を拒否しました</v-card-title>
+        <v-row justify="center">
+          <v-icon color="#FF3D00" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+        </v-row>
+      </v-card>
+    </v-dialog>
     <v-navigation-drawer
       v-if="userStatus"
       v-model="drawer"
@@ -44,7 +84,7 @@
             v-on="on"
           >{{getFriendRequestLists.length}}</v-btn>
         </template>
-        <v-list v-if="lastReject">
+        <v-list v-if="lastReject" class="py-0">
           <v-subheader v-if="isRequest(getFriendRequestLists.length)">フレンド申請が届いています</v-subheader>
           <v-subheader v-else>フレンド申請はありません</v-subheader>
           <v-list-group
@@ -55,46 +95,69 @@
             <template v-slot:activator>
               <v-list-item-content>
                 <v-list-item-title>
-                  <v-list-item-avatar>
+                  <v-list-item-avatar class="ml-0">
                     <v-img :src="friendRequest.avatarUrl"></v-img>
                   </v-list-item-avatar>
-                  <span class="indigo--text">{{ friendRequest.userName }}</span>
-                  からフレンド申請が届いています
+                  <v-text style="font-size:14px;" class="indigo--text">{{ friendRequest.userName }}</v-text>
                 </v-list-item-title>
               </v-list-item-content>
             </template>
-            <v-list-item>
-              <v-row>
-                <v-col col="4">
-                  <v-btn
-                    block
-                    @click="acceptFriendRequest(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName)"
-                    outlined
-                    color="warning"
-                  >フレンドになる</v-btn>
-                </v-col>
-                <v-col col="4">
-                  <v-btn
-                    block
-                    @click="rejectFriendRequest(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName)"
-                    outlined
-                    color="warning"
-                  >拒否</v-btn>
-                </v-col>
-                <v-col col="4">
-                  <v-btn block @click="goProfile(friendRequest.id)" outlined color="warning">プロフィール</v-btn>
-                </v-col>
-              </v-row>
-            </v-list-item>
+            <!-- <v-list-item> -->
+            <v-row>
+              <v-col col="1"></v-col>
+
+              <v-col col="2">
+                <v-btn
+                  block
+                  @click="acceptFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,0)"
+                  outlined
+                  color="#42A5F5"
+                  small
+                  fab
+                >
+                  <v-icon>mdi-handshake</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col col="2"></v-col>
+
+              <v-col col="2">
+                <v-btn
+                  block
+                  @click="goProfile(friendRequest.id)"
+                  outlined
+                  color="#42A5F5"
+                  small
+                  fab
+                >
+                  <v-icon>mdi-shield-account</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col col="2"></v-col>
+
+              <v-col col="2">
+                <v-btn
+                  block
+                  @click="rejectFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,1)"
+                  outlined
+                  color="#EF5350"
+                  small
+                  fab
+                >
+                  <v-icon>mdi-account-cancel</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col col="1"></v-col>
+            </v-row>
+            <!-- </v-list-item> -->
           </v-list-group>
         </v-list>
       </v-menu>
       <v-toolbar-items v-if="userStatus">
-        <v-btn @click="doLogout" text>ログアウト</v-btn>
+        <v-btn @click="doLogout" text class="pr-0">ログアウト</v-btn>
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
-        <v-btn text to="/signUp">新規登録</v-btn>
+        <v-btn text to="/signUp" class="pr-0">新規登録</v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <v-content>
@@ -140,7 +203,15 @@ export default {
       userName: null,
       avatarUrl: null,
       getFriendRequestLists: [],
-      lastReject: true
+      lastReject: true,
+      friendAvatarUrl: null,
+      friendId: null,
+      friendName: null,
+      acceptFriendRequestModal: false,
+      rejectFriendRequestModal: false,
+      requestAcceptDialog: false,
+      requestRejectDialog: false,
+      modalStatus: null
     };
   },
   methods: {
@@ -163,20 +234,28 @@ export default {
         return false;
       }
     },
-    rejectFriendRequest(avatarUrl, id, name) {
+    rejectFriendRequestByDialog(avatarUrl, friendId, name, status) {
+      this.friendAvatarUrl = avatarUrl;
+      this.friendId = friendId;
+      this.friendName = name;
+      this.requestRejectDialog = true;
+      this.modalStatus = status;
+    },
+    rejectFriendRequest() {
+      this.requestRejectDialog = false;
       //申請の削除
       db.collection("users")
         .doc(this.$store.getters.user.uid)
         .update({
           friendRequestList: firebase.firestore.FieldValue.arrayRemove({
-            avatarUrl: avatarUrl,
-            id: id,
-            userName: name
+            avatarUrl: this.friendAvatarUrl,
+            id: this.friendId,
+            userName: this.friendName
           })
         });
       //申請元の申請の削除
       db.collection("users")
-        .doc(id)
+        .doc(this.friendId)
         .update({
           sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
             avatarUrl: this.avatarUrl,
@@ -185,7 +264,7 @@ export default {
           })
         });
       db.collection("users")
-        .doc(id)
+        .doc(this.friendId)
         .update({
           sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
             this.userName
@@ -210,30 +289,54 @@ export default {
             }
           });
       }, 300);
+      setTimeout(() => {
+        if (this.modalStatus == 0) {
+          this.acceptFriendRequestModal = true;
+        } else {
+          this.rejectFriendRequestModal = true;
+        }
+      }, 300);
+      setTimeout(() => {
+        if (this.modalStatus == 0) {
+          this.acceptFriendRequestModal = false;
+        } else {
+          this.rejectFriendRequestModal = false;
+        }
+      }, 1500);
     },
-    acceptFriendRequest(avatarUrl, friendId, name) {
+    acceptFriendRequestByDialog(avatarUrl, friendId, name, status) {
+      this.friendAvatarUrl = avatarUrl;
+      this.friendId = friendId;
+      this.friendName = name;
+      this.requestAcceptDialog = true;
+      this.modalStatus = status;
+    },
+    acceptFriendRequest() {
+      this.requestAcceptDialog = false;
       //ログイン中のユーザーのDBにフレンド追加
       const users = db.collection("users");
       users.doc(this.$store.getters.user.uid).update({
-        friends: firebase.firestore.FieldValue.arrayUnion(users.doc(friendId))
+        friends: firebase.firestore.FieldValue.arrayUnion(
+          users.doc(this.friendId)
+        )
       });
       //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
       users.doc(this.$store.getters.user.uid).update({
-        friendIdList: firebase.firestore.FieldValue.arrayUnion(friendId)
+        friendIdList: firebase.firestore.FieldValue.arrayUnion(this.friendId)
       });
       //申請を投げていたユーザーのDBにフレンド追加
-      users.doc(friendId).update({
+      users.doc(this.friendId).update({
         friends: firebase.firestore.FieldValue.arrayUnion(
           users.doc(this.$store.getters.user.uid)
         )
       });
       //フレンドIDリスト（プロフィール画面でフレンドかどうかを判断するために必要）
-      users.doc(friendId).update({
+      users.doc(this.friendId).update({
         friendIdList: firebase.firestore.FieldValue.arrayUnion(
           this.$store.getters.user.uid
         )
       });
-      this.rejectFriendRequest(avatarUrl, friendId, name);
+      this.rejectFriendRequest();
       //フレンド追加後に画面遷移するならこれ使う
       // this.$router.push({ name: "friendProfile", params: { uid: friendId } });
     },

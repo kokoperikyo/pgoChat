@@ -1,5 +1,16 @@
 <template>
   <v-card class="mx-auto" tile>
+    <v-dialog v-model="deleteFriendDialog" max-width="290">
+      <v-card>
+        <v-card-title class="pb-0">フレンドを削除しますか？</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn rounded dark color="#FF3D00" @click="deleteFriend" class="mr-5">削除</v-btn>
+          <v-btn rounded color="#FF3D00" outlined @click="deleteFriendDialog = false">閉じる</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="addNicknameModal" max-width="350">
       <v-card>
         <v-card-title class="headline">
@@ -47,7 +58,7 @@
       <div v-if="friendLists.friends.length == 0">フレンドはいません</div>
       <v-list-item
         v-else
-        class="px-2"
+        class="pl-2 pr-0"
         two-line
         v-for="(friendList, i) in friendLists.friends"
         :key="i"
@@ -62,8 +73,8 @@
           <v-img :src="friendList.avatarUrl"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title v-text="friendList.name"></v-list-item-title>
-          <v-list-item-subtitle style="font-size:12px;">
+          <v-list-item-title v-text="friendList.name" class="mt-1"></v-list-item-title>
+          <v-list-item-subtitle style="font-size:12px;" class="mt-1">
             <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
               <template v-slot:activator="{ on }">
                 <v-btn
@@ -81,7 +92,7 @@
               <span>ニックネームを追加できます</span>
             </v-tooltip>
             <div v-else>
-              ({{getNickname(friendList.nicknameList)}})
+              {{getNickname(friendList.nicknameList)}}
               <v-btn
                 @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
                 x-small
@@ -106,7 +117,7 @@
           <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
             <v-icon>mdi-chat-processing-outline</v-icon>
           </v-btn>
-          <v-btn @click="deleteFriend(friendList.id)" class="red mr-2" small dark fab>
+          <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" small dark fab>
             <v-icon>mdi-trash-can-outline</v-icon>
           </v-btn>
         </div>
@@ -114,22 +125,22 @@
           <v-list-item-title>
             {{getLastLogin(friendList.lastLogin)}}
             <v-list-item-avatar
-              class="ml-5"
+              class="ml-1"
               size="8"
               :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
             ></v-list-item-avatar>
           </v-list-item-title>
-          <v-list-item-titile>
+          <v-list-item-subtitle class="mr-5">
             <v-btn outlined @click="goProfile(friendList.id)" class="mr-1" x-small fab>
-              <v-icon>mdi-shield-account-outline</v-icon>
+              <v-icon>mdi-shield-account</v-icon>
             </v-btn>
             <v-btn outlined @click="goChat(friendList.id)" class="mr-1" x-small fab>
               <v-icon>mdi-chat-processing-outline</v-icon>
             </v-btn>
-            <v-btn @click="deleteFriend(friendList.id)" class="red" x-small dark fab>
+            <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" x-small dark fab>
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
-          </v-list-item-titile>
+          </v-list-item-subtitle>
         </v-list-item-action>
       </v-list-item>
     </v-list>
@@ -152,7 +163,9 @@ export default {
     editNicknameModal: false,
     inputNickname: null,
     inputEditNickname: null,
-    beforeNickname: null
+    beforeNickname: null,
+    deleteFriendId: null,
+    deleteFriendDialog: false
   }),
   mounted() {
     //最終ログインを更新
@@ -198,26 +211,31 @@ export default {
     goChat(uid) {
       this.$router.push({ name: "chat", params: { uid: uid } });
     },
-    deleteFriend(friendId) {
+    deleteFriend() {
       //ログイン中のユーザーのDB
       const users = db.collection("users");
       users.doc(this.$store.getters.user.uid).update({
-        friends: firebase.firestore.FieldValue.arrayRemove(users.doc(friendId))
+        friends: firebase.firestore.FieldValue.arrayRemove(
+          users.doc(this.deleteFriendId)
+        )
       });
       users.doc(this.$store.getters.user.uid).update({
-        friendIdList: firebase.firestore.FieldValue.arrayRemove(friendId)
+        friendIdList: firebase.firestore.FieldValue.arrayRemove(
+          this.deleteFriendId
+        )
       });
       //フレンドのDB
-      users.doc(friendId).update({
+      users.doc(this.deleteFriendId).update({
         friends: firebase.firestore.FieldValue.arrayRemove(
           users.doc(this.$store.getters.user.uid)
         )
       });
-      users.doc(friendId).update({
+      users.doc(this.deleteFriendId).update({
         friendIdList: firebase.firestore.FieldValue.arrayRemove(
           this.$store.getters.user.uid
         )
       });
+      this.deleteFriendDialog = false;
     },
     addNicknameModalDis(friendId) {
       this.addNicknameModal = true;
@@ -230,31 +248,52 @@ export default {
       this.inputEditNickname = beforeNickname;
     },
     addNickname() {
-      db.collection("users")
-        .doc(this.friendId)
-        .update({
-          nicknameList: firebase.firestore.FieldValue.arrayUnion({
-            nickname: this.inputNickname,
-            ref: this.$store.getters.user.uid
-          })
-        });
-      this.addNicknameModal = false;
+      if (
+        this.inputNickname == null ||
+        this.inputNickname == "" ||
+        this.inputNickname == " "
+      ) {
+        this.addNicknameModal = false;
+      } else {
+        db.collection("users")
+          .doc(this.friendId)
+          .update({
+            nicknameList: firebase.firestore.FieldValue.arrayUnion({
+              nickname: this.inputNickname,
+              ref: this.$store.getters.user.uid
+            })
+          });
+        this.addNicknameModal = false;
+      }
     },
     editNickname() {
       const user = db.collection("users").doc(this.friendId);
-      user.update({
-        nicknameList: firebase.firestore.FieldValue.arrayUnion({
-          nickname: this.inputEditNickname,
-          ref: this.$store.getters.user.uid
-        })
-      });
-      if (this.inputEditNickname != this.beforeNickname) {
+      if (
+        this.inputEditNickname == null ||
+        this.inputEditNickname == "" ||
+        this.inputEditNickname == " "
+      ) {
         user.update({
           nicknameList: firebase.firestore.FieldValue.arrayRemove({
             nickname: this.beforeNickname,
             ref: this.$store.getters.user.uid
           })
         });
+      } else {
+        user.update({
+          nicknameList: firebase.firestore.FieldValue.arrayUnion({
+            nickname: this.inputEditNickname,
+            ref: this.$store.getters.user.uid
+          })
+        });
+        if (this.inputEditNickname != this.beforeNickname) {
+          user.update({
+            nicknameList: firebase.firestore.FieldValue.arrayRemove({
+              nickname: this.beforeNickname,
+              ref: this.$store.getters.user.uid
+            })
+          });
+        }
       }
       this.editNicknameModal = false;
     },
@@ -286,6 +325,10 @@ export default {
       if (event.keyCode !== 13) return;
 
       this.editNickname();
+    },
+    deleteFriendByDialog(friendId) {
+      this.deleteFriendDialog = true;
+      this.deleteFriendId = friendId;
     }
   },
   computed: {

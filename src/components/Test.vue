@@ -1,63 +1,9 @@
 <template>
-  <v-card max-width="600" class="mx-auto">
-    <v-toolbar color="light-blue" dark>
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-      <v-toolbar-title>My files</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-view-module</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <v-list two-line subheader>
-      <v-subheader inset>Folders</v-subheader>
-
-      <v-list-item v-for="item in items" :key="item.title">
-        <v-list-item-avatar>
-          <v-icon :class="[item.iconClass]" v-text="item.icon"></v-icon>
-        </v-list-item-avatar>
-
-        <v-list-item-content>
-          <v-list-item-title v-text="item.title"></v-list-item-title>
-          <v-list-item v-if="$vuetify.breakpoint.mdAndDown">
-            <v-list-item-avatar class="mr-5" color="red"></v-list-item-avatar>
-            <v-list-item-avatar class="mr-5" color="red"></v-list-item-avatar>
-          </v-list-item>
-        </v-list-item-content>
-
-        <v-list-item-action>
-          <v-btn icon>
-            <v-icon color="grey lighten-1">mdi-information</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
-
-      <v-divider inset></v-divider>
-
-      <v-list-item v-for="item in items2" :key="item.title">
-        <v-list-item-avatar>
-          <v-icon :class="[item.iconClass]" v-text="item.icon"></v-icon>
-        </v-list-item-avatar>
-
-        <v-list-item-content>
-          <v-list-item-title v-text="item.title"></v-list-item-title>
-          <v-list-item-subtitle v-text="item.subtitle"></v-list-item-subtitle>
-        </v-list-item-content>
-
-        <v-list-item-action>
-          <v-btn icon>
-            <v-icon color="grey lighten-1">mdi-information</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
-    </v-list>
+  <v-card max-width="350" min-height="250">
+    <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
+    <v-row justify="center">
+      <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+    </v-row>
   </v-card>
 </template>
 <script>

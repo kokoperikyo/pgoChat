@@ -1,28 +1,33 @@
 <template>
   <div>
     <v-alert v-show="addFriendSuccess" type="success">フレンド申請をしました</v-alert>
-    <v-text-field v-model="searchUserName" label="探しているユーザー名を入力してください" append-icon="search"></v-text-field>
+    <v-text-field v-model="searchUserName" label="ユーザー名を入力してください" append-icon="search"></v-text-field>
     <v-card class="mx-auto" tile>
       <v-list v-if="searchUserName">
         {{noResultMessage}}
         <v-list-item
           v-for="(serchedUser, i) in serchedUsers"
           :key="i"
-          @click="sendFriendRequest(serchedUser.id,serchedUser.name,serchedUser.avatarUrl)"
+          @click="goProfile(serchedUser.id)"
         >
           <v-list-item-avatar>
             <v-img :src="serchedUser.avatarUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title v-text="serchedUser.name"></v-list-item-title>
+            <v-list-item-title v-text="serchedUser.name" style="font-size:16px;"></v-list-item-title>
           </v-list-item-content>
-          <v-spacer></v-spacer>
+          <v-btn @click="goProfile(serchedUser.id)" class="mr-2" fab small outlined>
+            <v-icon>mdi-shield-account-outline</v-icon>
+          </v-btn>
           <v-btn
+            fab
+            small
+            outlined
             v-on:click.stop="sendFriendRequest"
-            @click="goProfile(serchedUser.id)"
-            class="mr-2"
-          >プロフィール</v-btn>
-          <v-btn class="mr-2">フレンド申請</v-btn>
+            @click="sendFriendRequest(serchedUser.id,serchedUser.name,serchedUser.avatarUrl)"
+          >
+            <v-icon>mdi-account-plus-outline</v-icon>
+          </v-btn>
         </v-list-item>
       </v-list>
     </v-card>
@@ -41,16 +46,25 @@
           <v-list-item-content>
             <v-list-item-title v-text="sendFriendRequest.friendName"></v-list-item-title>
           </v-list-item-content>
-          <v-spacer></v-spacer>
           <v-btn
+            fab
+            small
+            outlined
             v-on:click.stop="sendFriendRequest"
             @click="goProfile(sendFriendRequest.friendId)"
             class="mr-2"
-          >プロフィール</v-btn>
+          >
+            <v-icon>mdi-shield-account-outline</v-icon>
+          </v-btn>
 
           <v-btn
+            fab
+            small
+            outlined
             @click="rejectFriendRequest(sendFriendRequest.avatarUrl,sendFriendRequest.friendId,sendFriendRequest.friendName)"
-          >申請取り消し</v-btn>
+          >
+            <v-icon>mdi-account-cancel</v-icon>
+          </v-btn>
         </v-list-item>
       </v-list>
     </v-card>
