@@ -1,23 +1,103 @@
 <template>
-  <div>
-    <!-- 日本語入力中のEnterでもイベントが発火してしまう -->
-    <input @keyup.enter="trigger" placeholder="keyup.enter" />
-    <!-- 日本語入力中のEnterではイベント発火しない -->
-    <v-btn @keydown.enter="trigger" placeholder="keydown.enter">aa</v-btn>
-  </div>
+  <v-card max-width="600" class="mx-auto">
+    <v-toolbar color="light-blue" dark>
+      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+      <v-toolbar-title>My files</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+
+      <v-btn icon>
+        <v-icon>mdi-view-module</v-icon>
+      </v-btn>
+    </v-toolbar>
+
+    <v-list two-line subheader>
+      <v-subheader inset>Folders</v-subheader>
+
+      <v-list-item v-for="item in items" :key="item.title">
+        <v-list-item-avatar>
+          <v-icon :class="[item.iconClass]" v-text="item.icon"></v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="item.title"></v-list-item-title>
+          <v-list-item v-if="$vuetify.breakpoint.mdAndDown">
+            <v-list-item-avatar class="mr-5" color="red"></v-list-item-avatar>
+            <v-list-item-avatar class="mr-5" color="red"></v-list-item-avatar>
+          </v-list-item>
+        </v-list-item-content>
+
+        <v-list-item-action>
+          <v-btn icon>
+            <v-icon color="grey lighten-1">mdi-information</v-icon>
+          </v-btn>
+        </v-list-item-action>
+      </v-list-item>
+
+      <v-divider inset></v-divider>
+
+      <v-list-item v-for="item in items2" :key="item.title">
+        <v-list-item-avatar>
+          <v-icon :class="[item.iconClass]" v-text="item.icon"></v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="item.title"></v-list-item-title>
+          <v-list-item-subtitle v-text="item.subtitle"></v-list-item-subtitle>
+        </v-list-item-content>
+
+        <v-list-item-action>
+          <v-btn icon>
+            <v-icon color="grey lighten-1">mdi-information</v-icon>
+          </v-btn>
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
+  </v-card>
 </template>
 <script>
 export default {
-  methods: {
-    trigger: event => {
-      // 日本語入力中のEnterキー操作は無効にする
-      if (event.keyCode !== 13) return;
-
-      // 実行したい処理
-      // eslint-disable-next-line no-console
-      console.log("aaaaa");
-    }
-  }
+  data: () => ({
+    items: [
+      {
+        icon: "folder",
+        iconClass: "grey lighten-1 white--text",
+        title: "Photos",
+        subtitle: "Jan 9, 2014"
+      },
+      {
+        icon: "folder",
+        iconClass: "grey lighten-1 white--text",
+        title: "Recipes",
+        subtitle: "Jan 17, 2014"
+      },
+      {
+        icon: "folder",
+        iconClass: "grey lighten-1 white--text",
+        title: "Work",
+        subtitle: "Jan 28, 2014"
+      }
+    ],
+    items2: [
+      {
+        icon: "assignment",
+        iconClass: "blue white--text",
+        title: "Vacation itinerary",
+        subtitle: "Jan 20, 2014"
+      },
+      {
+        icon: "call_to_action",
+        iconClass: "amber white--text",
+        title: "Kitchen remodel",
+        subtitle: "Jan 10, 2014"
+      }
+    ]
+  })
 };
 </script>
 <style>

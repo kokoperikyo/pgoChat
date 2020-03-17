@@ -42,58 +42,95 @@
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
     </v-toolbar>
+    <!-- こっからフレンドリスト -->
     <v-list>
       <div v-if="friendLists.friends.length == 0">フレンドはいません</div>
-      <v-list-item v-else v-for="(friendList, i) in friendLists.friends" :key="i">
-        <v-list-item-avatar size="10" :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"></v-list-item-avatar>
-        <v-list-item-avatar class="mr-5">
+      <v-list-item
+        v-else
+        class="px-2"
+        two-line
+        v-for="(friendList, i) in friendLists.friends"
+        :key="i"
+      >
+        <v-list-item-avatar
+          class="ml-3"
+          v-if="$vuetify.breakpoint.mdAndUp"
+          size="8"
+          :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
+        ></v-list-item-avatar>
+        <v-list-item-avatar size="40" class="mr-3">
           <v-img :src="friendList.avatarUrl"></v-img>
         </v-list-item-avatar>
-        <div class="mr-2">{{friendList.name}}</div>
-
-        <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
-          <template v-slot:activator="{ on }">
-            <v-btn
-              @click="addNicknameModalDis(friendList.id)"
-              v-on="on"
-              x-small
-              fab
-              dark
-              color="primary"
-              class="ml-1"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>ニックネームを追加できます</span>
-        </v-tooltip>
-        <div v-else>
-          ({{getNickname(friendList.nicknameList)}})
-          <v-btn
-            @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
-            x-small
-            fab
-            dark
-            color="primary"
-            class="ml-1"
-          >
-            <v-icon>mdi-pencil</v-icon>
+        <v-list-item-content>
+          <v-list-item-title v-text="friendList.name"></v-list-item-title>
+          <v-list-item-subtitle style="font-size:12px;">
+            <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  @click="addNicknameModalDis(friendList.id)"
+                  v-on="on"
+                  x-small
+                  fab
+                  dark
+                  color="primary"
+                  class="ml-1"
+                >
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </template>
+              <span>ニックネームを追加できます</span>
+            </v-tooltip>
+            <div v-else>
+              ({{getNickname(friendList.nicknameList)}})
+              <v-btn
+                @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
+                x-small
+                fab
+                dark
+                color="primary"
+                class="ml-1"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+        <div v-if="$vuetify.breakpoint.mdAndUp">
+          <v-text
+            class="mr-5"
+            style="width:80px; text-align:center;"
+          >{{getLastLogin(friendList.lastLogin)}}</v-text>
+          <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
+            <v-icon>mdi-shield-account-outline</v-icon>
+          </v-btn>
+          <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
+            <v-icon>mdi-chat-processing-outline</v-icon>
+          </v-btn>
+          <v-btn @click="deleteFriend(friendList.id)" class="red mr-2" small dark fab>
+            <v-icon>mdi-trash-can-outline</v-icon>
           </v-btn>
         </div>
-        <v-spacer></v-spacer>
-        <div
-          class="mr-5"
-          style="width:80px; text-align:center;"
-        >{{getLastLogin(friendList.lastLogin)}}</div>
-        <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
-          <v-icon>mdi-shield-account-outline</v-icon>
-        </v-btn>
-        <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
-          <v-icon>mdi-chat-processing-outline</v-icon>
-        </v-btn>
-        <v-btn @click="deleteFriend(friendList.id)" class="red" small dark fab>
-          <v-icon>mdi-trash-can-outline</v-icon>
-        </v-btn>
+        <v-list-item-action class="ml-0" v-if="$vuetify.breakpoint.smAndDown">
+          <v-list-item-title>
+            {{getLastLogin(friendList.lastLogin)}}
+            <v-list-item-avatar
+              class="ml-5"
+              size="8"
+              :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
+            ></v-list-item-avatar>
+          </v-list-item-title>
+          <v-list-item-titile>
+            <v-btn outlined @click="goProfile(friendList.id)" class="mr-1" x-small fab>
+              <v-icon>mdi-shield-account-outline</v-icon>
+            </v-btn>
+            <v-btn outlined @click="goChat(friendList.id)" class="mr-1" x-small fab>
+              <v-icon>mdi-chat-processing-outline</v-icon>
+            </v-btn>
+            <v-btn @click="deleteFriend(friendList.id)" class="red" x-small dark fab>
+              <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+          </v-list-item-titile>
+        </v-list-item-action>
       </v-list-item>
     </v-list>
   </v-card>

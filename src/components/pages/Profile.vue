@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="mx-auto">
+    <v-card class="mx-auto" color="#E3F2FD">
       <v-dialog v-model="acceptFriendRequestModal" max-width="350">
         <v-card min-height="250">
           <v-card-title class="headline">フレンドになりました！</v-card-title>
@@ -21,34 +21,42 @@
           <v-card-title class="headline">フレンド申請を取り消しました</v-card-title>
         </v-card>
       </v-dialog>
-      <div v-if="isEdit">
-        <v-img :src="displayDamyHeaderImg" :aspect-ratio="4"></v-img>
-        <v-file-input
-          accept="image/*"
-          show-size
-          label="ヘッダー画像ファイルをアップロードしてください"
-          prepend-icon="mdi-image"
-          @change="desplayImg"
-        ></v-file-input>
+      <div v-if="isEdit" class="headerImg">
+        <div v-if="displayDemoHeaderImg">
+          <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
+          <input class="headerInput" type="file" v-on:change="desplayImg" />
+          <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
+        </div>
+        <!-- 編集押してすぐの時 -->
+        <div v-else>
+          <v-img :src="displayHeaderImg" style="opacity:0.6;" :aspect-ratio="4"></v-img>
+          <input class="headerInput" type="file" v-on:change="desplayImg" />
+          <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
+        </div>
       </div>
       <div v-else>
         <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
         <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
       </div>
-      <v-list-item>
-        <v-list-item-avatar size="80">
-          <div v-if="isEdit">
-            <v-img :src="displayDemoAvatar"></v-img>
-            <v-file-input
-              accept="image/*"
-              show-size
-              label="アイコン画像ファイルをアップロードしてください"
-              prepend-icon="mdi-image"
-              @change="desplayAvatar"
-            ></v-file-input>
+      <v-list-item class="mt-5">
+        <v-list-item-avatar class="ml-1 mr-5">
+          <div v-if="isEdit" class="avatarImg">
+            <v-avatar v-if="displayDemoAvatar" size="60">
+              <v-img style="background-color:white;" :src="displayDemoAvatar"></v-img>
+              <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
+              <v-icon class="displayCameraIconOnAvatarAfter" size="40">mdi-camera</v-icon>
+            </v-avatar>
+            <!-- 編集押してすぐの時 -->
+            <div v-else>
+              <v-avatar size="60">
+                <v-img style="background-color:white; opacity:0.6;" :src="displayAvatar"></v-img>
+              </v-avatar>
+              <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
+              <v-icon class="displayCameraIconOnAvatar" size="40">mdi-camera</v-icon>
+            </div>
           </div>
           <div v-else>
-            <v-avatar>
+            <v-avatar size="60">
               <v-img v-if="isMypage" :src="displayAvatar"></v-img>
               <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
             </v-avatar>
@@ -159,7 +167,7 @@ export default {
       headerFile: null,
       avatarFile: null,
       displayHeaderImg: "",
-      displayDamyHeaderImg: "",
+      displayDemoHeaderImg: "",
       displayAvatar: "",
       displayDemoAvatar: "",
       displayFriendUserInfo: null,
@@ -269,6 +277,8 @@ export default {
         });
       }
       this.isEdit = false;
+      this.displayDemoHeaderImg = "";
+      this.displayDemoAvatar = "";
     },
     saveByEnter() {
       // 日本語入力中のEnterキー操作は無効にする
@@ -434,14 +444,32 @@ export default {
       }, 2000);
     },
     //編集中にアップした画像を一時的に表示
-    desplayImg(file) {
-      var blobUrl = window.URL.createObjectURL(file);
+    // desplayImg(file) {
+    //   // eslint-disable-next-line no-console
+    //   console.log(file);
 
-      this.displayDamyHeaderImg = blobUrl;
+    //   var blobUrl = window.URL.createObjectURL(file);
+
+    //   this.displayDemoHeaderImg = blobUrl;
+    //   this.headerFile = file;
+    // },
+    desplayImg(file) {
+      let files = file.target.files;
+      this.createImage(files[0]);
+    },
+    // アップロードしたheader画像を表示
+    createImage(file) {
+      var blobUrl = window.URL.createObjectURL(file);
+      // eslint-disable-next-line no-console
+      console.log(blobUrl);
+      this.displayDemoHeaderImg = blobUrl;
       this.headerFile = file;
     },
+    // アップロードしたavatar画像を表示
     desplayAvatar(file) {
       var blobUrl = window.URL.createObjectURL(file);
+      // eslint-disable-next-line no-console
+      console.log(file);
 
       this.displayDemoAvatar = blobUrl;
       this.avatarFile = file;
@@ -499,5 +527,55 @@ export default {
   color: rgb(150, 150, 153);
   position: relative;
   bottom: 10px;
+}
+.headerImg {
+  position: relative;
+}
+
+.headerInput {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  top: 0px;
+  opacity: 0;
+  z-index: 2;
+}
+
+.headerInputCameraIcon {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  top: 0px;
+  z-index: 1;
+}
+
+.avatar {
+  margin-left: 15px;
+}
+
+/* .avatarImg {
+  position: relative;
+} */
+
+.avatarInput {
+  position: absolute;
+  left: 10px;
+  bottom: 0px;
+  opacity: 0;
+  z-index: 2;
+}
+
+.displayCameraIconOnAvatar {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  z-index: 1;
+}
+
+.displayCameraIconOnAvatarAfter {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  z-index: 1;
 }
 </style>
