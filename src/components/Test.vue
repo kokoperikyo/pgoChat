@@ -1,50 +1,21 @@
 <template>
-  <v-card max-width="350" min-height="250">
-    <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
-    <v-row justify="center">
-      <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
-    </v-row>
-  </v-card>
+  <div>
+    <p class="subtitle-2 text-center">Agnostic RTL Alignment</p>
+
+    <p class="text-sm-left">Left aligned text on viewports sized SM (small) or wider for rtl or ltr.</p>
+    <p
+      class="text-md-left"
+    >Left aligned text on viewports sized MD (medium) or wider for rtl or ltr.</p>
+    <p
+      class="text-lg-right"
+    >Right aligned text on viewports sized LG (large) or wider for rtl or ltr.</p>
+    <p
+      class="text-xl-left"
+    >Left aligned text on viewports sized XL (extra-large) or wider for rtl or ltr.</p>
+
+    <p class="subtitle-2 text-center">Responsive RTL Alignment</p>
+
+    <p class="text-start">Left aligned text on ltr and right aligned on rtl.</p>
+    <p class="text-end">Right aligned text on ltr and left aligned on rtl.</p>
+  </div>
 </template>
-<script>
-export default {
-  data: () => ({
-    items: [
-      {
-        icon: "folder",
-        iconClass: "grey lighten-1 white--text",
-        title: "Photos",
-        subtitle: "Jan 9, 2014"
-      },
-      {
-        icon: "folder",
-        iconClass: "grey lighten-1 white--text",
-        title: "Recipes",
-        subtitle: "Jan 17, 2014"
-      },
-      {
-        icon: "folder",
-        iconClass: "grey lighten-1 white--text",
-        title: "Work",
-        subtitle: "Jan 28, 2014"
-      }
-    ],
-    items2: [
-      {
-        icon: "assignment",
-        iconClass: "blue white--text",
-        title: "Vacation itinerary",
-        subtitle: "Jan 20, 2014"
-      },
-      {
-        icon: "call_to_action",
-        iconClass: "amber white--text",
-        title: "Kitchen remodel",
-        subtitle: "Jan 10, 2014"
-      }
-    ]
-  })
-};
-</script>
-<style>
-</style>

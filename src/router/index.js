@@ -9,6 +9,8 @@ import Profile from '../components/pages/Profile.vue'
 import FriendList from '../components/pages/FriendList.vue'
 import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
+import Chat2 from '../components/pages/Chat2.vue'
+
 
 
 Vue.use(VueRouter)
@@ -72,6 +74,14 @@ const routes = [{
     path: '/chat/:uid',
     name: 'chat',
     component: Chat,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/chat2/:uid',
+    name: 'chat2',
+    component: Chat2,
     meta: {
       requiresAuth: true
     }
