@@ -177,10 +177,10 @@
           <div v-else>
             <v-list-item-title
               v-if="$vuetify.breakpoint.smAndDown"
-              v-text="displayUserName"
+              v-text="displayFriendUserInfo.name"
               style="font-size:20px;"
             ></v-list-item-title>
-            <v-list-item-title v-else style="font-size:24px;" v-text="displayUserName"></v-list-item-title>
+            <v-list-item-title v-else style="font-size:24px;" v-text="displayFriendUserInfo.name"></v-list-item-title>
           </div>
         </v-list-item-content>
         <!-- 相手ユーザーとのステータスの表示 -->
