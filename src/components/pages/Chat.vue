@@ -19,7 +19,6 @@
         </v-container>
       </v-card>
     </v-dialog>
-
     <v-card max-width="1100px" class="mx-auto" id="chatCard">
       <v-toolbar color="gray" dark>
         <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
@@ -32,65 +31,72 @@
         </v-btn>
       </v-toolbar>
       <v-card class="overflow-y-auto scroll" style="max-height: 400px">
-        <v-list color="#FFFAFA">
-          <v-list-item style="white-space:pre-line; " v-for="(message, i) in messages" :key="i">
-            <v-list-item-avatar v-if="isOthersMessage(message.ref)">
-              <v-img :src="chatUser.avatarUrl"></v-img>
+        <v-list>
+          <v-list-item
+            class="mt-2"
+            v-for="(message, i) in messages"
+            :key="i"
+            style="white-space:pre-wrap;"
+          >
+            <!-- 自分のメッセージは右側に表示するのでスペースを入れる -->
+            <v-spacer v-if="!isMyMessage(message.ref)"></v-spacer>
+            <!-- 相手のメッセージの左にアバター表示 -->
+            <v-list-item-avatar v-if="isMyMessage(message.ref)" size="25">
+              <v-img
+                :src="chatUser.avatarUrl"
+                :class="{ firstMesMargin: isFirstMes(message.createdAt,i)}"
+              ></v-img>
             </v-list-item-avatar>
-            <div
-              v-if="isOthersMessage(message.ref)"
-              :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-              class="other_message px-5 py-2"
-            >{{message.message}}</div>
-            <div
-              v-if="isOthersMessage(message.ref)"
-              class="display-get-time"
-            >{{displaySendTime(message.createdAt)}}</div>
-            <v-spacer></v-spacer>
-            <div
-              v-if="!isOthersMessage(message.ref)"
-              :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-              class="my_message px-5 pt-2"
-            >
-              {{message.message}}
-              <div class="display-send-time">{{displaySendTime(message.createdAt)}}</div>
+            <div :class="{ firstMesMargin: isFirstMes(message.createdAt,i)}">
+              <!-- メッセージの色分け -->
+              <!-- 自分がわ（右） -->
+              <div v-if="!isMyMessage(message.ref)">
+                <div v-if="!editStatus">
+                  <v-btn
+                    @click="editMesAction(message.message,message.uid)"
+                    class="mb-1"
+                    outlined
+                    x-small
+                    fab
+                    color="indigo"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
+                    @click="deleteMesAction(message.uid)"
+                    class="mb-1 ml-1"
+                    outlined
+                    x-small
+                    fab
+                    color="error"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+                <div class="my_message p-2">{{message.message}}</div>
+                <div class="display-send-time">{{displaySendTime(message.createdAt)}}</div>
+              </div>
+              <!-- 相手側（左） -->
+              <div v-else>
+                <div style="white-space:pre-line;" class="other_message py-2 pl-5">
+                  {{message.message}}
+                  <span
+                    class="display-get-time"
+                  >{{displaySendTime(message.createdAt)}}</span>
+                </div>
+              </div>
+
+              <div
+                v-if="isFirstMes(message.createdAt,i)"
+                class="first-mes-position"
+                :style="{right: getChatCardWidth + 'px' }"
+              >{{firstMes(message.createdAt,i)}}</div>
+              <div
+                v-else-if="i == 0"
+                class="first-first-mes-position"
+                :style="{right: getChatCardWidth + 'px' }"
+              >{{firstMes(message.createdAt,i)}}</div>
             </div>
-            <div v-if="!editStatus">
-              <v-btn
-                v-if="!isOthersMessage(message.ref)"
-                @click="editMesAction(message.message,message.uid)"
-                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                class="ml-3"
-                outlined
-                x-small
-                fab
-                color="indigo"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn
-                v-if="!isOthersMessage(message.ref)"
-                @click="deleteMesAction(message.uid)"
-                :class="{ firstMesMargin: isFristMes(message.createdAt,i),notFirstMesMargin: !isFristMes(message.createdAt,i)}"
-                class="ml-1"
-                outlined
-                x-small
-                fab
-                color="error"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </div>
-            <div
-              v-if="isFristMes(message.createdAt,i)"
-              class="first-mes-position"
-              :style="{right: getChatCardWidth + 'px' }"
-            >{{firstMes(message.createdAt,i)}}</div>
-            <div
-              v-else-if="i == 0"
-              class="first-first-mes-position"
-              :style="{right: getChatCardWidth + 'px' }"
-            >{{firstMes(message.createdAt,i)}}</div>
           </v-list-item>
         </v-list>
       </v-card>
@@ -131,25 +137,20 @@ export default {
       editMes: "",
       mesUid: "",
       editStatus: true,
-      editingModal: false
+      editingModal: false,
+      isMyMessageCla: false
     };
   },
   computed: {
-    canSend: function() {
-      if (this.inputMessage) {
-        return false;
-      } else {
-        return true;
-      }
-    },
     getChatCardWidth: function() {
       //80っのはfirst-mes-positionで定義してある
       return (this.chatCardWidth - 80) / 2;
     }
   },
   methods: {
-    isOthersMessage(who) {
-      if (who == this.$store.getters.user.uid + this.$route.params["uid"]) {
+    isMyMessage(mesId) {
+      if (mesId == this.$store.getters.user.uid + this.$route.params["uid"]) {
+        this.isMyMessageCla = true;
         return true;
       } else {
         return false;
@@ -266,7 +267,7 @@ export default {
             .delete();
         });
     },
-    isFristMes(date, i) {
+    isFirstMes(date, i) {
       if (i != 0) {
         const thisTimeDate = date.toDate().getDate();
         const oneBeforeTimeDate = this.messages[i - 1].createdAt
@@ -279,6 +280,13 @@ export default {
         }
       }
       return false;
+    },
+    isTopMes(i) {
+      if (i == 0) {
+        return true;
+      } else {
+        return false;
+      }
     },
     firstMes(date, i) {
       const weekArray = ["", "日", "月", "火", "水", "木", "金", "土"];
@@ -334,3 +342,46 @@ export default {
   }
 };
 </script>
+<style>
+.other_message {
+  background: #6cfcfc;
+  border: 1px solid;
+  /* border-color: white; */
+  border-radius: 0px 10px 10px 10px; /*左下だけ尖らせて吹き出し感を出す*/
+  /* max-width: 200px; */
+}
+.my_message {
+  background: #f5a37d;
+  border: 1px solid;
+  /* border-color: white; */
+  border-radius: 10px 0px 10px 10px;
+  /*左下だけ尖らせて吹き出し感を出す*/
+}
+.display-send-time {
+  position: relative;
+  right: 46px;
+  bottom: 20px;
+}
+.display-get-time {
+  position: relative;
+  top: 10px;
+  left: 50px;
+}
+.firstMesMargin {
+  margin-top: 40px;
+}
+.first-mes-position {
+  position: absolute;
+  top: 10px;
+  font-size: 12px;
+  width: 80px;
+  text-align: center;
+}
+.first-first-mes-position {
+  position: absolute;
+  bottom: 64px;
+  font-size: 12px;
+  width: 80px;
+  text-align: center;
+}
+</style>
