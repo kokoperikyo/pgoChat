@@ -6,9 +6,9 @@
           <v-list-item>
             <v-spacer></v-spacer>
             <div class="mt-3">
-              <v-btn fab class="mr-2" color="#01579B">
+              <!-- <v-btn fab class="mr-2" color="#01579B">
                 <v-icon large color="white" class="fab fa-facebook-square"></v-icon>
-              </v-btn>
+              </v-btn>-->
               <v-btn fab class="mr-2" color="error">
                 <v-icon large color="white" class="fab fa-google-plus-square" @click="signInGoogle"></v-icon>
               </v-btn>
@@ -35,7 +35,6 @@
               <v-text-field
                 v-model="password"
                 :error-messages="passwordErrors"
-                :counter="10"
                 prepend-inner-icon="lock"
                 placeholder="password"
                 solo
@@ -48,7 +47,7 @@
             </v-form>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" @click="signInEmail">ログイン</v-btn>
+              <v-btn color="primary" @click="signInEmail" :disabled="isError">ログイン</v-btn>
             </v-card-actions>
           </v-card-text>
           <v-divider></v-divider>
@@ -97,10 +96,27 @@ export default {
       !this.$v.email.email && errors.push("メールアドレスを入力してください");
       !this.$v.email.required && errors.push("メールアドレスは必須です");
       return errors;
+    },
+    isError() {
+      if (this.passwordErrors.length == 0 && this.emailErrors.length == 0) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
 
   methods: {
+    alertMes(code) {
+      if (code == "auth/invalid-email") {
+        alert("正しいメールアドレスを入力してください");
+      } else if (
+        code == "auth/user-not-found" ||
+        code == "auth/wrong-password"
+      ) {
+        alert("メールアドレスかパスワードが間違っています");
+      }
+    },
     signInEmail() {
       firebase
         .auth()
@@ -109,34 +125,24 @@ export default {
           this.$router.push("/profile");
         })
         .catch(error => {
-          alert(error.message);
+          this.alertMes(error.code);
         });
     },
     signInGoogle() {
       var provider = new firebase.auth.GoogleAuthProvider();
       firebase
         .auth()
-        .signInWithPopup(provider)
-        .then(() => {
-          this.$router.push("/profile");
-        })
+        .signInWithRedirect(provider)
         .catch(error => alert(error.message));
+      this.$router.push("loading");
     },
     signInTwitter() {
       var provider = new firebase.auth.TwitterAuthProvider();
       firebase
         .auth()
-        .signInWithPopup(provider)
-        .then(result => {
-          this.$router.push("/profile");
-          result.credential.accessToken; //token
-          result.credential.secret; //secret
-          result.user; //user
-        })
-        .catch(error => {
-          // eslint-disable-next-line no-console
-          console.log(error);
-        });
+        .signInWithRedirect(provider)
+        .catch(error => alert(error.message));
+      this.$router.push("loading");
     }
   }
 };

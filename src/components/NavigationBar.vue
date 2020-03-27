@@ -102,11 +102,8 @@
                 </v-list-item-title>
               </v-list-item-content>
             </template>
-            <!-- <v-list-item> -->
-            <v-row>
-              <v-col col="1"></v-col>
-
-              <v-col col="2">
+            <v-row class="mx-3">
+              <v-col>
                 <v-btn
                   block
                   @click="acceptFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,0)"
@@ -118,9 +115,7 @@
                   <v-icon>mdi-handshake</v-icon>
                 </v-btn>
               </v-col>
-              <v-col col="2"></v-col>
-
-              <v-col col="2">
+              <v-col>
                 <v-btn
                   block
                   @click="goProfile(friendRequest.id)"
@@ -132,9 +127,7 @@
                   <v-icon>mdi-shield-account</v-icon>
                 </v-btn>
               </v-col>
-              <v-col col="2"></v-col>
-
-              <v-col col="2">
+              <v-col>
                 <v-btn
                   block
                   @click="rejectFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,1)"
@@ -146,9 +139,7 @@
                   <v-icon>mdi-account-cancel</v-icon>
                 </v-btn>
               </v-col>
-              <v-col col="1"></v-col>
             </v-row>
-            <!-- </v-list-item> -->
           </v-list-group>
         </v-list>
       </v-menu>
@@ -157,7 +148,7 @@
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
-        <v-btn text to="/signUp" class="pr-0">新規登録</v-btn>
+        <v-btn text to="/signUp" class>新規登録</v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <v-content>

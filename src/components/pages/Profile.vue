@@ -329,9 +329,10 @@ export default {
         this.user = doc.data();
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
+          //chatの6-3のために必要
           //初期アバターのセット
           this.displayAvatar =
-            "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8";
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/avatarSampleImg%2Favatar-default-icon.png?alt=media&token=49138b6a-bb64-450a-b476-bf0150756912";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
@@ -345,7 +346,7 @@ export default {
               nicknameList: [],
               //初期アバターのDB登録
               avatarUrl:
-                "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/avatarSampleImg%2FSrBtEaccUUh5OMFVKMOZ2VIqZSQ2?alt=media&token=273fa8ce-b385-4e6e-b94d-743c96f6a2b8"
+                "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/avatarSampleImg%2Favatar-default-icon.png?alt=media&token=49138b6a-bb64-450a-b476-bf0150756912"
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
@@ -649,16 +650,6 @@ export default {
         });
       }, 2000);
     },
-    //編集中にアップした画像を一時的に表示
-    // desplayImg(file) {
-    //   // eslint-disable-next-line no-console
-    //   console.log(file);
-
-    //   var blobUrl = window.URL.createObjectURL(file);
-
-    //   this.displayDemoHeaderImg = blobUrl;
-    //   this.headerFile = file;
-    // },
     desplayImg(file) {
       let files = file.target.files;
       this.createImage(files[0]);

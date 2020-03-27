@@ -9,6 +9,10 @@ import Profile from '../components/pages/Profile.vue'
 import FriendList from '../components/pages/FriendList.vue'
 import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
+import Loading from '../components/pages/Loading.vue'
+
+
+
 
 
 
@@ -26,6 +30,11 @@ const routes = [{
     path: '/signIn',
     name: 'signIn',
     component: SignIn
+  },
+  {
+    path: '/loading',
+    name: 'loading',
+    component: Loading
   },
   {
     path: '/test',
@@ -86,7 +95,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  // firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   if (requiresAuth) {
     // このルートはログインされているかどうか認証が必要です。

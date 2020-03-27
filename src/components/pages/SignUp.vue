@@ -6,14 +6,11 @@
           <v-list-item>
             <v-spacer></v-spacer>
             <div class="mt-3">
-              <v-btn fab class="mr-2" color="#01579B">
-                <v-icon large color="white" class="fab fa-facebook-square"></v-icon>
-              </v-btn>
               <v-btn fab class="mr-2" color="error">
                 <v-icon large color="white" class="fab fa-google-plus-square" @click="signUpGoogle"></v-icon>
               </v-btn>
               <v-btn fab color="primary">
-                <v-icon large color="white" class="fab fa-twitter-square"></v-icon>
+                <v-icon large color="white" class="fab fa-twitter-square" @click="signUpTwitter"></v-icon>
               </v-btn>
             </div>
             <v-spacer></v-spacer>
@@ -35,7 +32,6 @@
               <v-text-field
                 v-model="password"
                 :error-messages="passwordErrors"
-                :counter="10"
                 prepend-inner-icon="lock"
                 placeholder="password"
                 solo
@@ -48,7 +44,7 @@
             </v-form>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" @click="signUpEmail">登録</v-btn>
+              <v-btn color="primary" @click="signUpEmail" :disabled="isError">登録</v-btn>
             </v-card-actions>
           </v-card-text>
         </v-card>
@@ -58,7 +54,7 @@
 </template>
 <script>
 import { validationMixin } from "vuelidate";
-import { required, minLength, email } from "vuelidate/lib/validators";
+import { required, minLength, alphaNum, email } from "vuelidate/lib/validators";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 
@@ -66,8 +62,12 @@ export default {
   mixins: [validationMixin],
 
   validations: {
-    password: { required, maxLength: minLength(6) },
-    email: { required, email }
+    password: {
+      required,
+      maxLength: minLength(6),
+      alpha: alphaNum
+    },
+    email: { required, email, alpha: alphaNum }
   },
 
   data: () => ({
@@ -79,6 +79,8 @@ export default {
     passwordErrors() {
       const errors = [];
       if (!this.$v.password.$dirty) return errors;
+      !this.$v.password.alpha &&
+        errors.push("アルファベットか数字を入力してください");
       !this.$v.password.maxLength && errors.push("パスワードは6文字以上です");
       !this.$v.password.required && errors.push("パスワードは必須です");
       return errors;
@@ -86,12 +88,27 @@ export default {
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
+      !this.$v.email.alpha && errors.push("メールアドレスを入力してください");
       !this.$v.email.email && errors.push("メールアドレスを入力してください");
       !this.$v.email.required && errors.push("メールアドレスは必須です");
       return errors;
+    },
+    isError() {
+      if (this.passwordErrors.length == 0 && this.emailErrors.length == 0) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
   methods: {
+    alertMes(code) {
+      if (code == "auth/invalid-email") {
+        alert("メールアドレスを入力してください");
+      } else if (code == "auth/weak-password") {
+        alert("パスワードを入力してください");
+      }
+    },
     signUpEmail() {
       firebase
         .auth()
@@ -100,18 +117,24 @@ export default {
           this.$router.push("/profile");
         })
         .catch(error => {
-          alert(error.message);
+          this.alertMes(error.code);
         });
     },
     signUpGoogle() {
       var provider = new firebase.auth.GoogleAuthProvider();
       firebase
         .auth()
-        .signInWithPopup(provider)
-        .then(() => {
-          this.$router.push("/profile");
-        })
+        .signInWithRedirect(provider)
         .catch(error => alert(error.message));
+      this.$router.push("loading");
+    },
+    signUpTwitter() {
+      var provider = new firebase.auth.TwitterAuthProvider();
+      firebase
+        .auth()
+        .signInWithRedirect(provider)
+        .catch(error => alert(error.message));
+      this.$router.push("loading");
     }
   }
 };

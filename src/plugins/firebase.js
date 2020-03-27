@@ -10,14 +10,14 @@ import store from "../store";
 Vue.use(firestorePlugin)
 
 const firebaseApp = firebase.initializeApp({
-  apiKey: "AIzaSyBbkj14_B5DG_kEG8KElA1dC7-XRm9P93g",
-  authDomain: "pgochat-91c46.firebaseapp.com",
-  databaseURL: "https://pgochat-91c46.firebaseio.com",
-  projectId: "pgochat-91c46",
-  storageBucket: "pgochat-91c46.appspot.com",
-  messagingSenderId: "345882079330",
-  appId: "1:345882079330:web:83a488bf6e42ee29bce13b",
-  measurementId: "G-ZRKV1BLLK5"
+  apiKey: "AIzaSyBkA8JBqg0sNJE0Bs5dsm6Z99mxZJOfSd4",
+  authDomain: "devpgochat-e5d09.firebaseapp.com",
+  databaseURL: "https://devpgochat-e5d09.firebaseio.com",
+  projectId: "devpgochat-e5d09",
+  storageBucket: "devpgochat-e5d09.appspot.com",
+  messagingSenderId: "414367036342",
+  appId: "1:414367036342:web:1a5fc5fbd797d2852d8717",
+  measurementId: "G-VRFGE0313E"
 });
 
 export default {

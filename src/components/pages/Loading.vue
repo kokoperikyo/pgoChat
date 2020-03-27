@@ -14,3 +14,15 @@
     </v-row>
   </v-container>
 </template>
+<script>
+export default {
+  created() {},
+  computed: {},
+  mounted() {
+    setTimeout(() => {
+      this.$router.push("/profile");
+    }, 5000);
+  },
+  methods: {}
+};
+</script>
