@@ -19,21 +19,22 @@
   </div>
 </template>
 <script>
+import { db } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 
 export default {
   data: () => ({
-    exitModal: false
+    exitModal: false,
+    userInfo: null,
+    test: null
   }),
-  mounted() {
-    // setTimeout(() => {
-    //   this.$router.push("/profile");
-    // }, 5000);
-  },
+  mounted() {},
   methods: {
     deleteAccount() {
-      var user = firebase.auth().currentUser;
+      this.deleteFriendFromFriendsData();
+      this.deleteFriendReqFromFriendsData();
 
+      var user = firebase.auth().currentUser;
       user
         .delete()
         .then(function() {})
@@ -42,7 +43,65 @@ export default {
             "大変申し訳ございませんが、ログアウトして再度ログインした後実行してくだい"
           );
         });
+    },
+    deleteFriendFromFriendsData() {
+      this.userInfo.friends.forEach(friend => {
+        this.deleteFromfriendIdList(friend.id);
+        this.deleteFromfriends(friend.id);
+      });
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .delete();
+    },
+    deleteFromfriendIdList(friendId) {
+      db.collection("users")
+        .doc(friendId)
+        .update({
+          friendIdList: firebase.firestore.FieldValue.arrayRemove(
+            this.$store.getters.user.uid
+          )
+        });
+    },
+    deleteFromfriends(friendId) {
+      db.collection("users")
+        .doc(friendId)
+        .update({
+          friends: firebase.firestore.FieldValue.arrayRemove(
+            db.collection("users").doc(this.$store.getters.user.uid)
+          )
+        });
+    },
+    deleteFriendReqFromFriendsData() {
+      this.userInfo.friendRequestList.forEach(friend => {
+        this.deleteFromSendFriendRequestList(friend.id);
+        this.deleteFromSendFriendRequestNameList(friend.id);
+      });
+    },
+    deleteFromSendFriendRequestList(friendId) {
+      db.collection("users")
+        .doc(friendId)
+        .update({
+          sendFriendRequestList: firebase.firestore.FieldValue.arrayRemove({
+            avatarUrl: this.userInfo.avatarUrl,
+            friendId: this.$store.getters.user.uid,
+            friendName: this.userInfo.name
+          })
+        });
+    },
+    deleteFromSendFriendRequestNameList(friendId) {
+      db.collection("users")
+        .doc(friendId)
+        .update({
+          sendFriendRequestNameList: firebase.firestore.FieldValue.arrayRemove(
+            this.userInfo.name
+          )
+        });
     }
+  },
+  firestore() {
+    return {
+      userInfo: db.collection("users").doc(this.$store.getters.user.uid)
+    };
   }
 };
 </script>
