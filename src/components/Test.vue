@@ -1,16 +1,33 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <v-row align="center" justify="center" class="grey lighten-5">
-          <h3>ログイン中です.....</h3>
-        </v-row>
-      </v-col>
-      <v-col cols="12">
-        <v-row align="center" justify="center" class="grey lighten-5">
-          <v-progress-circular indeterminate color="primary" :size="100" :width="10"></v-progress-circular>
-        </v-row>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-list>{{userInfo}}</v-list>
 </template>
+<script>
+import { db } from "@/plugins/firebase";
+import "@firebase/firestore";
+export default {
+  data() {
+    return {
+      userInfo: null,
+      latestMes: [],
+      latestMesTime: [],
+      cahtOpenTime: [],
+      lastChatOpen: [],
+      isUnreadList: [],
+      mes: null
+    };
+  },
+  firestore() {
+    return {
+      userInfo: db.collection("users").doc(this.$store.getters.user.uid),
+      mes: db
+        .collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("messages"),
+      lastChatOpen: db
+        .collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("lastOpen")
+    };
+  }
+};
+</script>

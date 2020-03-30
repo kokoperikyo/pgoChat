@@ -67,7 +67,7 @@ export default {
       maxLength: minLength(6),
       alpha: alphaNum
     },
-    email: { required, email, alpha: alphaNum }
+    email: { required, email }
   },
 
   data: () => ({
@@ -88,7 +88,6 @@ export default {
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.alpha && errors.push("メールアドレスを入力してください");
       !this.$v.email.email && errors.push("メールアドレスを入力してください");
       !this.$v.email.required && errors.push("メールアドレスは必須です");
       return errors;

@@ -6,10 +6,14 @@ import SignIn from '../components/pages/SignIn.vue'
 import Test from '../components/Test.vue'
 import TestTwo from '../components/TestTwo.vue'
 import Profile from '../components/pages/Profile.vue'
+import ChatRoom from '../components/pages/ChatRoom.vue'
 import FriendList from '../components/pages/FriendList.vue'
 import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
 import Loading from '../components/pages/Loading.vue'
+import DeleteAccount from '../components/pages/DeleteAccount.vue'
+import TestChat from '../components/pages/TestChat.vue'
+
 
 
 
@@ -55,6 +59,14 @@ const routes = [{
     }
   },
   {
+    path: '/chatRoom',
+    name: 'chatRoom',
+    component: ChatRoom,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/profile/:uid',
     name: 'friendProfile',
     component: Profile,
@@ -86,6 +98,23 @@ const routes = [{
       requiresAuth: true
     }
   },
+  {
+    path: '/deleteAccount',
+    name: 'deleteAccount',
+    component: DeleteAccount,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/testChat',
+    name: 'testChat',
+    component: TestChat,
+    meta: {
+      requiresAuth: true
+    }
+  },
+
 ]
 
 const router = new VueRouter({

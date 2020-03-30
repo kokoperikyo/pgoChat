@@ -91,6 +91,7 @@
           </v-row>
         </v-card>
       </v-dialog>
+      <!-- こっから本体 -->
       <div v-if="isEdit" class="headerImg">
         <div v-if="displayDemoHeaderImg">
           <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
@@ -105,8 +106,13 @@
         </div>
       </div>
       <div v-else>
-        <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
-        <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
+        <v-row v-if="showHeaderLoader" align="center" justify="center" style="height: 220px;">
+          <v-progress-circular indeterminate color="primary" :size="80" width="10"></v-progress-circular>
+        </v-row>
+        <div v-else>
+          <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
+          <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
+        </div>
       </div>
       <v-list-item class="mt-5 pr-1">
         <v-list-item-avatar class="ml-1 mr-5">
@@ -126,10 +132,15 @@
             </div>
           </div>
           <div v-else>
-            <v-avatar size="60">
-              <v-img v-if="isMypage" :src="displayAvatar"></v-img>
-              <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
-            </v-avatar>
+            <div v-if="showAvatarLoader">
+              <v-progress-circular indeterminate color="primary" :size="40"></v-progress-circular>
+            </div>
+            <div v-else>
+              <v-avatar size="60">
+                <v-img v-if="isMypage" :src="displayAvatar"></v-img>
+                <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+              </v-avatar>
+            </div>
           </div>
         </v-list-item-avatar>
         <!-- 編集中 -->
@@ -290,7 +301,9 @@ export default {
       displayUserName: null,
       displaySelfIntroduction: null,
       headerFile: null,
+      showHeaderLoader: false,
       avatarFile: null,
+      showAvatarLoader: false,
       displayHeaderImg: "",
       displayDemoHeaderImg: "",
       displayAvatar: "",
@@ -332,7 +345,7 @@ export default {
           //chatの6-3のために必要
           //初期アバターのセット
           this.displayAvatar =
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/avatarSampleImg%2Favatar-default-icon.png?alt=media&token=49138b6a-bb64-450a-b476-bf0150756912";
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
@@ -346,7 +359,7 @@ export default {
               nicknameList: [],
               //初期アバターのDB登録
               avatarUrl:
-                "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/avatarSampleImg%2Favatar-default-icon.png?alt=media&token=49138b6a-bb64-450a-b476-bf0150756912"
+                "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0"
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
@@ -376,7 +389,6 @@ export default {
         selfIntroduction: this.displaySelfIntroduction
       });
       const storageRef = firebase.storage().ref();
-
       if (this.headerFile) {
         const imageRef = storageRef.child(
           `headerImg/${this.$store.getters.user.uid}`
@@ -392,6 +404,12 @@ export default {
               });
           });
         });
+        this.showHeaderLoader = true;
+        setTimeout(() => {
+          this.showHeaderLoader = false;
+        }, 10000);
+        this.displayHeaderImg = "";
+        this.headerFile = "";
       }
       if (this.avatarFile) {
         const imageRef = storageRef.child(
@@ -408,6 +426,12 @@ export default {
               });
           });
         });
+        this.showAvatarLoader = true;
+        setTimeout(() => {
+          this.showAvatarLoader = false;
+        }, 5000);
+        this.displayAvatar = "";
+        this.avatarFile = "";
       }
       this.isEdit = false;
       this.displayDemoHeaderImg = "";

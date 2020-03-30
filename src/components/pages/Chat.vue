@@ -34,7 +34,7 @@
             <v-btn icon @click="startSixToThree(1)">
               <v-img
                 width="60px"
-                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%82%B9%E3%83%BC%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=b917de82-c48f-432f-9da7-9fe241bc30cf"
+                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%82%B9%E3%83%BC%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=2daccd4d-c422-47a8-9457-19c88562f3f5"
               ></v-img>
             </v-btn>
           </v-col>
@@ -42,7 +42,7 @@
             <v-btn icon @click="startSixToThree(2)">
               <v-img
                 width="60px"
-                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%83%8F%E3%82%A4%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=ed6574c7-a541-4b2d-95a1-2077a57ac4ff"
+                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%83%8F%E3%82%A4%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=07b49c27-20f9-49fb-a663-a0b4c278a1fc"
               ></v-img>
             </v-btn>
           </v-col>
@@ -50,7 +50,7 @@
             <v-btn icon @click="startSixToThree(3)">
               <v-img
                 width="60px"
-                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=e5321c5c-7dbb-41e9-92ee-17aa7d94b0f3"
+                src="https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=b66582c4-0af9-4165-9944-00de24a4cd77"
               ></v-img>
             </v-btn>
           </v-col>
@@ -194,8 +194,17 @@
                     <div v-if="canShowParty()">
                       <v-card width="240" color="#9ccc65" class="px-3" flat>
                         <v-row>
-                          <v-col cols="4" v-for="(item, index) in message.message" :key="index">
-                            <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
+                          <v-col
+                            cols="4"
+                            v-for="(item, index) in message.partyListDis"
+                            :key="index"
+                          >
+                            <v-img
+                              v-if="imgLoad"
+                              width="60px"
+                              :src="getImg(item)"
+                              class="pokemonImgOnChat"
+                            ></v-img>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -244,8 +253,17 @@
                     <div v-if="canShowParty()">
                       <v-card width="240" color="#9ccc65" class="px-3" flat>
                         <v-row>
-                          <v-col cols="4" v-for="(item, index) in message.message" :key="index">
-                            <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
+                          <v-col
+                            cols="4"
+                            v-for="(item, index) in message.partyListDis"
+                            :key="index"
+                          >
+                            <v-img
+                              v-if="imgLoad"
+                              width="60px"
+                              :src="getImg(item)"
+                              class="pokemonImgOnChat"
+                            ></v-img>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -325,6 +343,7 @@ import { format } from "date-fns";
 export default {
   data() {
     return {
+      imgLoad: false,
       chatCardWidth: 0,
       messages: [],
       inputMessage: "",
@@ -344,58 +363,40 @@ export default {
       showParty: false,
       items: [
         {
+          name: "フシギダネ（ふしぎだね）",
+          index: 1,
+          img:
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0001.PNG?alt=media&token=2dc5a845-e0e2-41c5-9e8a-fa334fc3825e"
+        },
+        {
           name: "フシギソウ（ふしぎそう）",
           index: 2,
           img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0002.PNG?alt=media&token=4ad36e70-9b08-4acf-9e2c-ff4be907d3f6"
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0002.PNG?alt=media&token=d4285cbd-0d9a-49fb-a8b7-3de29ed3d5fa"
         },
         {
           name: "フシギバナ（ふしぎばな）",
           index: 3,
           img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0003.PNG?alt=media&token=3f3ab5c3-9d4c-4085-9f23-97ae65e52f8b"
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0003.PNG?alt=media&token=e5cddba8-bbfd-44aa-8c75-be13535b43dc"
+        },
+        {
+          name: "ヒトカゲ（ひとかげ）",
+          index: 4,
+          img:
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0004.PNG?alt=media&token=b191c199-25ae-4283-8074-566d4da0c7a6"
+        },
+        {
+          name: "リザード（りざーど）",
+          index: 5,
+          img:
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0005.PNG?alt=media&token=01c86bf4-67ec-47cd-b57a-4d4b7d6f2426"
         },
         {
           name: "リザードン（りざーどん）",
           index: 6,
           img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0006.PNG?alt=media&token=5b691454-1cbd-43bd-90b7-8b7e4fd80da1"
-        },
-        {
-          name: "カメックス（かめっくす）",
-          index: 9,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0009.PNG?alt=media&token=085a83af-f45b-426b-8360-f1861480328a"
-        },
-        {
-          name: "スピアー（すぴあー）",
-          index: 15,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0015.PNG?alt=media&token=9e5fc809-388a-41d6-b4c1-bc135253a05d"
-        },
-        {
-          name: "ライチュウ（らいちゅう）",
-          index: 26,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0026.PNG?alt=media&token=a33e2ba5-1cce-4150-be8b-e94058ba5541"
-        },
-        {
-          name: "ピクシー（ぴくしー）",
-          index: 36,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0036.PNG?alt=media&token=11527678-5cf1-46cd-9717-c10599cf5d86"
-        },
-        {
-          name: "キュウコン（きゅうこん）",
-          index: 38,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0038.PNG?alt=media&token=7f09680f-b1e0-4128-8478-4179a0f8dec9"
-        },
-        {
-          name: "プクリン（ぷくりん）",
-          index: 40,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemon%2F0040.PNG?alt=media&token=d10de3ba-2a82-4a64-b5ed-4706e56cb306"
+            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0006.PNG?alt=media&token=92a5f7a5-f6ab-4c03-b48a-495e5bc74c73"
         }
       ],
       partyValue: null,
@@ -445,6 +446,7 @@ export default {
           ref: this.$route.params["uid"],
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           uid: result,
+          whoesMes: this.$store.getters.user.uid,
           stanpSt: 0
         });
       db.collection("users")
@@ -455,6 +457,7 @@ export default {
           ref: this.$route.params["uid"] + this.$store.getters.user.uid,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           uid: result,
+          whoesMes: this.$store.getters.user.uid,
           stanpSt: 0
         });
       this.inputMessage = "";
@@ -476,17 +479,17 @@ export default {
         this.leagueBaseColor = "#0D47A1";
         this.leagueRowColor = "#EF5350";
         this.leagueImg =
-          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%82%B9%E3%83%BC%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=b917de82-c48f-432f-9da7-9fe241bc30cf";
+          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%82%B9%E3%83%BC%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=2daccd4d-c422-47a8-9457-19c88562f3f5";
       } else if (st == 2) {
         this.leagueBaseColor = "#263238";
         this.leagueRowColor = "#FFEA00";
         this.leagueImg =
-          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%83%8F%E3%82%A4%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=ed6574c7-a541-4b2d-95a1-2077a57ac4ff";
+          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%83%8F%E3%82%A4%E3%83%8F%E3%82%9A%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=07b49c27-20f9-49fb-a663-a0b4c278a1fc";
       } else {
         this.leagueBaseColor = "#4527A0";
         this.leagueRowColor = "#E040FB";
         this.leagueImg =
-          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/league%2F%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=e5321c5c-7dbb-41e9-92ee-17aa7d94b0f3";
+          "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/leagueImg%2F%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%82%AF%E3%82%99.png?alt=media&token=b66582c4-0af9-4165-9944-00de24a4cd77";
       }
     },
     //６−３を投げる
@@ -504,22 +507,24 @@ export default {
         .doc(this.$store.getters.user.uid)
         .collection("messages")
         .add({
-          message: this.inputMessage,
+          message: "6-3申請中",
           ref: this.$route.params["uid"],
           uid: result,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           stanpSt: 1,
+          whoesMes: this.$store.getters.user.uid,
           league: st
         });
       db.collection("users")
         .doc(this.$route.params["uid"])
         .collection("messages")
         .add({
-          message: this.inputMessage,
+          message: "6-3申請がきています",
           ref: this.$route.params["uid"] + this.$store.getters.user.uid,
           uid: result,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           stanpSt: 1,
+          whoesMes: this.$store.getters.user.uid,
           league: st
         });
       this.inputMessage = "";
@@ -591,21 +596,25 @@ export default {
           .doc(this.$store.getters.user.uid)
           .collection("messages")
           .add({
-            message: this.partyList,
+            message: "パーティ選択完了",
             ref: this.$route.params["uid"],
             uid: result,
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-            stanpSt: 2
+            stanpSt: 2,
+            whoesMes: this.$store.getters.user.uid,
+            partyListDis: this.partyList
           });
         db.collection("users")
           .doc(this.$route.params["uid"])
           .collection("messages")
           .add({
-            message: this.partyList,
+            message: "パーティ選択完了",
             ref: this.$route.params["uid"] + this.$store.getters.user.uid,
             uid: result,
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-            stanpSt: 2
+            stanpSt: 2,
+            whoesMes: this.$store.getters.user.uid,
+            partyListDis: this.partyList
           });
       }, 500);
 
@@ -642,21 +651,25 @@ export default {
         .doc(this.$store.getters.user.uid)
         .collection("messages")
         .add({
-          message: this.partyList,
+          message: "パーティ選択完了",
           ref: this.$route.params["uid"],
           uid: result,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-          stanpSt: 2
+          stanpSt: 2,
+          whoesMes: this.$store.getters.user.uid,
+          partyListDis: this.partyList
         });
       db.collection("users")
         .doc(this.$route.params["uid"])
         .collection("messages")
         .add({
-          message: this.partyList,
+          message: "パーティ選択完了",
           ref: this.$route.params["uid"] + this.$store.getters.user.uid,
           uid: result,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-          stanpSt: 2
+          stanpSt: 2,
+          whoesMes: this.$store.getters.user.uid,
+          partyListDis: this.partyList
         });
       this.showParty = true;
     },
@@ -823,7 +836,11 @@ export default {
       });
     setTimeout(() => {
       this.scrollToEnd();
-    }, 1000);
+    }, 1500);
+    setTimeout(() => {
+      this.imgLoad = true;
+    }, 500);
+    false;
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .collection("test")
@@ -845,6 +862,14 @@ export default {
       .doc(this.$store.getters.user.uid)
       .update({
         status: true
+      });
+    db.collection("users")
+      .doc(this.$store.getters.user.uid)
+      .collection("lastOpen")
+      .doc(this.$route.params["uid"])
+      .set({
+        lastOpen: firebase.firestore.Timestamp.fromDate(new Date()),
+        id: this.$store.getters.user.uid
       });
   },
   watch: {

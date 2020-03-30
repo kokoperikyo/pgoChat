@@ -181,6 +181,11 @@ export default {
           link: { name: "profile" }
         },
         {
+          icon: "mdi-chat-processing-outline",
+          text: "チャットルーム",
+          link: { name: "chatRoom" }
+        },
+        {
           icon: "mdi-account-group-outline",
           text: "フレンド一覧",
           link: { name: "friendList" }
@@ -189,6 +194,11 @@ export default {
           icon: "mdi-magnify",
           text: "フレンド検索",
           link: { name: "friendSearch" }
+        },
+        {
+          icon: "mdi-exit-run",
+          text: "アカウント削除",
+          link: { name: "deleteAccount" }
         }
       ],
       userName: null,
@@ -327,6 +337,23 @@ export default {
           this.$store.getters.user.uid
         )
       });
+      //ここでチャットの最新ログインを記録する
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("lastOpen")
+        .doc(this.friendId)
+        .set({
+          lastOpen: firebase.firestore.Timestamp.fromDate(new Date()),
+          id: this.friendId
+        });
+      db.collection("users")
+        .doc(this.friendId)
+        .collection("lastOpen")
+        .doc(this.$store.getters.user.uid)
+        .set({
+          lastOpen: firebase.firestore.Timestamp.fromDate(new Date()),
+          id: this.$store.getters.user.uid
+        });
       this.rejectFriendRequest();
       //フレンド追加後に画面遷移するならこれ使う
       // this.$router.push({ name: "friendProfile", params: { uid: friendId } });
