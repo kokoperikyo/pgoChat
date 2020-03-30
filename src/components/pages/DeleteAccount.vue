@@ -33,6 +33,9 @@ export default {
     deleteAccount() {
       this.deleteFriendFromFriendsData();
       this.deleteFriendReqFromFriendsData();
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .delete();
 
       var user = firebase.auth().currentUser;
       user
@@ -45,13 +48,14 @@ export default {
         });
     },
     deleteFriendFromFriendsData() {
-      this.userInfo.friends.forEach(friend => {
-        this.deleteFromfriendIdList(friend.id);
-        this.deleteFromfriends(friend.id);
-      });
-      db.collection("users")
-        .doc(this.$store.getters.user.uid)
-        .delete();
+      if (this.userInfo.friends.length == 0) {
+        return;
+      } else {
+        this.userInfo.friends.forEach(friend => {
+          this.deleteFromfriendIdList(friend.id);
+          this.deleteFromfriends(friend.id);
+        });
+      }
     },
     deleteFromfriendIdList(friendId) {
       db.collection("users")
@@ -72,10 +76,14 @@ export default {
         });
     },
     deleteFriendReqFromFriendsData() {
-      this.userInfo.friendRequestList.forEach(friend => {
-        this.deleteFromSendFriendRequestList(friend.id);
-        this.deleteFromSendFriendRequestNameList(friend.id);
-      });
+      if (this.userInfo.friends.length == 0) {
+        return;
+      } else {
+        this.userInfo.friendRequestList.forEach(friend => {
+          this.deleteFromSendFriendRequestList(friend.id);
+          this.deleteFromSendFriendRequestNameList(friend.id);
+        });
+      }
     },
     deleteFromSendFriendRequestList(friendId) {
       db.collection("users")
