@@ -11,6 +11,7 @@ import FriendList from '../components/pages/FriendList.vue'
 import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
 import Loading from '../components/pages/Loading.vue'
+import BulletinBoard from '../components/pages/BulletinBoard.vue'
 import DeleteAccount from '../components/pages/DeleteAccount.vue'
 import TestChat from '../components/pages/TestChat.vue'
 
@@ -94,6 +95,14 @@ const routes = [{
     path: '/chat/:uid',
     name: 'chat',
     component: Chat,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/bulletinBoard',
+    name: 'bulletinBoard',
+    component: BulletinBoard,
     meta: {
       requiresAuth: true
     }

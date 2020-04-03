@@ -1,12 +1,12 @@
 <template>
   <div>
+    <div class="mt-2">
+      <span class="mx-2" style="font-size:12px;">新しいフレンドとのチャットはこちら</span>
+      <v-btn link to="/friendList" x-small rounded color="primary">フレンドリスト</v-btn>
+    </div>
     <v-card color flat class="overflow-y-auto scroll" :height="getChatCardHeifht">
       <v-list color v-for="(item, i) in latestMesUid" :key="i" class="p-0">
-        <v-list-item v-if="latestMesUid.length == 0 && delateDis == true">
-          フレンドとチャットを開始してください
-          <v-btn link to="/friendList" small rounded color="primary">フレンドリスト</v-btn>
-        </v-list-item>
-        <v-list-item v-else @click="goChat(item.id)">
+        <v-list-item @click="goChat(item.id)">
           <v-list-item-avatar size="40" class="mr-3" color="white">
             <v-img :src="item.avatarUrl"></v-img>
           </v-list-item-avatar>
@@ -39,7 +39,6 @@ import "@firebase/firestore";
 export default {
   data() {
     return {
-      delateDis: false,
       userInfo: null,
       latestMesUid: [],
       lastChatOpen: [],
@@ -129,14 +128,11 @@ export default {
     setTimeout(() => {
       this.makeMesList();
     }, 1500);
-    setTimeout(() => {
-      this.delateDis = true;
-    }, 2000);
   },
   computed: {
     getChatCardHeifht: function() {
       //ヘッダー、フッター、タブバー、パディング
-      return this.screenHeight - 40 - 80;
+      return this.screenHeight - 40 - 80 - 36;
     }
   },
   watch: {

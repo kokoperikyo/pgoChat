@@ -222,6 +222,11 @@ export default {
           link: { name: "friendSearch" }
         },
         {
+          icon: "mdi-tooltip-text-outline",
+          text: "掲示板",
+          link: { name: "bulletinBoard" }
+        },
+        {
           icon: "mdi-exit-run",
           text: "アカウント削除",
           link: { name: "deleteAccount" }
