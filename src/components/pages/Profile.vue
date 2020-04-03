@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="mx-auto" color="#E3F2FD">
+    <v-card tile flat class="mx-auto" color="#E3F2FD">
       <!-- フレンド許可 -->
       <v-dialog v-model="requestAcceptDialog" max-width="290">
         <v-card>
@@ -92,190 +92,191 @@
         </v-card>
       </v-dialog>
       <!-- こっから本体 -->
-      <div v-if="isEdit" class="headerImg">
-        <div v-if="displayDemoHeaderImg">
-          <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
-          <input class="headerInput" type="file" v-on:change="desplayImg" />
-          <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
-        </div>
-        <!-- 編集押してすぐの時 -->
-        <div v-else>
-          <v-img :src="displayHeaderImg" style="opacity:0.6;" :aspect-ratio="4"></v-img>
-          <input class="headerInput" type="file" v-on:change="desplayImg" />
-          <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
-        </div>
-      </div>
-      <div v-else>
-        <v-row v-if="showHeaderLoader" align="center" justify="center" style="height: 220px;">
-          <v-progress-circular indeterminate color="primary" :size="80" width="10"></v-progress-circular>
-        </v-row>
-        <div v-else>
-          <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
-          <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
-        </div>
-      </div>
-      <v-list-item class="mt-5 pr-1">
-        <v-list-item-avatar class="ml-1 mr-5">
-          <div v-if="isEdit" class="avatarImg">
-            <v-avatar v-if="displayDemoAvatar" size="60">
-              <v-img style="background-color:white;" :src="displayDemoAvatar"></v-img>
-              <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
-              <v-icon class="displayCameraIconOnAvatarAfter" size="40">mdi-camera</v-icon>
-            </v-avatar>
-            <!-- 編集押してすぐの時 -->
-            <div v-else>
-              <v-avatar size="60">
-                <v-img style="background-color:white; opacity:0.6;" :src="displayAvatar"></v-img>
-              </v-avatar>
-              <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
-              <v-icon class="displayCameraIconOnAvatar" size="40">mdi-camera</v-icon>
-            </div>
+      <v-card>
+        <div v-if="isEdit" class="headerImg">
+          <div v-if="displayDemoHeaderImg">
+            <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
+            <input class="headerInput" type="file" v-on:change="desplayImg" />
+            <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
           </div>
+          <!-- 編集押してすぐの時 -->
           <div v-else>
-            <div v-if="showAvatarLoader">
-              <v-progress-circular indeterminate color="primary" :size="40"></v-progress-circular>
+            <v-img :src="displayHeaderImg" style="opacity:0.6;" :aspect-ratio="4"></v-img>
+            <input class="headerInput" type="file" v-on:change="desplayImg" />
+            <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
+          </div>
+        </div>
+        <div v-else>
+          <v-row v-if="showHeaderLoader" align="center" justify="center" style="height: 220px;">
+            <v-progress-circular indeterminate color="primary" :size="80" width="10"></v-progress-circular>
+          </v-row>
+          <div v-else>
+            <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
+            <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
+          </div>
+        </div>
+        <v-list-item class="mt-5">
+          <v-list-item-avatar class="ml-1 mr-5">
+            <div v-if="isEdit" class="avatarImg">
+              <v-avatar v-if="displayDemoAvatar" size="60">
+                <v-img style="background-color:white;" :src="displayDemoAvatar"></v-img>
+                <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
+                <v-icon class="displayCameraIconOnAvatarAfter" size="40">mdi-camera</v-icon>
+              </v-avatar>
+              <!-- 編集押してすぐの時 -->
+              <div v-else>
+                <v-avatar size="60">
+                  <v-img style="background-color:white; opacity:0.6;" :src="displayAvatar"></v-img>
+                </v-avatar>
+                <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
+                <v-icon class="displayCameraIconOnAvatar" size="40">mdi-camera</v-icon>
+              </div>
             </div>
             <div v-else>
-              <v-avatar size="60">
-                <v-img v-if="isMypage" :src="displayAvatar"></v-img>
-                <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
-              </v-avatar>
+              <div v-if="showAvatarLoader">
+                <v-progress-circular indeterminate color="primary" :size="40"></v-progress-circular>
+              </div>
+              <div v-else>
+                <v-avatar size="60">
+                  <v-img v-if="isMypage" :src="displayAvatar"></v-img>
+                  <v-img v-else :src="displayFriendUserInfo.avatarUrl"></v-img>
+                </v-avatar>
+              </div>
             </div>
-          </div>
-        </v-list-item-avatar>
-        <!-- 編集中 -->
-        <v-list-item-content v-if="isEdit">
-          <v-list-item-title class="headline">
-            <v-text-field
-              @keydown.enter="saveByEnter"
-              placeholder="ポケGOのユーザー名を入力してください"
-              v-model="displayUserName"
-              :rules="rules"
-            ></v-text-field>
-          </v-list-item-title>
-        </v-list-item-content>
-        <!-- 編集中ではない -->
-        <v-list-item-content v-else>
-          <div v-if="isMypage">
-            <v-list-item-title v-if="$vuetify.breakpoint.smAndDown" v-text="displayUserName"></v-list-item-title>
-            <v-list-item-title v-else style="font-size:24px;" v-text="displayUserName"></v-list-item-title>
-          </div>
-          <div v-else-if="isFriend">
-            <v-list-item-title>
-              {{displayFriendUserInfo.name}}
-              <v-btn
-                v-if="!getNickname(displayFriendUserInfo.nicknameList)"
-                @click="addNicknameModalDis(displayFriendUserInfo.id)"
-                x-small
-                fab
-                color="primary"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
+          </v-list-item-avatar>
+          <!-- 編集中 -->
+          <v-list-item-content v-if="isEdit">
+            <v-list-item-title class="headline">
+              <v-text-field
+                @keydown.enter="saveByEnter"
+                placeholder="ポケGOのユーザー名を入力してください"
+                v-model="displayUserName"
+                :rules="rules"
+              ></v-text-field>
             </v-list-item-title>
-            <v-list-item-subtitle v-if="getNickname(displayFriendUserInfo.nicknameList)">
-              {{getNickname(displayFriendUserInfo.nicknameList)}}
-              <v-btn
-                @click="editNicknameModalDis(displayFriendUserInfo.id,getNickname(displayFriendUserInfo.nicknameList))"
-                x-small
-                fab
-                color="primary"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-            </v-list-item-subtitle>
+          </v-list-item-content>
+          <!-- 編集中ではない -->
+          <v-list-item-content v-else>
+            <div v-if="isMypage">
+              <v-list-item-title v-if="$vuetify.breakpoint.smAndDown" v-text="displayUserName"></v-list-item-title>
+              <v-list-item-title v-else style="font-size:24px;" v-text="displayUserName"></v-list-item-title>
+            </div>
+            <div v-else-if="isFriend">
+              <v-list-item-title>
+                {{displayFriendUserInfo.name}}
+                <v-btn
+                  v-if="!getNickname(displayFriendUserInfo.nicknameList)"
+                  @click="addNicknameModalDis(displayFriendUserInfo.id)"
+                  x-small
+                  fab
+                  color="primary"
+                >
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-list-item-title>
+              <v-list-item-subtitle v-if="getNickname(displayFriendUserInfo.nicknameList)">
+                {{getNickname(displayFriendUserInfo.nicknameList)}}
+                <v-btn
+                  @click="editNicknameModalDis(displayFriendUserInfo.id,getNickname(displayFriendUserInfo.nicknameList))"
+                  x-small
+                  fab
+                  color="primary"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+              </v-list-item-subtitle>
+            </div>
+            <div v-else>
+              <v-list-item-title
+                v-if="$vuetify.breakpoint.smAndDown"
+                v-text="displayFriendUserInfo.name"
+                style="font-size:20px;"
+              ></v-list-item-title>
+              <v-list-item-title v-else style="font-size:24px;" v-text="displayFriendUserInfo.name"></v-list-item-title>
+            </div>
+          </v-list-item-content>
+          <!-- 相手ユーザーとのステータスの表示 -->
+          <div v-if="!isMypage" class="mr-2 friendStatus">
+            <div v-if="isFriend">友達</div>
+            <div v-else-if="isRequest">申請が来てる</div>
+            <div v-else-if="isSendRequest">申請中</div>
+          </div>
+          <div v-if="isMypage">
+            <v-btn v-if="isEdit" @click="save" fab small outlined color="#AB47BC">
+              <v-icon>mdi-content-save-edit</v-icon>
+            </v-btn>
+            <v-btn v-else @click="edit" fab small outlined color="#AB47BC">
+              <v-icon>mdi-account-edit</v-icon>
+            </v-btn>
           </div>
           <div v-else>
-            <v-list-item-title
-              v-if="$vuetify.breakpoint.smAndDown"
-              v-text="displayFriendUserInfo.name"
-              style="font-size:20px;"
-            ></v-list-item-title>
-            <v-list-item-title v-else style="font-size:24px;" v-text="displayFriendUserInfo.name"></v-list-item-title>
-          </div>
-        </v-list-item-content>
-        <!-- 相手ユーザーとのステータスの表示 -->
-        <div v-if="!isMypage" class="mr-2 friendStatus">
-          <div v-if="isFriend">友達</div>
-          <div v-else-if="isRequest">申請が来てる</div>
-          <div v-else-if="isSendRequest">申請中</div>
-        </div>
-        <div v-if="isMypage">
-          <v-btn v-if="isEdit" @click="save" fab small outlined color="#AB47BC">
-            <v-icon>mdi-content-save-edit</v-icon>
-          </v-btn>
-          <v-btn v-else @click="edit" fab small outlined color="#AB47BC">
-            <v-icon>mdi-account-edit</v-icon>
-          </v-btn>
-        </div>
-        <div v-else>
-          <v-btn v-if="isFriend" @click="goChat()" fab small outlined color="#AB47BC">
-            <v-icon>mdi-chat-processing-outline</v-icon>
-          </v-btn>
-          <div v-else-if="isRequest">
-            <v-btn class="mr-1" @click="requestAcceptDialog = true" fab small outlined>
-              <v-icon>mdi-handshake</v-icon>
+            <v-btn v-if="isFriend" @click="goChat()" fab small outlined color="#AB47BC">
+              <v-icon>mdi-chat-processing-outline</v-icon>
             </v-btn>
-            <v-btn @click="requestRejectDialog = true" fab small outlined>
+            <div v-else-if="isRequest">
+              <v-btn class="mr-1" @click="requestAcceptDialog = true" fab small outlined>
+                <v-icon>mdi-handshake</v-icon>
+              </v-btn>
+              <v-btn @click="requestRejectDialog = true" fab small outlined>
+                <v-icon>mdi-account-cancel</v-icon>
+              </v-btn>
+            </div>
+            <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()" fab small outlined>
               <v-icon>mdi-account-cancel</v-icon>
             </v-btn>
+            <v-tooltip v-else left>
+              <template v-slot:activator="{ on }">
+                <v-btn v-on="on" @click="sendFriendRequest()" fab small outlined>
+                  <v-icon>mdi-account-multiple-plus</v-icon>
+                </v-btn>
+              </template>
+              <span>フレンド申請</span>
+            </v-tooltip>
           </div>
-          <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()" fab small outlined>
-            <v-icon>mdi-account-cancel</v-icon>
-          </v-btn>
-          <v-tooltip v-else left>
-            <template v-slot:activator="{ on }">
-              <v-btn v-on="on" @click="sendFriendRequest()" fab small outlined>
-                <v-icon>mdi-account-multiple-plus</v-icon>
-              </v-btn>
-            </template>
-            <span>フレンド申請</span>
-          </v-tooltip>
+        </v-list-item>
+        <v-card-text v-if="isEdit">
+          <v-textarea
+            v-model="displaySelfIntroduction"
+            clearable
+            clear-icon="cancel"
+            label="Text"
+            value="This is clearable text."
+          ></v-textarea>
+        </v-card-text>
+        <div v-else class="mt-5">
+          <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
+          <v-card-text
+            v-else
+            style="white-space:pre-wrap; "
+          >{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
         </div>
-      </v-list-item>
-      <v-card-text v-if="isEdit">
-        <v-textarea
-          v-model="displaySelfIntroduction"
-          clearable
-          clear-icon="cancel"
-          label="Text"
-          value="This is clearable text."
-        ></v-textarea>
-      </v-card-text>
-      <div v-else class="mt-5">
-        <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
-        <v-card-text
-          v-else
-          style="white-space:pre-wrap; "
-        >{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
-      </div>
-
-      <v-card-actions>
-        <v-row>
-          <v-col align="center">
-            <v-btn text color="deep-purple accent-4" @click="status = 1">対戦情報</v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col align="center">
-            <v-btn text color="deep-purple accent-4" @click="status = 2">対戦成績</v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col align="center">
-            <v-btn text color="deep-purple accent-4" @click="status = 3">あああ</v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-      <v-divider></v-divider>
-      <v-card-text>
-        <span v-if="status === 1">対戦情報</span>
-        <span v-if="status === 2">
-          対戦成績
-          <v-list v-for="item in items" v-bind:key="item">{{item}}</v-list>
-        </span>
-        <span v-if="status === 3">あああ</span>
-      </v-card-text>
+        <v-card-actions>
+          <v-row>
+            <v-col align="center">
+              <v-btn text color="deep-purple accent-4" @click="status = 1">対戦情報</v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col align="center">
+              <v-btn text color="deep-purple accent-4" @click="status = 2">対戦成績</v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col align="center">
+              <v-btn text color="deep-purple accent-4" @click="status = 3">あああ</v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+        <v-divider></v-divider>
+        <v-card-text>
+          <span v-if="status === 1">対戦情報</span>
+          <span v-if="status === 2">
+            対戦成績
+            <v-list v-for="item in items" v-bind:key="item">{{item}}</v-list>
+          </span>
+          <span v-if="status === 3">あああ</span>
+        </v-card-text>
+      </v-card>
     </v-card>
   </div>
 </template>
@@ -289,7 +290,7 @@ export default {
   data() {
     return {
       status: 1,
-      items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11],
+      items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15],
       rules: [
         value => !!value || "必須",
         value =>
@@ -681,16 +682,12 @@ export default {
     // アップロードしたheader画像を表示
     createImage(file) {
       var blobUrl = window.URL.createObjectURL(file);
-      // eslint-disable-next-line no-console
-      console.log(blobUrl);
       this.displayDemoHeaderImg = blobUrl;
       this.headerFile = file;
     },
     // アップロードしたavatar画像を表示
     desplayAvatar(file) {
       var blobUrl = window.URL.createObjectURL(file);
-      // eslint-disable-next-line no-console
-      console.log(file);
 
       this.displayDemoAvatar = blobUrl;
       this.avatarFile = file;

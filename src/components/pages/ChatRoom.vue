@@ -1,33 +1,36 @@
 <template>
   <div>
-    <v-list class="p-0" color="#E0F2F1">
-      <v-list-item v-if="latestMesUid.length == 0 && delateDis == true">
-        フレンドとチャットを開始してください
-        <v-btn link to="/friendList" small rounded color="primary">フレンドリスト</v-btn>
-      </v-list-item>
-      <v-list-item v-else v-for="(item, i) in latestMesUid" :key="i" @click="goChat(item.id)">
-        <v-list-item-avatar size="40" class="mr-3" color="white">
-          <v-img :src="item.avatarUrl"></v-img>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{item.name}}
-            <span
-              v-if="getNickname(item.nicknameList)"
-            >({{getNickname(item.nicknameList)}})</span>
-          </v-list-item-title>
-          <v-list-item-subtitle v-text="item.mes"></v-list-item-subtitle>
-        </v-list-item-content>
+    <v-card color flat class="overflow-y-auto scroll" :height="getChatCardHeifht">
+      <v-list color v-for="(item, i) in latestMesUid" :key="i" class="p-0">
+        <v-list-item v-if="latestMesUid.length == 0 && delateDis == true">
+          フレンドとチャットを開始してください
+          <v-btn link to="/friendList" small rounded color="primary">フレンドリスト</v-btn>
+        </v-list-item>
+        <v-list-item v-else @click="goChat(item.id)">
+          <v-list-item-avatar size="40" class="mr-3" color="white">
+            <v-img :src="item.avatarUrl"></v-img>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{item.name}}
+              <span
+                v-if="getNickname(item.nicknameList)"
+              >({{getNickname(item.nicknameList)}})</span>
+            </v-list-item-title>
+            <v-list-item-subtitle v-text="item.mes"></v-list-item-subtitle>
+          </v-list-item-content>
 
-        <v-list-item-action>
-          <v-icon
-            v-if="getUnreadIcon(item.postAt,item.id,item.whoesMes)"
-            color="black"
-            large
-          >mdi-message-processing</v-icon>
-        </v-list-item-action>
-      </v-list-item>
-    </v-list>
+          <v-list-item-action>
+            <v-icon
+              v-if="getUnreadIcon(item.postAt,item.id,item.whoesMes)"
+              color="black"
+              large
+            >mdi-message-processing</v-icon>
+          </v-list-item-action>
+        </v-list-item>
+        <v-divider v-if="i + 1 < latestMesUid.length" :key="i"></v-divider>
+      </v-list>
+    </v-card>
   </div>
 </template>
 <script>
@@ -40,7 +43,8 @@ export default {
       userInfo: null,
       latestMesUid: [],
       lastChatOpen: [],
-      mes: null
+      mes: null,
+      screenHeight: 0
     };
   },
   methods: {
@@ -84,9 +88,6 @@ export default {
         .doc(uid)
         .get()
         .then(doc => {
-          // eslint-disable-next-line no-console
-          console.log(doc.data().avatarUrl);
-
           return doc.data();
         });
     },
@@ -123,12 +124,20 @@ export default {
     }
   },
   mounted() {
+    this.screenHeight = window.parent.screen.height;
+
     setTimeout(() => {
       this.makeMesList();
-    }, 1000);
+    }, 1500);
     setTimeout(() => {
       this.delateDis = true;
-    }, 1500);
+    }, 2000);
+  },
+  computed: {
+    getChatCardHeifht: function() {
+      //ヘッダー、フッター、タブバー、パディング
+      return this.screenHeight - 40 - 80;
+    }
   },
   watch: {
     mes() {

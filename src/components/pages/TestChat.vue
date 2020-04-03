@@ -77,9 +77,6 @@ export default {
         .doc(uid)
         .get()
         .then(doc => {
-          // eslint-disable-next-line no-console
-          console.log(doc.data().avatarUrl);
-
           return doc.data();
         });
     },

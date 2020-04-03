@@ -40,12 +40,7 @@
         </v-row>
       </v-card>
     </v-dialog>
-    <v-navigation-drawer
-      v-if="userStatus"
-      v-model="drawer"
-      :clipped="$vuetify.breakpoint.lgAndUp"
-      app
-    >
+    <v-navigation-drawer v-if="userStatus" v-model="drawer" clipped app>
       <v-list dense>
         <template v-for="item in items">
           <v-list-item :key="item.text" :to="item.link">
@@ -59,8 +54,39 @@
         </template>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" dark>
-      <v-app-bar-nav-icon v-if="userStatus" @click="drawer = !drawer" />
+    <!-- スマホ、タブレットの時のみ表示 -->
+    <v-footer
+      v-if="$vuetify.breakpoint.smAndDown && userStatus"
+      height="80px"
+      color="primary lighten-1"
+      padless
+      absolute
+    >
+      <v-row justify="center" no-gutters>
+        <v-col align="center" v-for="(item, index) in items" :key="index">
+          <v-btn icon :to="item.link">
+            <v-icon>{{item.icon}}</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row justify="center" no-gutters>
+        <v-col :to="item.link" align="center" v-for="(item, index) in items" :key="index">
+          <div style="font-size:8px;">{{item.text}}</div>
+        </v-col>
+      </v-row>
+    </v-footer>
+    <v-app-bar
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      app
+      absolute
+      color="blue darken-3"
+      dark
+      height="40px"
+    >
+      <v-app-bar-nav-icon
+        v-show="userStatus && !$vuetify.breakpoint.smAndDown"
+        @click="drawer = !drawer"
+      />
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">ポケモンGOチャット</span>
       </v-toolbar-title>
@@ -152,9 +178,9 @@
       </v-toolbar-items>
     </v-app-bar>
     <v-content>
-      <v-container>
-        <router-view />
-      </v-container>
+      <!-- <v-container> -->
+      <router-view />
+      <!-- </v-container> -->
     </v-content>
   </v-app>
 </template>
@@ -173,7 +199,7 @@ export default {
   data() {
     return {
       islogin: Boolean,
-      drawer: true,
+      drawer: false,
       items: [
         {
           icon: "mdi-account-circle-outline",

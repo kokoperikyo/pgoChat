@@ -155,8 +155,8 @@
         </div>
       </v-card>
     </v-dialog>
-    <v-card max-width="1100px" class="mx-auto" id="chatCard" flat>
-      <v-toolbar color="gray" dark>
+    <v-card flat tile color="gray" id="chatCard">
+      <v-toolbar dark height="40px" color="gray">
         <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn v-if="editStatus" @click="editStatus = false" fab small>
@@ -166,7 +166,7 @@
           <v-icon>mdi-content-save-edit-outline</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-card class="overflow-y-auto scroll" style="max-height: 380px;">
+      <v-card flat color="#E3F2FD" class="overflow-y-auto scroll" :height="getChatCardHeight">
         <v-list color="#E3F2FD">
           <v-list-item
             class="mt-2"
@@ -352,28 +352,24 @@
           </v-list-item>
         </v-list>
       </v-card>
-      <v-card color="#C0C0C0">
-        <v-row>
-          <v-col md="10" cols="8">
-            <v-textarea
-              class="ml-3 mt-5"
-              rows="1"
-              auto-grow
-              outlined
-              v-model="inputMessage"
-              background-color="white"
-              append-icon="send"
-              @click:append="regMessage"
-            ></v-textarea>
-          </v-col>
-          <v-col md="2" cols="3">
-            <v-row class="mt-7 mr-2 ml-3" justify="center">
-              <v-btn rounded @click="selectLeagueDialog = true">6-3対戦</v-btn>
-              <!-- <v-btn rounded disabled>スタンプ</v-btn> -->
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-card>
+      <v-row style="background:#C0C0C0;" class="mr-0">
+        <v-col md="10" cols="8" class="ml-3">
+          <v-textarea
+            rows="1"
+            auto-grow
+            v-model="inputMessage"
+            background-color="white"
+            append-icon="send"
+            @click:append="regMessage"
+          ></v-textarea>
+        </v-col>
+        <v-col md="1" cols="3">
+          <v-row class="mt-3 ml-3" justify="center">
+            <v-btn rounded @click="selectLeagueDialog = true">6-3対戦</v-btn>
+            <!-- <v-btn rounded disabled>スタンプ</v-btn> -->
+          </v-row>
+        </v-col>
+      </v-row>
     </v-card>
   </div>
 </template>
@@ -390,6 +386,7 @@ export default {
     return {
       imgLoad: false,
       chatCardWidth: 0,
+      screenHeight: 0,
       messages: [],
       inputMessage: "",
       chatUser: "",
@@ -415,6 +412,15 @@ export default {
     getChatCardWidth: function() {
       //80っのはfirst_mes_positionで定義してある
       return (this.chatCardWidth - 80) / 2;
+    },
+    getChatCardHeight: function() {
+
+      //ヘッダー、フッター、タブバー、チャットゾーン
+      if (this.$vuetify.breakpoint.smAndDown) {
+        return this.screenHeight - 40 - 80 - 40 - 94;
+      } else {
+        return this.screenHeight - 40 - 40 - 94 - 200;
+      }
     },
     isSixPatry: function() {
       // return true;
@@ -838,6 +844,8 @@ export default {
   },
   mounted() {
     this.chatCardWidth = document.getElementById("chatCard").clientWidth;
+    this.screenHeight = window.parent.screen.height;
+
     window.addEventListener("resize", this.adjustFirstMesPosition);
     //最終ログインを更新
     db.collection("users")

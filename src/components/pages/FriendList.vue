@@ -54,96 +54,98 @@
       </v-btn>-->
     </v-toolbar>
     <!-- こっからフレンドリスト -->
-    <v-list>
-      <div v-if="friendLists.friends.length == 0">フレンドはいません</div>
-      <v-list-item
-        v-else
-        class="pl-2 pr-0"
-        two-line
-        v-for="(friendList, i) in friendLists.friends"
-        :key="i"
-      >
-        <v-list-item-avatar
-          class="ml-3"
-          v-if="$vuetify.breakpoint.mdAndUp"
-          size="8"
-          :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
-        ></v-list-item-avatar>
-        <v-list-item-avatar size="40" class="mr-3">
-          <v-img :src="friendList.avatarUrl"></v-img>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title v-text="friendList.name" class="mt-1"></v-list-item-title>
-          <v-list-item-subtitle style="font-size:12px;" class="mt-1">
-            <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
-              <template v-slot:activator="{ on }">
+    <v-card flat class="overflow-y-auto scroll" :max-height="getChatCardHeifht">
+      <v-list>
+        <div v-if="friendLists.friends.length == 0">フレンドはいません</div>
+        <v-list-item
+          v-else
+          class="pl-2 pr-0"
+          two-line
+          v-for="(friendList, i) in friendLists.friends"
+          :key="i"
+        >
+          <v-list-item-avatar
+            class="ml-3"
+            v-if="$vuetify.breakpoint.mdAndUp"
+            size="8"
+            :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
+          ></v-list-item-avatar>
+          <v-list-item-avatar size="40" class="mr-3">
+            <v-img :src="friendList.avatarUrl"></v-img>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title v-text="friendList.name" class="mt-1"></v-list-item-title>
+            <v-list-item-subtitle style="font-size:12px;" class="mt-1">
+              <v-tooltip right v-if="isNickNameExist(getNickname(friendList.nicknameList))">
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    @click="addNicknameModalDis(friendList.id)"
+                    v-on="on"
+                    x-small
+                    fab
+                    dark
+                    color="primary"
+                    class="ml-1"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </template>
+                <span>ニックネームを追加できます</span>
+              </v-tooltip>
+              <div v-else>
+                {{getNickname(friendList.nicknameList)}}
                 <v-btn
-                  @click="addNicknameModalDis(friendList.id)"
-                  v-on="on"
+                  @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
                   x-small
                   fab
                   dark
                   color="primary"
                   class="ml-1"
                 >
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-              </template>
-              <span>ニックネームを追加できます</span>
-            </v-tooltip>
-            <div v-else>
-              {{getNickname(friendList.nicknameList)}}
-              <v-btn
-                @click="editNicknameModalDis(friendList.id,getNickname(friendList.nicknameList))"
-                x-small
-                fab
-                dark
-                color="primary"
-                class="ml-1"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-            </div>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-        <div v-if="$vuetify.breakpoint.mdAndUp">
-          <v-text
-            class="mr-5"
-            style="width:80px; text-align:center;"
-          >{{getLastLogin(friendList.lastLogin)}}</v-text>
-          <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
-            <v-icon>mdi-shield-account-outline</v-icon>
-          </v-btn>
-          <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
-            <v-icon>mdi-chat-processing-outline</v-icon>
-          </v-btn>
-          <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" small dark fab>
-            <v-icon>mdi-trash-can-outline</v-icon>
-          </v-btn>
-        </div>
-        <v-list-item-action class="ml-0" v-if="$vuetify.breakpoint.smAndDown">
-          <v-list-item-title>
-            {{getLastLogin(friendList.lastLogin)}}
-            <v-list-item-avatar
-              class="ml-1"
-              size="8"
-              :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
-            ></v-list-item-avatar>
-          </v-list-item-title>
-          <v-list-item-subtitle class="mr-5">
-            <v-btn outlined @click="goProfile(friendList.id)" class="mr-1" x-small fab>
-              <v-icon>mdi-shield-account</v-icon>
+              </div>
+            </v-list-item-subtitle>
+          </v-list-item-content>
+          <div v-if="$vuetify.breakpoint.mdAndUp">
+            <v-text
+              class="mr-5"
+              style="width:80px; text-align:center;"
+            >{{getLastLogin(friendList.lastLogin)}}</v-text>
+            <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
+              <v-icon>mdi-shield-account-outline</v-icon>
             </v-btn>
-            <v-btn outlined @click="goChat(friendList.id)" class="mr-1" x-small fab>
+            <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
               <v-icon>mdi-chat-processing-outline</v-icon>
             </v-btn>
-            <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" x-small dark fab>
+            <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" small dark fab>
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-action>
-      </v-list-item>
-    </v-list>
+          </div>
+          <v-list-item-action class="ml-0" v-if="$vuetify.breakpoint.smAndDown">
+            <v-list-item-title>
+              {{getLastLogin(friendList.lastLogin)}}
+              <v-list-item-avatar
+                class="ml-1"
+                size="8"
+                :color="isOnline(friendList.lastLogin) ? '#04F620' : 'grey'"
+              ></v-list-item-avatar>
+            </v-list-item-title>
+            <v-list-item-subtitle class="mr-5">
+              <v-btn outlined @click="goProfile(friendList.id)" class="mr-1" x-small fab>
+                <v-icon>mdi-shield-account</v-icon>
+              </v-btn>
+              <v-btn outlined @click="goChat(friendList.id)" class="mr-1" x-small fab>
+                <v-icon>mdi-chat-processing-outline</v-icon>
+              </v-btn>
+              <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" x-small dark fab>
+                <v-icon>mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </v-list-item-subtitle>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </v-card>
   </v-card>
 </template>
 <script>
@@ -165,15 +167,18 @@ export default {
     inputEditNickname: null,
     beforeNickname: null,
     deleteFriendId: null,
-    deleteFriendDialog: false
+    deleteFriendDialog: false,
+    screenHeight: 0
   }),
   mounted() {
+    this.screenHeight = window.parent.screen.height;
     //最終ログインを更新
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .update({
         lastLogin: firebase.firestore.Timestamp.fromDate(new Date())
       });
+    this.screenHeight = window.parent.screen.height;
   },
   methods: {
     getLastLogin: function(loginDate) {
@@ -336,6 +341,10 @@ export default {
       return this.caseSensitive
         ? (item, search, textKey) => item[textKey].indexOf(search) > -1
         : undefined;
+    },
+    getChatCardHeifht: function() {
+      //ヘッダー、フッター、タブバー、パディング
+      return this.screenHeight - 40 - 80 - 56;
     }
   },
   firestore() {

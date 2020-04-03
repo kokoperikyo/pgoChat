@@ -31,7 +31,7 @@
         </v-list-item>
       </v-list>
     </v-card>
-    <v-card class="mt-5">
+    <v-card class="mt-5" tile>
       <v-toolbar color="indigo" dark>
         <v-spacer></v-spacer>
         <v-toolbar-title>申請中ユーザー</v-toolbar-title>
