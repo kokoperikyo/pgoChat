@@ -81,9 +81,21 @@
         <v-card :color="leagueRowColor" class="mx-1 mb-3">
           <v-row no-gutters>
             <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
-              <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
-                <v-icon color="black">mdi-close-circle</v-icon>
-              </v-btn>
+              <div v-if="isShadow(item)">
+                <v-avatar size="30" class="shadowIcon">
+                  <v-img
+                    src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                  ></v-img>
+                </v-avatar>
+                <v-btn small icon fab @click="removeArray(index)" class="closeBtnSub">
+                  <v-icon color="black">mdi-close-circle</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
+                  <v-icon color="black">mdi-close-circle</v-icon>
+                </v-btn>
+              </div>
               <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
             </v-col>
           </v-row>
@@ -118,9 +130,21 @@
         <v-card :color="leagueRowColor" class="mx-1 mb-3">
           <v-row no-gutters>
             <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
-              <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
-                <v-icon color="black">mdi-close-circle</v-icon>
-              </v-btn>
+              <div v-if="isShadow(item)">
+                <v-avatar size="30" class="shadowIcon">
+                  <v-img
+                    src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                  ></v-img>
+                </v-avatar>
+                <v-btn small icon fab @click="removeArray(index)" class="closeBtnSub">
+                  <v-icon color="black">mdi-close-circle</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
+                  <v-icon color="black">mdi-close-circle</v-icon>
+                </v-btn>
+              </div>
               <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
             </v-col>
           </v-row>
@@ -205,6 +229,11 @@
                               :src="getImg(item)"
                               class="pokemonImgOnChat"
                             ></v-img>
+                            <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                              <v-img
+                                src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                              ></v-img>
+                            </v-avatar>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -220,6 +249,11 @@
                       <v-row>
                         <v-col cols="4" v-for="(item, index) in message.message" :key="index">
                           <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
+                          <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                            <v-img
+                              src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                            ></v-img>
+                          </v-avatar>
                         </v-col>
                       </v-row>
                     </v-card>
@@ -264,6 +298,11 @@
                               :src="getImg(item)"
                               class="pokemonImgOnChat"
                             ></v-img>
+                            <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                              <v-img
+                                src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                              ></v-img>
+                            </v-avatar>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -279,6 +318,11 @@
                       <v-row>
                         <v-col cols="4" v-for="(item, index) in message.message" :key="index">
                           <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
+                          <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                            <v-img
+                              src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                            ></v-img>
+                          </v-avatar>
                         </v-col>
                       </v-row>
                     </v-card>
@@ -339,6 +383,7 @@ import { db } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import { format } from "date-fns";
+import { pokemonList, shadowList } from "@/js/pokemonList";
 
 export default {
   data() {
@@ -361,44 +406,7 @@ export default {
       isMyMessageCla: false,
       partySelectedStatus: Object,
       showParty: false,
-      items: [
-        {
-          name: "フシギダネ（ふしぎだね）",
-          index: 1,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0001.PNG?alt=media&token=2dc5a845-e0e2-41c5-9e8a-fa334fc3825e"
-        },
-        {
-          name: "フシギソウ（ふしぎそう）",
-          index: 2,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0002.PNG?alt=media&token=d4285cbd-0d9a-49fb-a8b7-3de29ed3d5fa"
-        },
-        {
-          name: "フシギバナ（ふしぎばな）",
-          index: 3,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0003.PNG?alt=media&token=e5cddba8-bbfd-44aa-8c75-be13535b43dc"
-        },
-        {
-          name: "ヒトカゲ（ひとかげ）",
-          index: 4,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0004.PNG?alt=media&token=b191c199-25ae-4283-8074-566d4da0c7a6"
-        },
-        {
-          name: "リザード（りざーど）",
-          index: 5,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0005.PNG?alt=media&token=01c86bf4-67ec-47cd-b57a-4d4b7d6f2426"
-        },
-        {
-          name: "リザードン（りざーどん）",
-          index: 6,
-          img:
-            "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/pokemonImg%2F0006.PNG?alt=media&token=92a5f7a5-f6ab-4c03-b48a-495e5bc74c73"
-        }
-      ],
+      items: pokemonList,
       partyValue: null,
       partyList: []
     };
@@ -821,6 +829,9 @@ export default {
       });
       return target.img;
     },
+    isShadow(sendIndex) {
+      return shadowList.some(v => v === sendIndex);
+    },
     removeArray(index) {
       this.partyList.splice(index, 1);
     }
@@ -977,6 +988,26 @@ export default {
   position: absolute;
   left: 30px;
   top: 2px;
+  z-index: 2;
+}
+.closeBtnSub {
+  position: absolute;
+  left: 14px;
+  top: 2px;
+  z-index: 2;
+}
+.shadowIcon {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  background-color: rgb(16, 17, 4);
+  z-index: 2;
+}
+.shadowIconOnChat {
+  position: absolute;
+  right: 12px;
+  bottom: 66px;
+  background-color: rgb(16, 17, 4);
   z-index: 2;
 }
 </style>
