@@ -5,6 +5,7 @@ import store from './store'
 import Firebase from './plugins/firebase'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import './registerServiceWorker'
 
 
 
