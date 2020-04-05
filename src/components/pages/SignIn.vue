@@ -2,7 +2,7 @@
   <v-app>
     <v-content>
       <v-container>
-        <v-card color="#ECEFF1" class="mx-auto" max-width="400px">
+        <v-card color="#FCE4EC" class="mx-auto" max-width="400px">
           <v-list-item>
             <v-spacer></v-spacer>
             <div class="mt-3">
@@ -27,6 +27,7 @@
                 placeholder="E-mail"
                 solo
                 required
+                color="#8ac32b"
                 @input="$v.email.$touch()"
                 @blur="$v.email.$touch()"
                 background-color="white"
@@ -39,6 +40,7 @@
                 placeholder="password"
                 solo
                 required
+                color="#8ac32b"
                 @input="$v.password.$touch()"
                 @blur="$v.password.$touch()"
                 background-color="white"
@@ -47,14 +49,14 @@
             </v-form>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" @click="signInEmail" :disabled="isError">ログイン</v-btn>
+              <v-btn dark color="#8ac32b" @click="signInEmail" :disabled="isError">ログイン</v-btn>
             </v-card-actions>
           </v-card-text>
           <v-divider></v-divider>
           <div class="mb-3">
             <v-list-item>
               <v-spacer></v-spacer>初めての方
-              <v-btn class="ml-2" color="primary" to="/signUp">新規登録</v-btn>
+              <v-btn dark class="ml-2" color="#8ac32b" to="/signUp">新規登録</v-btn>
             </v-list-item>
           </div>
           <v-divider></v-divider>

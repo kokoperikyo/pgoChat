@@ -7,8 +7,8 @@
           <v-card-title class="pb-0">フレンドになりますか？</v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn rounded color="primary" @click="acceptFriendRequest(0)" class="mr-5">なる</v-btn>
-            <v-btn rounded color="primary" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
+            <v-btn rounded color="#004D40" dark @click="acceptFriendRequest(0)" class="mr-5">なる</v-btn>
+            <v-btn rounded color="#004D40" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
@@ -19,8 +19,8 @@
           <v-card-title class="pb-0">お断りしますか？</v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn rounded color="primary" @click="rejectFriendRequest(1)" class="mr-5">断る</v-btn>
-            <v-btn rounded color="primary" outlined @click="requestRejectDialog = false">閉じる</v-btn>
+            <v-btn rounded color="#004D40" dark @click="rejectFriendRequest(1)" class="mr-5">断る</v-btn>
+            <v-btn rounded color="#004D40" outlined @click="requestRejectDialog = false">閉じる</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
@@ -35,8 +35,9 @@
               class="mr-5"
               clearable
               clear-icon="cancel"
+              color="#8ac32b"
             ></v-text-field>
-            <v-btn @click="addNickname()" small fab>
+            <v-btn @click="addNickname()" small dark fab color="#8ac32b" depressed>
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-card-title>
@@ -52,8 +53,9 @@
               class="mr-5"
               clearable
               clear-icon="cancel"
+              color="#8ac32b"
             ></v-text-field>
-            <v-btn @click="editNickname()" small fab>
+            <v-btn @click="editNickname()" small dark fab color="#8ac32b" depressed>
               <v-icon>mdi-autorenew</v-icon>
             </v-btn>
           </v-card-title>
@@ -63,7 +65,7 @@
         <v-card>
           <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
           <v-row justify="center">
-            <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+            <v-icon color="#8ac32b" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
           </v-row>
         </v-card>
       </v-dialog>
@@ -79,7 +81,7 @@
         <v-card>
           <v-card-title class="headline">フレンド申請をしました</v-card-title>
           <v-row justify="center">
-            <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+            <v-icon color="#8ac32b" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
           </v-row>
         </v-card>
       </v-dialog>
@@ -134,7 +136,7 @@
             </div>
             <div v-else>
               <div v-if="showAvatarLoader">
-                <v-progress-circular indeterminate color="primary" :size="40"></v-progress-circular>
+                <v-progress-circular indeterminate color="#8ac32b" :size="40"></v-progress-circular>
               </div>
               <div v-else>
                 <v-avatar size="60">
@@ -152,6 +154,7 @@
                 placeholder="ポケGOのユーザー名を入力してください"
                 v-model="displayUserName"
                 :rules="rules"
+                color="#8ac32b"
               ></v-text-field>
             </v-list-item-title>
           </v-list-item-content>
@@ -169,7 +172,9 @@
                   @click="addNicknameModalDis(displayFriendUserInfo.id)"
                   x-small
                   fab
-                  color="primary"
+                  depressed
+                  dark
+                  color="#8ac32b"
                 >
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
@@ -180,7 +185,9 @@
                   @click="editNicknameModalDis(displayFriendUserInfo.id,getNickname(displayFriendUserInfo.nicknameList))"
                   x-small
                   fab
-                  color="primary"
+                  depressed
+                  dark
+                  color="#8ac32b"
                 >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
@@ -198,35 +205,59 @@
           <!-- 相手ユーザーとのステータスの表示 -->
           <div v-if="!isMypage" class="mr-2 friendStatus">
             <div v-if="isFriend">友達</div>
-            <div v-else-if="isRequest">申請が来てる</div>
+            <div v-else-if="isRequest">申請が来ています</div>
             <div v-else-if="isSendRequest">申請中</div>
           </div>
           <div v-if="isMypage">
-            <v-btn v-if="isEdit" @click="save" fab small outlined color="#AB47BC">
-              <v-icon>mdi-content-save-edit</v-icon>
+            <v-btn v-if="isEdit" @click="save" fab dark color="#8ac32b" depressed>
+              <v-icon large>mdi-content-save-edit</v-icon>
             </v-btn>
-            <v-btn v-else @click="edit" fab small outlined color="#AB47BC">
-              <v-icon>mdi-account-edit</v-icon>
+            <v-btn v-else @click="edit" fab dark color="#8ac32b" depressed>
+              <v-icon x-large>mdi-account-edit</v-icon>
             </v-btn>
           </div>
           <div v-else>
-            <v-btn v-if="isFriend" @click="goChat()" fab small outlined color="#AB47BC">
-              <v-icon>mdi-chat-processing-outline</v-icon>
+            <v-btn v-if="isFriend" @click="goChat()" depressed dark fab small color="#8ac32b">
+              <v-icon>mdi-chat-processing</v-icon>
             </v-btn>
             <div v-else-if="isRequest">
-              <v-btn class="mr-1" @click="requestAcceptDialog = true" fab small outlined>
+              <v-btn
+                class="mr-1"
+                @click="requestAcceptDialog = true"
+                depressed
+                fab
+                dark
+                small
+                color="#8ac32b"
+              >
                 <v-icon>mdi-handshake</v-icon>
               </v-btn>
-              <v-btn @click="requestRejectDialog = true" fab small outlined>
+              <v-btn @click="requestRejectDialog = true" depressed dark fab small color="#004D40">
                 <v-icon>mdi-account-cancel</v-icon>
               </v-btn>
             </div>
-            <v-btn v-else-if="isSendRequest" @click="cancelFriendRequest()" fab small outlined>
+            <v-btn
+              v-else-if="isSendRequest"
+              @click="cancelFriendRequest()"
+              fab
+              small
+              color="#004D40"
+              dark
+              depressed
+            >
               <v-icon>mdi-account-cancel</v-icon>
             </v-btn>
             <v-tooltip v-else left>
               <template v-slot:activator="{ on }">
-                <v-btn v-on="on" @click="sendFriendRequest()" fab small outlined>
+                <v-btn
+                  v-on="on"
+                  @click="sendFriendRequest()"
+                  fab
+                  small
+                  color="#004D40"
+                  dark
+                  depressed
+                >
                   <v-icon>mdi-account-multiple-plus</v-icon>
                 </v-btn>
               </template>
@@ -241,6 +272,7 @@
             clear-icon="cancel"
             label="Text"
             value="This is clearable text."
+            color="#8ac32b"
           ></v-textarea>
         </v-card-text>
         <div v-else class="mt-5">
@@ -253,17 +285,17 @@
         <v-card-actions>
           <v-row>
             <v-col align="center">
-              <v-btn text color="deep-purple accent-4" @click="status = 1">対戦情報</v-btn>
+              <v-btn text @click="status = 1">対戦情報</v-btn>
             </v-col>
           </v-row>
           <v-row>
             <v-col align="center">
-              <v-btn text color="deep-purple accent-4" @click="status = 2">対戦成績</v-btn>
+              <v-btn text @click="status = 2">対戦成績</v-btn>
             </v-col>
           </v-row>
           <v-row>
             <v-col align="center">
-              <v-btn text color="deep-purple accent-4" @click="status = 3">あああ</v-btn>
+              <v-btn text @click="status = 3">あああ</v-btn>
             </v-col>
           </v-row>
         </v-card-actions>

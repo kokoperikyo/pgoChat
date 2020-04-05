@@ -5,15 +5,15 @@
         <v-card-title class="pb-0">アカウント情報が全て削除されます</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded color="primary" @click="deleteAccount" class="mr-5">退会</v-btn>
-          <v-btn rounded color="primary" outlined @click="exitModal = false">閉じる</v-btn>
+          <v-btn rounded color="#004D40" dark depressed @click="deleteAccount" class="mr-5">退会</v-btn>
+          <v-btn rounded color="#004D40" outlined @click="exitModal = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-container fluid>
       <v-row align="center" justify="center">
-        <v-btn rounded outlined @click="exitModal = true">退会</v-btn>
+        <v-btn rounded outlined color="#004D40" @click="exitModal = true">退会</v-btn>
       </v-row>
     </v-container>
   </div>

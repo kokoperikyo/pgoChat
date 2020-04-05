@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-dialog v-model="editingModal" class="mx-auto">
-      <v-card class="mx-auto">
+    <v-dialog v-model="editingModal" class="mx-auto" max-width="500">
+      <v-card class="mx-auto" max-width="500" color="#FCE4EC">
         <v-container>
           <v-row>
             <v-textarea
@@ -10,11 +10,14 @@
               clearable
               clear-icon="cancel"
               v-model="editMes"
-              outlined
               row-height="10"
-              background-color="#f5a37d"
+              class="mx-5"
+              color="#8ac32b"
+              background-color="white"
             ></v-textarea>
-            <v-btn @click="updateMes" class="ml-3">更新</v-btn>
+            <v-btn @click="updateMes" class="mr-3 mt-3" small fab depressed dark color="#8ac32b">
+              <v-icon>mdi-autorenew</v-icon>
+            </v-btn>
           </v-row>
         </v-container>
       </v-card>
@@ -155,19 +158,19 @@
         </div>
       </v-card>
     </v-dialog>
-    <v-card flat tile color="gray" id="chatCard">
-      <v-toolbar dark height="40px" color="gray">
+    <v-card flat tile id="chatCard">
+      <v-toolbar height="40px" color="#8AC32B">
         <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn v-if="editStatus" @click="editStatus = false" fab small>
+        <v-btn class="mr-1" v-if="editStatus" @click="editStatus = false" icon small dark>
           <v-icon>mdi-comment-edit-outline</v-icon>
         </v-btn>
-        <v-btn v-else @click="editStatus = true,editingModal = false" fab small>
+        <v-btn class="mr-1" v-else @click="editStatus = true,editingModal = false" icon small dark>
           <v-icon>mdi-content-save-edit-outline</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-card flat color="#E3F2FD" class="overflow-y-auto scroll" :height="getChatCardHeight">
-        <v-list color="#E3F2FD">
+      <v-card flat class="overflow-y-auto scroll" :height="getChatCardHeight">
+        <v-list>
           <v-list-item
             class="mt-2"
             v-for="(message, i) in messages"
@@ -194,7 +197,7 @@
                     outlined
                     x-small
                     fab
-                    color="indigo"
+                    color="black"
                   >
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
@@ -204,7 +207,7 @@
                     outlined
                     x-small
                     fab
-                    color="error"
+                    color="#004D40"
                   >
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
@@ -352,11 +355,11 @@
           </v-list-item>
         </v-list>
       </v-card>
-      <v-row style="background:#C0C0C0;" class="mr-0">
+      <v-row style="background:#FCE4EC; height:130px;" class="mr-0">
         <v-col md="10" cols="8" class="ml-3">
           <v-textarea
-            rows="1"
-            auto-grow
+            rows="2"
+            color="#8ac32b"
             v-model="inputMessage"
             background-color="white"
             append-icon="send"
@@ -364,8 +367,8 @@
           ></v-textarea>
         </v-col>
         <v-col md="1" cols="3">
-          <v-row class="mt-3 ml-3" justify="center">
-            <v-btn rounded @click="selectLeagueDialog = true">6-3対戦</v-btn>
+          <v-row class="mt-5 ml-3" justify="center">
+            <v-btn depressed color="#8ac32b" dark rounded @click="selectLeagueDialog = true">6-3対戦</v-btn>
             <!-- <v-btn rounded disabled>スタンプ</v-btn> -->
           </v-row>
         </v-col>
@@ -414,12 +417,37 @@ export default {
       return (this.chatCardWidth - 80) / 2;
     },
     getChatCardHeight: function() {
-
-      //ヘッダー、フッター、タブバー、チャットゾーン
-      if (this.$vuetify.breakpoint.smAndDown) {
-        return this.screenHeight - 40 - 80 - 40 - 94;
+      //ヘッダー、フッター、タブバー、チャットゾーン、スマホの上下
+      var header = 40;
+      var footer = 80;
+      var tabbar = 40;
+      var chat = 130 - 20;
+      var padOfiphone = 20;
+      var padOfLargeiphone = 78;
+      var padOfTab = 40;
+      // iphoneの時
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphone8plus以下
+        if (window.innerHeight <= 716) {
+          return (
+            this.screenHeight - header - footer - tabbar - chat - padOfiphone
+          );
+          // iphoneX以上
+        } else {
+          return (
+            this.screenHeight -
+            header -
+            footer -
+            tabbar -
+            chat -
+            padOfLargeiphone
+          );
+        }
+        //タブレットの時
+      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+        return this.screenHeight - header - tabbar - chat - padOfTab;
       } else {
-        return this.screenHeight - 40 - 40 - 94 - 200;
+        return this.screenHeight - header - tabbar - chat - 20 - 200;
       }
     },
     isSixPatry: function() {
@@ -931,22 +959,22 @@ export default {
 </script>
 <style>
 .other_message {
-  background: white;
+  background: #fce4ec;
   border-radius: 0px 20px 20px 20px; /*左下だけ尖らせて吹き出し感を出す*/
   /* max-width: 200px; */
 }
 .other_six_three {
-  background: #9ccc65;
+  background: #8ac32b;
   border-radius: 0px 20px 20px 20px; /*左下だけ尖らせて吹き出し感を出す*/
   /* max-width: 200px; */
 }
 .my_message {
-  background: #9ccc65;
+  background: #8ac32b;
   border-radius: 20px 0px 20px 20px;
   /*左下だけ尖らせて吹き出し感を出す*/
 }
 .my_six_three {
-  background: #9ccc65;
+  background: #8ac32b;
   border-radius: 20px 0px 20px 20px;
   /*左下だけ尖らせて吹き出し感を出す*/
 }

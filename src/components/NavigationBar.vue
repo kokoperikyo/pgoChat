@@ -6,8 +6,8 @@
         <v-card-title class="pb-0">フレンドになりますか？</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded color="primary" @click="acceptFriendRequest" class="mr-5">なる</v-btn>
-          <v-btn rounded color="primary" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
+          <v-btn rounded color="#004D40" dark @click="acceptFriendRequest" class="mr-5">なる</v-btn>
+          <v-btn rounded color="#004D40" outlined @click="requestAcceptDialog = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -18,8 +18,8 @@
         <v-card-title class="pb-0">お断りしますか？</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded color="primary" @click="rejectFriendRequest" class="mr-5">断る</v-btn>
-          <v-btn rounded color="primary" outlined @click="requestRejectDialog = false">閉じる</v-btn>
+          <v-btn rounded color="#004D40" dark @click="rejectFriendRequest" class="mr-5">断る</v-btn>
+          <v-btn rounded color="#004D40" outlined @click="requestRejectDialog = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -28,7 +28,7 @@
       <v-card>
         <v-card-title class="headline pb-0">フレンドになりました！</v-card-title>
         <v-row justify="center">
-          <v-icon color="green" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+          <v-icon color="#8ac32b" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
         </v-row>
       </v-card>
     </v-dialog>
@@ -56,11 +56,12 @@
     </v-navigation-drawer>
     <!-- スマホ、タブレットの時のみ表示 -->
     <v-footer
-      v-if="$vuetify.breakpoint.smAndDown && userStatus"
+      v-if="isSmallerThanTablet && userStatus"
       height="80px"
-      color="primary lighten-1"
+      color="#DE4097"
       padless
       absolute
+      dark
     >
       <v-row justify="center" no-gutters>
         <v-col align="center" v-for="(item, index) in items" :key="index">
@@ -79,17 +80,12 @@
       :clipped-left="$vuetify.breakpoint.lgAndUp"
       app
       absolute
-      color="blue darken-3"
+      color="#DE4097"
+      flat
       dark
       height="40px"
     >
-      <v-app-bar-nav-icon
-        v-show="userStatus && !$vuetify.breakpoint.smAndDown"
-        @click="drawer = !drawer"
-      />
-      <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-        <span class="hidden-sm-and-down">ポケモンGOチャット</span>
-      </v-toolbar-title>
+      <v-app-bar-nav-icon v-show="userStatus && !isSmallerThanTablet" @click="drawer = !drawer" />
       <v-spacer />
       <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
         <template v-slot:activator="{ on }">
@@ -97,16 +93,17 @@
             v-if="isRequest(getFriendRequestLists.length)"
             x-small
             depressed
-            color="error"
-            min-height="32"
+            color="#8ac32b"
+            min-height="28"
             v-on="on"
+            class="mb-1"
           >{{getFriendRequestLists.length}}</v-btn>
           <v-btn
             v-else
             outlined
             dark
             x-small
-            min-height="32"
+            min-height="28"
             v-on="on"
           >{{getFriendRequestLists.length}}</v-btn>
         </template>
@@ -133,10 +130,11 @@
                 <v-btn
                   block
                   @click="acceptFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,0)"
-                  outlined
-                  color="#42A5F5"
+                  dark
+                  color="#8ac32b"
                   small
                   fab
+                  depressed
                 >
                   <v-icon>mdi-handshake</v-icon>
                 </v-btn>
@@ -145,10 +143,11 @@
                 <v-btn
                   block
                   @click="goProfile(friendRequest.id)"
-                  outlined
-                  color="#42A5F5"
+                  color="#8ac32b"
                   small
                   fab
+                  dark
+                  depressed
                 >
                   <v-icon>mdi-shield-account</v-icon>
                 </v-btn>
@@ -157,10 +156,11 @@
                 <v-btn
                   block
                   @click="rejectFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,1)"
-                  outlined
-                  color="#EF5350"
+                  color="#004D40"
                   small
                   fab
+                  dark
+                  depressed
                 >
                   <v-icon>mdi-account-cancel</v-icon>
                 </v-btn>
@@ -194,6 +194,13 @@ export default {
     userStatus() {
       // ログインするとtrue
       return this.$store.getters.isSignedIn;
+    },
+    isSmallerThanTablet() {
+      if (window.innerWidth < 700) {
+        return true;
+      } else {
+        return false;
+      }
     }
   },
   data() {

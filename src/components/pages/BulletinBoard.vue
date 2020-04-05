@@ -13,6 +13,7 @@
               append-icon="send"
               @click:append="rep"
               class="mx-2"
+              color="#8ac32b"
             ></v-textarea>
           </v-row>
         </v-container>
@@ -25,13 +26,14 @@
       v-model="inputMessage"
       append-icon="send"
       @click:append="regMessage"
+      color="#8ac32b"
     ></v-textarea>
     <v-card flat class="overflow-y-auto scroll" :height="getChatCardHeifht">
       <v-list v-for="mes in boardMes" :key="mes" dense>
         <v-list-item>
           <v-list-item-content>
-            <div v-if="mes.repflag == 1" style="color:#42A5F5;">
-              <v-icon color="#42A5F5">mdi-chevron-double-right</v-icon>
+            <div v-if="mes.repflag == 1" style="color:#DE4097;">
+              <v-icon color="#DE4097">mdi-chevron-double-right</v-icon>
               {{mes.repToWho}}
             </div>
             <v-list-item-title>
@@ -41,7 +43,7 @@
               <span>{{mes.name}}</span>
               <span class="dis_uid">{{mes.uid}}</span>
               <span class="rep_btn">
-                <v-btn outlined @click="repDialog(mes.uid)">
+                <v-btn @click="repDialog(mes.uid)" color="#8ac32b" dark>
                   <v-icon>reply</v-icon>返信
                 </v-btn>
               </span>
@@ -139,7 +141,29 @@ export default {
   computed: {
     getChatCardHeifht: function() {
       //ヘッダー、フッター、タブバー、パディング
-      return this.screenHeight - 40 - 80 - 66;
+      var header = 40;
+      var footer = 80;
+      var textarea = 66;
+      var padOfiphone = 20;
+      var padOfLargeiphone = 78;
+      var padOfTab = 40;
+      // iphoneの時
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphone8plus以下
+        if (window.innerHeight <= 716) {
+          return this.screenHeight - header - footer - textarea - padOfiphone;
+          // iphoneX以上
+        } else {
+          return (
+            this.screenHeight - header - footer - textarea - padOfLargeiphone
+          );
+        }
+        //タブレットの時
+      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+        return this.screenHeight - header - textarea - padOfTab;
+      } else {
+        return null;
+      }
     }
   },
   mounted() {

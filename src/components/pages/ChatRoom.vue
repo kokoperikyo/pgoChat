@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <div class="mt-2">
+  <div class="pt-2">
+    <div class>
       <span class="mx-2" style="font-size:12px;">新しいフレンドとのチャットはこちら</span>
-      <v-btn link to="/friendList" x-small rounded color="primary">フレンドリスト</v-btn>
+      <v-btn link to="/friendList" x-small depressed dark rounded color="#8ac32b">フレンドリスト</v-btn>
     </div>
-    <v-card color flat class="overflow-y-auto scroll" :height="getChatCardHeifht">
-      <v-list color v-for="(item, i) in latestMesUid" :key="i" class="p-0">
+    <v-card flat class="overflow-y-auto scroll" :height="getChatCardHeifht">
+      <v-list v-for="(item, i) in latestMesUid" :key="i" class="p-0">
         <v-list-item @click="goChat(item.id)">
-          <v-list-item-avatar size="40" class="mr-3" color="white">
+          <v-list-item-avatar size="40" class="mr-3">
             <v-img :src="item.avatarUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-content>
@@ -23,7 +23,7 @@
           <v-list-item-action>
             <v-icon
               v-if="getUnreadIcon(item.postAt,item.id,item.whoesMes)"
-              color="black"
+              color="#8ac32b"
               large
             >mdi-message-processing</v-icon>
           </v-list-item-action>
@@ -132,7 +132,29 @@ export default {
   computed: {
     getChatCardHeifht: function() {
       //ヘッダー、フッター、タブバー、パディング
-      return this.screenHeight - 40 - 80 - 36;
+      var header = 40;
+      var footer = 80;
+      var topComment = 32;
+      var padOfiphone = 20;
+      var padOfLargeiphone = 78;
+      var padOfTab = 40;
+      // iphoneの時
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphone8plus以下
+        if (window.innerHeight <= 716) {
+          return this.screenHeight - header - footer - topComment - padOfiphone;
+          // iphoneX以上
+        } else {
+          return (
+            this.screenHeight - header - footer - topComment - padOfLargeiphone
+          );
+        }
+        //タブレットの時
+      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+        return this.screenHeight - header - topComment - padOfTab;
+      } else {
+        return null;
+      }
     }
   },
   watch: {

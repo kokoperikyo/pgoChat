@@ -1,12 +1,12 @@
 <template>
   <v-card class="mx-auto" tile>
-    <v-dialog v-model="deleteFriendDialog" max-width="290">
+    <v-dialog v-model="deleteFriendDialog" max-width="320">
       <v-card>
         <v-card-title class="pb-0">フレンドを削除しますか？</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded dark color="#FF3D00" @click="deleteFriend" class="mr-5">削除</v-btn>
-          <v-btn rounded color="#FF3D00" outlined @click="deleteFriendDialog = false">閉じる</v-btn>
+          <v-btn rounded dark depressed color="#004D40" @click="deleteFriend" class="mr-5">削除</v-btn>
+          <v-btn rounded outlined color="#004D40" @click="deleteFriendDialog = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -21,8 +21,9 @@
             class="mr-5"
             clearable
             clear-icon="cancel"
+            color="#8ac32b"
           ></v-text-field>
-          <v-btn @click="addNickname()" small fab>
+          <v-btn @click="addNickname()" small fab depressed dark color="#8ac32b">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-card-title>
@@ -38,14 +39,15 @@
             class="mr-5"
             clearable
             clear-icon="cancel"
+            color="#8ac32b"
           ></v-text-field>
-          <v-btn @click="editNickname()" small fab>
+          <v-btn @click="editNickname()" small fab depressed dark color="#8ac32b">
             <v-icon>mdi-autorenew</v-icon>
           </v-btn>
         </v-card-title>
       </v-card>
     </v-dialog>
-    <v-toolbar color="light-blue" dark>
+    <v-toolbar height="40px" color="#8ac32b" dark>
       <v-spacer></v-spacer>
       <v-toolbar-title>フレンドリスト</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -84,8 +86,8 @@
                     x-small
                     fab
                     dark
-                    color="primary"
-                    class="ml-1"
+                    depressed
+                    color="#8ac32b"
                   >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
@@ -99,8 +101,9 @@
                   x-small
                   fab
                   dark
-                  color="primary"
+                  color="#8ac32b"
                   class="ml-1"
+                  depressed
                 >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
@@ -112,13 +115,37 @@
               class="mr-5"
               style="width:80px; text-align:center;"
             >{{getLastLogin(friendList.lastLogin)}}</v-text>
-            <v-btn outlined @click="goProfile(friendList.id)" class="mr-2" small fab>
-              <v-icon>mdi-shield-account-outline</v-icon>
+            <v-btn
+              @click="goProfile(friendList.id)"
+              color="#8ac32b"
+              class="mr-2"
+              depressed
+              small
+              fab
+              dark
+            >
+              <v-icon>mdi-shield-account</v-icon>
             </v-btn>
-            <v-btn outlined @click="goChat(friendList.id)" class="mr-2" small fab>
-              <v-icon>mdi-chat-processing-outline</v-icon>
+            <v-btn
+              @click="goChat(friendList.id)"
+              color="#8ac32b"
+              class="mr-2"
+              small
+              fab
+              depressed
+              dark
+            >
+              <v-icon>mdi-chat-processing</v-icon>
             </v-btn>
-            <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" small dark fab>
+            <v-btn
+              @click="deleteFriendByDialog(friendList.id)"
+              class="mr-2"
+              small
+              dark
+              fab
+              color="#004D40"
+              depressed
+            >
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
           </div>
@@ -132,13 +159,36 @@
               ></v-list-item-avatar>
             </v-list-item-title>
             <v-list-item-subtitle class="mr-5">
-              <v-btn outlined @click="goProfile(friendList.id)" class="mr-1" x-small fab>
-                <v-icon>mdi-shield-account</v-icon>
+              <v-btn
+                @click="goProfile(friendList.id)"
+                color="#8ac32b"
+                class="mr-1"
+                icon
+                dark
+                depressed
+              >
+                <v-icon x-large>mdi-account-circle</v-icon>
               </v-btn>
-              <v-btn outlined @click="goChat(friendList.id)" class="mr-1" x-small fab>
-                <v-icon>mdi-chat-processing-outline</v-icon>
+              <v-btn
+                @click="goChat(friendList.id)"
+                color="#8ac32b"
+                class="mr-1"
+                x-small
+                fab
+                dark
+                depressed
+              >
+                <v-icon>mdi-chat-processing</v-icon>
               </v-btn>
-              <v-btn @click="deleteFriendByDialog(friendList.id)" class="red mr-2" x-small dark fab>
+              <v-btn
+                @click="deleteFriendByDialog(friendList.id)"
+                class="#004D40 mr-2"
+                x-small
+                dark
+                fab
+                color="#004D40"
+                depressed
+              >
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
             </v-list-item-subtitle>
@@ -342,9 +392,31 @@ export default {
         ? (item, search, textKey) => item[textKey].indexOf(search) > -1
         : undefined;
     },
-    getChatCardHeifht: function() {
+    getChatCardHeifht() {
       //ヘッダー、フッター、タブバー、パディング
-      return this.screenHeight - 40 - 80 - 56;
+      var header = 40;
+      var footer = 80;
+      var toolbar = 40;
+      var padOfiphone = 20;
+      var padOfLargeiphone = 78;
+      var padOfTab = 40;
+      // iphoneの時
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphone8plus以下
+        if (window.innerHeight <= 716) {
+          return this.screenHeight - header - footer - toolbar - padOfiphone;
+          // iphoneX以上
+        } else {
+          return (
+            this.screenHeight - header - footer - toolbar - padOfLargeiphone
+          );
+        }
+        //タブレットの時
+      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+        return this.screenHeight - header - toolbar - padOfTab;
+      } else {
+        return null;
+      }
     }
   },
   firestore() {

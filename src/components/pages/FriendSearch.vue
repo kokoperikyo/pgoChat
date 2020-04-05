@@ -1,8 +1,14 @@
 <template>
   <div>
-    <v-alert v-show="addFriendSuccess" type="success">フレンド申請をしました</v-alert>
-    <v-text-field v-model="searchUserName" label="ユーザー名を入力してください" append-icon="search"></v-text-field>
-    <v-card class="mx-auto" tile>
+    <v-alert color="#8ac32b" v-show="addFriendSuccess" type="success">フレンド申請をしました</v-alert>
+    <v-text-field
+      v-model="searchUserName"
+      label="ユーザー名を入力してください"
+      append-icon="search"
+      color="#8ac32b"
+    ></v-text-field>
+    <div v-if="serchedUsers.length != 0">{{serchedUsers.length}}人います</div>
+    <v-card class="overflow-y-auto scroll" flat :max-height="getCardHeight">
       <v-list v-if="searchUserName">
         {{noResultMessage}}
         <v-list-item
@@ -16,13 +22,23 @@
           <v-list-item-content>
             <v-list-item-title v-text="serchedUser.name" style="font-size:16px;"></v-list-item-title>
           </v-list-item-content>
-          <v-btn @click="goProfile(serchedUser.id)" class="mr-2" fab small outlined>
+          <v-btn
+            @click="goProfile(serchedUser.id)"
+            small
+            class="mr-2"
+            color="#8ac32b"
+            fab
+            dark
+            depressed
+          >
             <v-icon>mdi-shield-account-outline</v-icon>
           </v-btn>
           <v-btn
-            fab
+            color="#8ac32b"
             small
-            outlined
+            fab
+            dark
+            depressed
             v-on:click.stop="sendFriendRequest"
             @click="sendFriendRequest(serchedUser.id,serchedUser.name,serchedUser.avatarUrl)"
           >
@@ -31,41 +47,47 @@
         </v-list-item>
       </v-list>
     </v-card>
-    <v-card class="mt-5" tile>
-      <v-toolbar color="indigo" dark>
+    <v-card class="mt-3" flat>
+      <v-toolbar flat color="#8ac32b" dark>
         <v-spacer></v-spacer>
         <v-toolbar-title>申請中ユーザー</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-list>
-        <div v-if="user.sendFriendRequestList.length == 0">申請中のユーザーはいません</div>
-        <v-list-item v-else v-for="(sendFriendRequest, i) in user.sendFriendRequestList" :key="i">
-          <v-list-item-avatar>
-            <v-img :src="sendFriendRequest.avatarUrl"></v-img>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title v-text="sendFriendRequest.friendName"></v-list-item-title>
-          </v-list-item-content>
-          <v-btn
-            fab
-            small
-            outlined
-            v-on:click.stop="sendFriendRequest"
-            @click="goProfile(sendFriendRequest.friendId)"
-            class="mr-2"
-          >
-            <v-icon>mdi-shield-account-outline</v-icon>
-          </v-btn>
+        <v-card class="overflow-y-auto scroll" tile flat :max-height="getCardHeight">
+          <div v-if="user.sendFriendRequestList.length == 0">申請中のユーザーはいません</div>
+          <v-list-item v-else v-for="(sendFriendRequest, i) in user.sendFriendRequestList" :key="i">
+            <v-list-item-avatar>
+              <v-img :src="sendFriendRequest.avatarUrl"></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-text="sendFriendRequest.friendName"></v-list-item-title>
+            </v-list-item-content>
+            <v-btn
+              color="#8ac32b"
+              fab
+              dark
+              depressed
+              small
+              v-on:click.stop="sendFriendRequest"
+              @click="goProfile(sendFriendRequest.friendId)"
+              class="mr-2"
+            >
+              <v-icon>mdi-shield-account-outline</v-icon>
+            </v-btn>
 
-          <v-btn
-            fab
-            small
-            outlined
-            @click="rejectFriendRequest(sendFriendRequest.avatarUrl,sendFriendRequest.friendId,sendFriendRequest.friendName)"
-          >
-            <v-icon>mdi-account-cancel</v-icon>
-          </v-btn>
-        </v-list-item>
+            <v-btn
+              color="#004D40"
+              fab
+              dark
+              depressed
+              small
+              @click="rejectFriendRequest(sendFriendRequest.avatarUrl,sendFriendRequest.friendId,sendFriendRequest.friendName)"
+            >
+              <v-icon>mdi-account-cancel</v-icon>
+            </v-btn>
+          </v-list-item>
+        </v-card>
       </v-list>
     </v-card>
   </div>
@@ -78,7 +100,7 @@ export default {
   data() {
     return {
       searchUserName: null,
-      serchedUsers: Object,
+      serchedUsers: [],
       noResultMessage: null,
       user: null,
       friendIdList: [],
@@ -115,6 +137,23 @@ export default {
             });
         }
       });
+  },
+  computed: {
+    getCardHeight() {
+      // iphoneSE以下
+      if (window.innerWidth <= 320) {
+        return 150;
+        // iphone11pro,x,xs,6,7,8
+      } else if (window.innerWidth <= 375) {
+        return 200;
+        // iphoneそれ以外
+      } else if (window.innerWidth <= 500) {
+        return 260;
+      } else {
+        return null;
+      }
+      //タブレットの時
+    }
   },
   methods: {
     //フレンド申請
@@ -183,6 +222,7 @@ export default {
   },
   watch: {
     searchUserName: function() {
+      this.noResultMessage = "";
       db.collection("users")
         .orderBy("name")
         .startAt(this.searchUserName)
@@ -195,17 +235,22 @@ export default {
             if (
               !this.friendNameList.includes(doc.data().name) &&
               doc.data().name != this.user.name &&
-              !this.user.sendFriendRequestNameList.includes(doc.data().name)
+              !this.user.sendFriendRequestNameList.includes(doc.data().name) &&
+              this.searchUserName != ""
             ) {
-              array.push(doc.data());
+              setTimeout(() => {
+                array.push(doc.data());
+              }, 1000);
             }
           });
           this.serchedUsers = array;
-          if (this.serchedUsers.length == 0) {
-            this.noResultMessage = "一致するユーザーがいません";
-          } else {
-            this.noResultMessage = "";
-          }
+          setTimeout(() => {
+            if (this.serchedUsers.length == 0) {
+              this.noResultMessage = "一致するユーザーがいません";
+            } else {
+              this.noResultMessage = "";
+            }
+          }, 1200);
         });
     }
   },
