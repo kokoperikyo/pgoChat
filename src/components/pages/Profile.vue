@@ -376,13 +376,15 @@ export default {
         this.user = doc.data();
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
-          //スマホログインの場合はid渡してtopicに登録
-          var ua = navigator.userAgent;
-          if (ua.indexOf("iPhone") > 0 || ua.indexOf("iPad") > 0) {
-            window.webkit.messageHandlers.callbackHandler.postMessage(
-              this.$store.getters.user.uid
-            );
-          }
+          setTimeout(() => {
+            //スマホログインの場合はid渡してtopicに登録
+            var ua = navigator.userAgent;
+            if (ua.indexOf("iPhone") > 0 || ua.indexOf("iPad") > 0) {
+              window.webkit.messageHandlers.callbackHandler.postMessage(
+                this.$store.getters.user.uid
+              );
+            }
+          }, 3000);
           //chatの6-3のために必要
           //初期アバターのセット
           this.displayAvatar =
