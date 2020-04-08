@@ -469,8 +469,8 @@ export default {
         priority: "high",
         content_available: true,
         notification: {
-          title: "新着メッセージがあります",
-          body: `${this.userInfo.name}:${body}`,
+          title: `${this.userInfo.name}`,
+          body: `${body}`,
           badge: "1"
         }
       };
