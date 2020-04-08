@@ -94,6 +94,7 @@
 </template>
 <script>
 import { db } from "@/plugins/firebase";
+import { iosAuthorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 export default {
@@ -156,8 +157,29 @@ export default {
     }
   },
   methods: {
+    sendNotification(id) {
+      let argObj = {
+        // 受信者のトークンIDと通知内容
+        to: `/topics/${id}`,
+        priority: "high",
+        content_available: true,
+        notification: {
+          title: `${this.user.name}からフレンド申請がきています`,
+          badge: "1"
+        }
+      };
+      let optionObj = {
+        //送信者のサーバーキー
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+        }
+      };
+      this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
+    },
     //フレンド申請
     sendFriendRequest: function(id, friendName, firendAvatarUrl) {
+      this.sendNotification(id);
       //申請を申請相手のDBに保存する
       const users = db.collection("users");
       users.doc(id).update({

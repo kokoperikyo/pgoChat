@@ -6,10 +6,15 @@ import Firebase from './plugins/firebase'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import './registerServiceWorker'
+import axios from 'axios' //追記
+import VueAxios from 'vue-axios' //追記
 
 
 
 Vue.use(Vuetify)
+Vue.use(VueAxios, axios) //追記
+
+
 const vuetify = new Vuetify();
 
 Firebase.init();

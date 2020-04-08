@@ -379,6 +379,7 @@
 
 <script>
 import { db } from "@/plugins/firebase";
+import { iosAuthorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import { format } from "date-fns";
@@ -392,6 +393,7 @@ export default {
       screenHeight: 0,
       messages: [],
       inputMessage: "",
+      userInfo: "",
       chatUser: "",
       selectLeagueDialog: false,
       selectSixThreeDialog: false,
@@ -460,6 +462,27 @@ export default {
     }
   },
   methods: {
+    sendNotification(body) {
+      let argObj = {
+        // 受信者のトークンIDと通知内容
+        to: `/topics/${this.$route.params["uid"]}`,
+        priority: "high",
+        content_available: true,
+        notification: {
+          title: "新着メッセージがあります",
+          body: `${this.userInfo.name}:${body}`,
+          badge: "1"
+        }
+      };
+      let optionObj = {
+        //送信者のサーバーキー
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+        }
+      };
+      this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
+    },
     isMyMessage(mesId) {
       if (mesId == this.$store.getters.user.uid + this.$route.params["uid"]) {
         this.isMyMessageCla = true;
@@ -469,6 +492,7 @@ export default {
       }
     },
     regMessage() {
+      this.sendNotification(this.inputMessage);
       // 空文字入力を防ぐ
       if (this.inputMessage == "") {
         return;
@@ -536,6 +560,8 @@ export default {
     },
     //６−３を投げる
     startSixToThree(st) {
+      this.sendNotification("６−３が申し込まれました");
+
       this.selectLeagueDialog = false;
       this.judgeLeague(st);
       var len = 12;
@@ -943,6 +969,7 @@ export default {
         ])
         .orderBy("createdAt", "asc"),
       chatUser: db.collection("users").doc(this.$route.params["uid"]),
+      userInfo: db.collection("users").doc(this.$store.getters.user.uid),
       partySelectedStatus: db
         .collection("users")
         .doc(this.$store.getters.user.uid)

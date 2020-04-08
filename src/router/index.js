@@ -12,7 +12,9 @@ import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
 import Loading from '../components/pages/Loading.vue'
 import BulletinBoard from '../components/pages/BulletinBoard.vue'
+import Menu from '../components/pages/Menu.vue'
 import DeleteAccount from '../components/pages/DeleteAccount.vue'
+import NotificationMobile from '../components/pages/NotificationMobile.vue'
 import TestChat from '../components/pages/TestChat.vue'
 
 
@@ -108,9 +110,25 @@ const routes = [{
     }
   },
   {
+    path: '/menu',
+    name: 'menu',
+    component: Menu,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/deleteAccount',
     name: 'deleteAccount',
     component: DeleteAccount,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/notificationMobile',
+    name: 'notificationMobile',
+    component: NotificationMobile,
     meta: {
       requiresAuth: true
     }

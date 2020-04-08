@@ -314,6 +314,7 @@
 </template>
 <script>
 import { db } from "@/plugins/firebase";
+import { iosAuthorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import "firebase/storage";
@@ -375,6 +376,13 @@ export default {
         this.user = doc.data();
         //登録後初回ログインはドキュメントを作成する
         if (doc.data() == undefined) {
+          //スマホログインの場合はid渡してtopicに登録
+          var ua = navigator.userAgent;
+          if (ua.indexOf("iPhone") > 0 || ua.indexOf("iPad") > 0) {
+            window.webkit.messageHandlers.callbackHandler.postMessage(
+              this.$store.getters.user.uid
+            );
+          }
           //chatの6-3のために必要
           //初期アバターのセット
           this.displayAvatar =
@@ -412,6 +420,46 @@ export default {
     // }, 3000);
   },
   methods: {
+    sendAcceptFriendRequestNotification() {
+      let argObj = {
+        // 受信者のトークンIDと通知内容
+        to: `/topics/${this.displayFriendUserInfo.id}`,
+        priority: "high",
+        content_available: true,
+        notification: {
+          title: `${this.displayUserName}とフレンドになりました`,
+          badge: "1"
+        }
+      };
+      let optionObj = {
+        //送信者のサーバーキー
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+        }
+      };
+      this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
+    },
+    sendSendFriendRequestNotification() {
+      let argObj = {
+        // 受信者のトークンIDと通知内容
+        to: `/topics/${this.displayFriendUserInfo.id}`,
+        priority: "high",
+        content_available: true,
+        notification: {
+          title: `${this.displayUserName}からフレンド申請がきています`,
+          badge: "1"
+        }
+      };
+      let optionObj = {
+        //送信者のサーバーキー
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+        }
+      };
+      this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
+    },
     edit() {
       this.isEdit = true;
     },
@@ -553,6 +601,7 @@ export default {
       });
     },
     acceptFriendRequest(status) {
+      this.sendAcceptFriendRequestNotification();
       this.requestAcceptDialog = false;
       setTimeout(() => {
         //ログイン中のユーザーのDBにフレンド追加
@@ -674,6 +723,7 @@ export default {
       }, 2000);
     },
     sendFriendRequest() {
+      this.sendSendFriendRequestNotification();
       //申請を申請相手のDBに保存する
       const users = db.collection("users");
       users.doc(this.displayFriendUserInfo.id).update({

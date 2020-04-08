@@ -76,15 +76,7 @@
         </v-col>
       </v-row>
     </v-footer>
-    <v-app-bar
-      :clipped-left="$vuetify.breakpoint.lgAndUp"
-      app
-      absolute
-      color="#DE4097"
-      flat
-      dark
-      height="40px"
-    >
+    <v-app-bar clipped-left="true" app absolute color="#DE4097" flat dark height="40px">
       <v-app-bar-nav-icon v-show="userStatus && !isSmallerThanTablet" @click="drawer = !drawer" />
       <v-spacer />
       <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
@@ -187,6 +179,7 @@
 <script>
 import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
+import { iosAuthorizationOfNotification } from "@/plugins/firebase";
 import "@firebase/firestore";
 
 export default {
@@ -234,9 +227,9 @@ export default {
           link: { name: "bulletinBoard" }
         },
         {
-          icon: "mdi-exit-run",
-          text: "アカウント削除",
-          link: { name: "deleteAccount" }
+          icon: "mdi-dots-horizontal-circle-outline",
+          text: "メニュー",
+          link: { name: "menu" }
         }
       ],
       userName: null,
@@ -254,6 +247,26 @@ export default {
     };
   },
   methods: {
+    sendNotification() {
+      let argObj = {
+        // 受信者のトークンIDと通知内容
+        to: `/topics/${this.friendId}`,
+        priority: "high",
+        content_available: true,
+        notification: {
+          title: `${this.userName}とフレンドになりました`,
+          badge: "1"
+        }
+      };
+      let optionObj = {
+        //送信者のサーバーキー
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+        }
+      };
+      this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
+    },
     // ログアウト処理
     doLogout() {
       firebase
@@ -351,6 +364,7 @@ export default {
       this.modalStatus = status;
     },
     acceptFriendRequest() {
+      this.sendNotification();
       this.requestAcceptDialog = false;
       //ログイン中のユーザーのDBにフレンド追加
       const users = db.collection("users");
