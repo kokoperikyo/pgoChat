@@ -141,15 +141,29 @@ export default {
   },
   computed: {
     getCardHeight() {
-      // iphoneSE以下
-      if (window.innerWidth <= 320) {
-        return 150;
-        // iphone11pro,x,xs,6,7,8
-      } else if (window.innerWidth <= 375) {
-        return 200;
-        // iphoneそれ以外
-      } else if (window.innerWidth <= 500) {
-        return 260;
+      //iphone
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphoneSE以下
+        if (window.innerWidth <= 320) {
+          return 150;
+          // iphone11pro,x,xs,6,7,8
+        } else if (window.innerWidth <= 375) {
+          return 200;
+          // iphoneのそれ以外
+        } else {
+          return 260;
+        }
+      }
+      //android
+      else if (
+        navigator.userAgent.indexOf("Mobile") >= 0 &&
+        navigator.userAgent.indexOf("Android") >= 0
+      ) {
+        if (window.innerWidth <= 320) {
+          return 150;
+        } else {
+          return 200;
+        }
       } else {
         return null;
       }

@@ -2,6 +2,11 @@
   <v-app>
     <v-content>
       <v-container>
+        <v-dialog v-model="alertDialog" max-width="290">
+          <v-card>
+            <v-card-title>既に使用されているメールアドレスです</v-card-title>
+          </v-card>
+        </v-dialog>
         <v-card color="#FCE4EC" class="mx-auto" max-width="400px">
           <v-list-item>
             <v-spacer></v-spacer>
@@ -74,7 +79,8 @@ export default {
 
   data: () => ({
     email: "",
-    password: ""
+    password: "",
+    alertDialog: false
   }),
 
   computed: {
@@ -103,13 +109,13 @@ export default {
     }
   },
   methods: {
-    alertMes(code) {
-      if (code == "auth/invalid-email") {
-        alert("メールアドレスを入力してください");
-      } else if (code == "auth/weak-password") {
-        alert("パスワードを入力してください");
-      }
-    },
+    // alertMes(code) {
+    //   if (code == "auth/invalid-email") {
+    //     alert("メールアドレスを入力してください");
+    //   } else if (code == "auth/weak-password") {
+    //     alert("パスワードを入力してください");
+    //   }
+    // },
     signUpEmail() {
       firebase
         .auth()
@@ -118,7 +124,9 @@ export default {
           this.$router.push("/profile");
         })
         .catch(error => {
-          this.alertMes(error.code);
+          // eslint-disable-next-line no-console
+          console.log(error);
+          this.alertDialog = true;
         });
     },
     signUpGoogle() {

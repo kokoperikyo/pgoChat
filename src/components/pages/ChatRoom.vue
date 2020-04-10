@@ -138,6 +138,7 @@ export default {
       var padOfiphone = 20;
       var padOfLargeiphone = 78;
       var padOfTab = 40;
+      var andMobBar = 60;
       // iphoneの時
       if (navigator.userAgent.indexOf("iPhone") >= 0) {
         // iphone8plus以下
@@ -149,8 +150,20 @@ export default {
             this.screenHeight - header - footer - topComment - padOfLargeiphone
           );
         }
-        //タブレットの時
-      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+      }
+      //androidモバイルの時
+      else if (
+        navigator.userAgent.indexOf("Android") >= 0 &&
+        navigator.userAgent.indexOf("Mobile") >= 0
+      ) {
+        return this.screenHeight - header - footer - topComment - andMobBar;
+      }
+      //androidタブレットの時
+      else if (navigator.userAgent.indexOf("Android") >= 0) {
+        return this.screenHeight - header - topComment - andMobBar;
+      }
+      //タブレットの時
+      else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
         return this.screenHeight - header - topComment - padOfTab;
       } else {
         return null;

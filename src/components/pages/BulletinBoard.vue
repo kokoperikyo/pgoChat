@@ -128,8 +128,6 @@ export default {
       const now = new Date();
       const timeDate = now.getTime() - time.toDate().getTime();
       const floorDate = Math.floor(timeDate / (1000 * 60 * 60));
-      // eslint-disable-next-line no-console
-      console.log(floorDate);
 
       if (floorDate <= 1) {
         return format(new Date(time.toDate()), "HH:mm");
@@ -147,6 +145,7 @@ export default {
       var padOfiphone = 20;
       var padOfLargeiphone = 78;
       var padOfTab = 40;
+      var andMobBar = 60;
       // iphoneの時
       if (navigator.userAgent.indexOf("iPhone") >= 0) {
         // iphone8plus以下
@@ -158,8 +157,20 @@ export default {
             this.screenHeight - header - footer - textarea - padOfLargeiphone
           );
         }
-        //タブレットの時
-      } else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+      }
+      //androidモバイルの時
+      else if (
+        navigator.userAgent.indexOf("Android") >= 0 &&
+        navigator.userAgent.indexOf("Mobile") >= 0
+      ) {
+        return this.screenHeight - header - footer - textarea - andMobBar;
+      }
+      //androidタブレットの時
+      else if (navigator.userAgent.indexOf("Android") >= 0) {
+        return this.screenHeight - header - textarea - andMobBar;
+      }
+      //タブレットの時
+      else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
         return this.screenHeight - header - textarea - padOfTab;
       } else {
         return null;

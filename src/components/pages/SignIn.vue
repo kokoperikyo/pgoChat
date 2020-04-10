@@ -2,6 +2,11 @@
   <v-app>
     <v-content>
       <v-container>
+        <v-dialog v-model="alertDialog" max-width="290">
+          <v-card>
+            <v-card-title>{{this.dialogMes}}</v-card-title>
+          </v-card>
+        </v-dialog>
         <v-card color="#FCE4EC" class="mx-auto" max-width="400px">
           <v-list-item>
             <v-spacer></v-spacer>
@@ -81,9 +86,10 @@ export default {
 
   data: () => ({
     email: "",
-    password: ""
+    password: "",
+    alertDialog: false,
+    dialogMes: ""
   }),
-
   computed: {
     passwordErrors() {
       const errors = [];
@@ -111,12 +117,14 @@ export default {
   methods: {
     alertMes(code) {
       if (code == "auth/invalid-email") {
-        alert("正しいメールアドレスを入力してください");
+        this.alertDialog = true;
+        this.dialogMes = "正しいメールアドレスを入力してください";
       } else if (
         code == "auth/user-not-found" ||
         code == "auth/wrong-password"
       ) {
-        alert("メールアドレスかパスワードが間違っています");
+        this.alertDialog = true;
+        this.dialogMes = "メールアドレスかパスワードが間違っています";
       }
     },
     signInEmail() {

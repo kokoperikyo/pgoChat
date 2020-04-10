@@ -40,7 +40,7 @@
         </v-row>
       </v-card>
     </v-dialog>
-    <v-navigation-drawer v-if="userStatus" v-model="drawer" clipped app>
+    <v-navigation-drawer v-if="userStatus && !isSmallerThanTablet" v-model="drawer" clipped app>
       <v-list dense>
         <template v-for="item in items">
           <v-list-item :key="item.text" :to="item.link">
@@ -63,21 +63,32 @@
       absolute
       dark
     >
-      <v-row justify="center" no-gutters>
+      <v-row style="position: relative;" justify="center" no-gutters>
         <v-col align="center" v-for="(item, index) in items" :key="index">
           <v-btn icon :to="item.link">
             <v-icon>{{item.icon}}</v-icon>
           </v-btn>
         </v-col>
       </v-row>
-      <v-row justify="center" no-gutters>
+      <v-row style="position: relative;" justify="center" no-gutters>
         <v-col :to="item.link" align="center" v-for="(item, index) in items" :key="index">
           <div style="font-size:8px;">{{item.text}}</div>
         </v-col>
       </v-row>
     </v-footer>
-    <v-app-bar clipped-left="true" app absolute color="#DE4097" flat dark height="40px">
+    <v-app-bar clipped-left app absolute color="#DE4097" flat dark height="40px">
       <v-app-bar-nav-icon v-show="userStatus && !isSmallerThanTablet" @click="drawer = !drawer" />
+      <div v-if="isMobileAndTab">
+        <v-btn @click="back" icon small>
+          <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+        </v-btn>
+        <v-btn @click="forward" icon small>
+          <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+        </v-btn>
+        <v-btn @click="tapRelord" icon small>
+          <v-icon>mdi-restart</v-icon>
+        </v-btn>
+      </div>
       <v-spacer />
       <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
         <template v-slot:activator="{ on }">
@@ -169,7 +180,7 @@
         <v-btn text to="/signUp" class>新規登録</v-btn>
       </v-toolbar-items>
     </v-app-bar>
-    <v-content>
+    <v-content id="contentBox">
       <!-- <v-container> -->
       <router-view />
       <!-- </v-container> -->
@@ -194,12 +205,19 @@ export default {
       } else {
         return false;
       }
+    },
+    isMobileAndTab() {
+      return (
+        navigator.userAgent.indexOf("iPhone") >= 0 ||
+        navigator.userAgent.indexOf("iPad") >= 0 ||
+        navigator.userAgent.indexOf("Android") >= 0
+      );
     }
   },
   data() {
     return {
       islogin: Boolean,
-      drawer: false,
+      drawer: true,
       items: [
         {
           icon: "mdi-account-circle-outline",
@@ -247,6 +265,15 @@ export default {
     };
   },
   methods: {
+    back() {
+      history.back();
+    },
+    forward() {
+      history.forward();
+    },
+    tapRelord() {
+      location.reload();
+    },
     sendNotification() {
       let argObj = {
         // 受信者のトークンIDと通知内容
@@ -440,6 +467,38 @@ export default {
           }
         });
     }, 5000);
+    if (window.innerWidth <= 1024) {
+      this.drawer = false;
+    } else {
+      this.drawer = true;
+    }
+
+    var t = document.getElementById("contentBox");
+    var startX;
+    var moveX;
+    var distBack = 150;
+    var distForward = 120;
+    t.addEventListener("touchstart", function(e) {
+      startX = e.touches[0].pageX;
+    });
+    t.addEventListener("touchmove", function(e) {
+      moveX = e.changedTouches[0].pageX;
+    });
+    t.addEventListener("touchend", function() {
+      if (startX > moveX && startX > moveX + distForward) {
+        // 右から左の時の処理
+        history.forward();
+        startX = 0;
+        moveX = 0;
+      } else if (startX < moveX && startX + distBack < moveX) {
+        // 左から右の時の処理
+        history.back();
+        startX = 0;
+        moveX = 0;
+      }
+    });
   }
 };
 </script>
+<style>
+</style>

@@ -27,7 +27,7 @@ Vue.use(VueRouter)
 
 const routes = [{
     path: '*',
-    redirect: 'SignIn'
+    redirect: 'profile'
   }, {
     path: '/signUp',
     name: 'signUp',
@@ -151,7 +151,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   if (requiresAuth) {
     // このルートはログインされているかどうか認証が必要です。
