@@ -379,7 +379,10 @@
 
 <script>
 import { db } from "@/plugins/firebase";
-import { iosAuthorizationOfNotification } from "@/plugins/firebase";
+import {
+  iosAuthorizationOfNotification,
+  androidAuthorizationOfNotification
+} from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import { format } from "date-fns";
@@ -421,7 +424,7 @@ export default {
     getChatCardHeight: function() {
       //ヘッダー、フッター、タブバー、チャットゾーン、スマホの上下
       var header = 40;
-      var footer = 80;
+      var footer = 60;
       var tabbar = 40;
       var chat = 130 - 20;
       var padOfiphone = 20;
@@ -487,11 +490,18 @@ export default {
           badge: "1"
         }
       };
+      var ua = navigator.userAgent;
+      var key;
+      if (ua.indexOf("Android") > 0) {
+        key = androidAuthorizationOfNotification;
+      } else if (window.innerWidth <= 1024) {
+        key = iosAuthorizationOfNotification;
+      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+          Authorization: "key=" + `${key}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);

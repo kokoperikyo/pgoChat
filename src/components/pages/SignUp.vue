@@ -11,10 +11,10 @@
           <v-list-item>
             <v-spacer></v-spacer>
             <div class="mt-3">
-              <v-btn fab class="mr-2" color="error">
+              <!-- <v-btn fab class="mr-2" color="error">
                 <v-icon large color="white" class="fab fa-google-plus-square" @click="signUpGoogle"></v-icon>
-              </v-btn>
-              <v-btn fab color="primary">
+              </v-btn>-->
+              <v-btn fab color="primary" depressed>
                 <v-icon large color="white" class="fab fa-twitter-square" @click="signUpTwitter"></v-icon>
               </v-btn>
             </div>
@@ -109,13 +109,6 @@ export default {
     }
   },
   methods: {
-    // alertMes(code) {
-    //   if (code == "auth/invalid-email") {
-    //     alert("メールアドレスを入力してください");
-    //   } else if (code == "auth/weak-password") {
-    //     alert("パスワードを入力してください");
-    //   }
-    // },
     signUpEmail() {
       firebase
         .auth()

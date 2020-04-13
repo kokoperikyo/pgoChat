@@ -36,3 +36,4 @@ export default {
 export const db = firebaseApp.firestore();
 
 export const iosAuthorizationOfNotification = "AAAAD-WZikw:APA91bF99_2he4aNCW1WjmtqJKB62-u6FZ7snpPlWOyX_rALIiV5NzWxOB_R5ga5ncC7C3bFLCvPJpva-BRt7zM7AhGbtVoB-PGHFiQMDZ1s9zHMtbsGeCY_pjiNqXEDdcIwcttVGQ7Y"
+export const androidAuthorizationOfNotification = "AAAA-KY97PA:APA91bHAUDtL4x23mDeWaO6sJegmFhbyppOVLta8QqAo3g2oHC8AJF2ZCu4piupxQ7BAkxqX4ZLBeLaUKrKDt0ihTth9FVSCcxnD2RKeIjvS6WSdYiL2LBre9-AxQeOnl9a-Bica8fot"

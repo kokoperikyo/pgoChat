@@ -94,7 +94,7 @@
         </v-card>
       </v-dialog>
       <!-- こっから本体 -->
-      <v-card>
+      <v-card :height="getChatCardHeifht" flat>
         <div v-if="isEdit" class="headerImg">
           <div v-if="displayDemoHeaderImg">
             <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
@@ -209,11 +209,11 @@
             <div v-else-if="isSendRequest">申請中</div>
           </div>
           <div v-if="isMypage">
-            <v-btn v-if="isEdit" @click="save" fab dark color="#8ac32b" depressed>
-              <v-icon large>mdi-content-save-edit</v-icon>
+            <v-btn v-if="isEdit" @click="save" small fab dark color="#8ac32b" depressed>
+              <v-icon>mdi-content-save-edit</v-icon>
             </v-btn>
-            <v-btn v-else @click="edit" fab dark color="#8ac32b" depressed>
-              <v-icon x-large>mdi-account-edit</v-icon>
+            <v-btn v-else @click="edit" small fab dark color="#8ac32b" depressed>
+              <v-icon>mdi-account-edit</v-icon>
             </v-btn>
           </div>
           <div v-else>
@@ -282,39 +282,16 @@
             style="white-space:pre-wrap; "
           >{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
         </div>
-        <v-card-actions>
-          <v-row>
-            <v-col align="center">
-              <v-btn text @click="status = 1">対戦情報</v-btn>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col align="center">
-              <v-btn text @click="status = 2">対戦成績</v-btn>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col align="center">
-              <v-btn text @click="status = 3">あああ</v-btn>
-            </v-col>
-          </v-row>
-        </v-card-actions>
-        <v-divider></v-divider>
-        <v-card-text>
-          <span v-if="status === 1">対戦情報</span>
-          <span v-if="status === 2">
-            対戦成績
-            <v-list v-for="item in items" v-bind:key="item">{{item}}</v-list>
-          </span>
-          <span v-if="status === 3">あああ</span>
-        </v-card-text>
       </v-card>
     </v-card>
   </div>
 </template>
 <script>
 import { db } from "@/plugins/firebase";
-import { iosAuthorizationOfNotification } from "@/plugins/firebase";
+import {
+  iosAuthorizationOfNotification,
+  androidAuthorizationOfNotification
+} from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import "firebase/storage";
@@ -355,10 +332,12 @@ export default {
       beforeNickname: null,
       inputEditNickname: null,
       requestAcceptDialog: false,
-      requestRejectDialog: false
+      requestRejectDialog: false,
+      screenHeight: 0
     };
   },
   mounted() {
+    this.screenHeight = window.parent.screen.height;
     //最終ログインを更新
     db.collection("users")
       .doc(this.$store.getters.user.uid)
@@ -379,7 +358,9 @@ export default {
           setTimeout(() => {
             //スマホログインの場合はid渡してtopicに登録
             var ua = navigator.userAgent;
-            if (ua.indexOf("iPhone") > 0 || ua.indexOf("iPad") > 0) {
+            if (ua.indexOf("Android") > 0) {
+              window.appJsInterface.subscribeUid(this.$store.getters.user.uid);
+            } else if (window.innerWidth <= 1024) {
               window.webkit.messageHandlers.callbackHandler.postMessage(
                 this.$store.getters.user.uid
               );
@@ -433,11 +414,18 @@ export default {
           badge: "1"
         }
       };
+      var ua = navigator.userAgent;
+      var key;
+      if (ua.indexOf("Android") > 0) {
+        key = androidAuthorizationOfNotification;
+      } else if (window.innerWidth <= 1024) {
+        key = iosAuthorizationOfNotification;
+      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+          Authorization: "key=" + `${key}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
@@ -453,11 +441,18 @@ export default {
           badge: "1"
         }
       };
+      var ua = navigator.userAgent;
+      var key;
+      if (ua.indexOf("Android") > 0) {
+        key = androidAuthorizationOfNotification;
+      } else if (window.innerWidth <= 1024) {
+        key = iosAuthorizationOfNotification;
+      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+          Authorization: "key=" + `${key}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
@@ -778,6 +773,42 @@ export default {
     }
   },
   computed: {
+    getChatCardHeifht() {
+      //ヘッダー、フッター、タブバー、パディング
+      var header = 40;
+      var footer = 54;
+      var padOfiphone = 20;
+      var padOfLargeiphone = 78;
+      var padOfTab = 40;
+      var andMobBar = 60;
+      // iphoneの時
+      if (navigator.userAgent.indexOf("iPhone") >= 0) {
+        // iphone8plus以下
+        if (window.innerHeight <= 716) {
+          return this.screenHeight - header - footer - padOfiphone;
+          // iphoneX以上
+        } else {
+          return this.screenHeight - header - footer - padOfLargeiphone;
+        }
+      }
+      //androidモバイルの時
+      else if (
+        navigator.userAgent.indexOf("Android") >= 0 &&
+        navigator.userAgent.indexOf("Mobile") >= 0
+      ) {
+        return this.screenHeight - header - footer - andMobBar;
+      }
+      //androidタブレットの時
+      else if (navigator.userAgent.indexOf("Android") >= 0) {
+        return this.screenHeight - header - andMobBar;
+      }
+      //タブレット(ipad)の時
+      else if (window.innerWidth > 700 && window.innerWidth <= 1024) {
+        return this.screenHeight - header - padOfTab;
+      } else {
+        return this.screenHeight - header - 203;
+      }
+    },
     isMypage: function() {
       if (this.$route.params["uid"] == undefined) {
         return true;

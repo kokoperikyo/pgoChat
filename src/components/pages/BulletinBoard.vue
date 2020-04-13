@@ -140,7 +140,7 @@ export default {
     getChatCardHeifht: function() {
       //ヘッダー、フッター、タブバー、パディング
       var header = 40;
-      var footer = 80;
+      var footer = 54;
       var textarea = 66;
       var padOfiphone = 20;
       var padOfLargeiphone = 78;

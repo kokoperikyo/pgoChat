@@ -16,12 +16,7 @@
 export default {
   computed: {
     isMobile() {
-      var ua = navigator.userAgent;
-      if (
-        ua.indexOf("iPhone") > 0 ||
-        ua.indexOf("iPad") > 0 ||
-        ua.indexOf("Android") > 0
-      ) {
+      if (window.innerWidth <= 1024) {
         return true;
       } else {
         return false;

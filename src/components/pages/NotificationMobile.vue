@@ -18,7 +18,10 @@
   </div>
 </template>
 <script>
-import { iosAuthorizationOfNotification } from "@/plugins/firebase";
+import {
+  iosAuthorizationOfNotification,
+  androidAuthorizationOfNotification
+} from "@/plugins/firebase";
 
 export default {
   data() {
@@ -28,9 +31,14 @@ export default {
   },
   methods: {
     regNotification() {
-      window.webkit.messageHandlers.callbackHandler.postMessage(
-        this.$store.getters.user.uid
-      );
+      var ua = navigator.userAgent;
+      if (ua.indexOf("Android") > 0) {
+        window.appJsInterface.subscribeUid(this.$store.getters.user.uid);
+      } else if (window.innerWidth <= 1024) {
+        window.webkit.messageHandlers.callbackHandler.postMessage(
+          this.$store.getters.user.uid
+        );
+      }
       this.regNotificationDialog = true;
 
       setTimeout(() => {
@@ -44,15 +52,21 @@ export default {
           priority: "high",
           content_available: true,
           notification: {
-            body: "おしらせ",
+            title: "通知設定完了",
             badge: "1"
           }
         };
+        var key;
+        if (ua.indexOf("Android") > 0) {
+          key = androidAuthorizationOfNotification;
+        } else if (window.innerWidth <= 1024) {
+          key = iosAuthorizationOfNotification;
+        }
         let optionObj = {
           //送信者のサーバーキー
           headers: {
             "Content-Type": "application/json",
-            Authorization: "key=" + `${iosAuthorizationOfNotification}`
+            Authorization: "key=" + `${key}`
           }
         };
         this.axios.post(

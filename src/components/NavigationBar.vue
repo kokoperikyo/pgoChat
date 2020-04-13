@@ -57,7 +57,7 @@
     <!-- スマホ、タブレットの時のみ表示 -->
     <v-footer
       v-if="isSmallerThanTablet && userStatus"
-      height="80px"
+      height="54px"
       color="#DE4097"
       padless
       absolute
@@ -72,7 +72,7 @@
       </v-row>
       <v-row style="position: relative;" justify="center" no-gutters>
         <v-col :to="item.link" align="center" v-for="(item, index) in items" :key="index">
-          <div style="font-size:8px;">{{item.text}}</div>
+          <div style="font-size:10px;">{{item.text}}</div>
         </v-col>
       </v-row>
     </v-footer>
@@ -190,7 +190,10 @@
 <script>
 import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
-import { iosAuthorizationOfNotification } from "@/plugins/firebase";
+import {
+  iosAuthorizationOfNotification,
+  androidAuthorizationOfNotification
+} from "@/plugins/firebase";
 import "@firebase/firestore";
 
 export default {
@@ -207,11 +210,7 @@ export default {
       }
     },
     isMobileAndTab() {
-      return (
-        navigator.userAgent.indexOf("iPhone") >= 0 ||
-        navigator.userAgent.indexOf("iPad") >= 0 ||
-        navigator.userAgent.indexOf("Android") >= 0
-      );
+      return window.innerWidth <= 1024;
     }
   },
   data() {
@@ -221,22 +220,22 @@ export default {
       items: [
         {
           icon: "mdi-account-circle-outline",
-          text: "プロフィール",
+          text: "プロフ",
           link: { name: "profile" }
         },
         {
           icon: "mdi-chat-processing-outline",
-          text: "チャットルーム",
+          text: "チャット",
           link: { name: "chatRoom" }
         },
         {
           icon: "mdi-account-group-outline",
-          text: "フレンド一覧",
+          text: "フレンド",
           link: { name: "friendList" }
         },
         {
           icon: "mdi-magnify",
-          text: "フレンド検索",
+          text: "検索",
           link: { name: "friendSearch" }
         },
         {
@@ -285,11 +284,18 @@ export default {
           badge: "1"
         }
       };
+      var ua = navigator.userAgent;
+      var key;
+      if (ua.indexOf("Android") > 0) {
+        key = androidAuthorizationOfNotification;
+      } else if (window.innerWidth <= 1024) {
+        key = iosAuthorizationOfNotification;
+      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+          Authorization: "key=" + `${key}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);

@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <div id="result"></div>
-    <div style="height:100px; background:red;" class="box"></div>
-  </div>
+  <v-btn @click="test"></v-btn>
 </template>
 
 <script>
@@ -18,32 +15,11 @@ export default {
     };
   },
   methods: {
-    setSwipe(elem) {
-      var t = document.querySelector(elem);
-      var r = document.getElementById("result");
-      var startX;
-      var moveX;
-      var dist = 30;
-      t.addEventListener("touchstart", function(e) {
-        e.preventDefault();
-        startX = e.touches[0].pageX;
-      });
-      t.addEventListener("touchmove", function(e) {
-        e.preventDefault();
-        moveX = e.changedTouches[0].pageX;
-      });
-      t.addEventListener("touchend", function() {
-        if (startX > moveX && startX > moveX + dist) {
-          r.textContent = "右から左にスワイプ";
-        } else if (startX < moveX && startX + dist < moveX) {
-          r.textContent = "左から右にスワイプ";
-        }
-      });
+    test() {
+      this.appJsInterface.showAlert("message");
     }
   },
-  mounted() {
-    this.setSwipe(".box");
-  },
+  mounted() {},
   computed: {},
   created() {},
   firestore() {}

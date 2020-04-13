@@ -14,10 +14,10 @@
               <!-- <v-btn fab class="mr-2" color="#01579B">
                 <v-icon large color="white" class="fab fa-facebook-square"></v-icon>
               </v-btn>-->
-              <v-btn fab class="mr-2" color="error">
+              <!-- <v-btn fab class="mr-2" color="error">
                 <v-icon large color="white" class="fab fa-google-plus-square" @click="signInGoogle"></v-icon>
-              </v-btn>
-              <v-btn fab color="primary">
+              </v-btn>-->
+              <v-btn fab color="primary" depressed>
                 <v-icon large color="white" class="fab fa-twitter-square" @click="signInTwitter"></v-icon>
               </v-btn>
             </div>
@@ -138,14 +138,14 @@ export default {
           this.alertMes(error.code);
         });
     },
-    signInGoogle() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      firebase
-        .auth()
-        .signInWithRedirect(provider)
-        .catch(error => alert(error.message));
-      this.$router.push("loading");
-    },
+    // signInGoogle() {
+    //   var provider = new firebase.auth.GoogleAuthProvider();
+    //   firebase
+    //     .auth()
+    //     .signInWithRedirect(provider)
+    //     .catch(error => alert(error.message));
+    //   this.$router.push("loading");
+    // },
     signInTwitter() {
       var provider = new firebase.auth.TwitterAuthProvider();
       firebase
