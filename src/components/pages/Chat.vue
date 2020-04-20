@@ -379,10 +379,7 @@
 
 <script>
 import { db } from "@/plugins/firebase";
-import {
-  iosAuthorizationOfNotification,
-  androidAuthorizationOfNotification
-} from "@/plugins/firebase";
+import { authorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import { format } from "date-fns";
@@ -429,7 +426,7 @@ export default {
       var chat = 130 - 20;
       var padOfiphone = 20;
       var padOfLargeiphone = 78;
-      var padOfTab = 40;
+      var padOfTab = 64;
       var andMobBar = 60;
       // iphoneの時
       if (navigator.userAgent.indexOf("iPhone") >= 0) {
@@ -490,18 +487,11 @@ export default {
           badge: "1"
         }
       };
-      var ua = navigator.userAgent;
-      var key;
-      if (ua.indexOf("Android") > 0) {
-        key = androidAuthorizationOfNotification;
-      } else if (window.innerWidth <= 1024) {
-        key = iosAuthorizationOfNotification;
-      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${key}`
+          Authorization: "key=" + `${authorizationOfNotification}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
@@ -936,7 +926,6 @@ export default {
     setTimeout(() => {
       this.imgLoad = true;
     }, 500);
-    false;
     db.collection("users")
       .doc(this.$store.getters.user.uid)
       .collection("test")

@@ -8,7 +8,7 @@
       </v-col>
       <v-col cols="12">
         <v-row align="center" justify="center" class="grey lighten-5">
-          <v-progress-circular indeterminate color="primary" :size="100" :width="10"></v-progress-circular>
+          <v-progress-circular indeterminate color="#8ac32b" :size="100" :width="10"></v-progress-circular>
         </v-row>
       </v-col>
     </v-row>

@@ -4,23 +4,21 @@ import firebase from "@firebase/app";
 import SignUp from '../components/pages/SignUp.vue'
 import SignIn from '../components/pages/SignIn.vue'
 import Test from '../components/Test.vue'
-import TestTwo from '../components/TestTwo.vue'
 import Profile from '../components/pages/Profile.vue'
 import ChatRoom from '../components/pages/ChatRoom.vue'
 import FriendList from '../components/pages/FriendList.vue'
 import FriendSearch from '../components/pages/FriendSearch.vue'
 import Chat from '../components/pages/Chat.vue'
+import TimeLimitChat from '../components/pages/TimeLimitChat.vue'
+import TimeLimitChatLogin from '../components/pages/TimeLimitChatLogin.vue'
 import Loading from '../components/pages/Loading.vue'
 import BulletinBoard from '../components/pages/BulletinBoard.vue'
 import Menu from '../components/pages/Menu.vue'
 import DeleteAccount from '../components/pages/DeleteAccount.vue'
 import NotificationMobile from '../components/pages/NotificationMobile.vue'
-import TestChat from '../components/pages/TestChat.vue'
-
-
-
-
-
+import ShareToke from '../components/pages/ShareToke.vue'
+import PrivacyPolicy from '../components/pages/PrivacyPolicy.vue'
+import NotFound from '../components/pages/NotFound.vue'
 
 
 Vue.use(VueRouter)
@@ -47,11 +45,6 @@ const routes = [{
     path: '/test',
     name: 'test',
     component: Test,
-  },
-  {
-    path: '/testTwo',
-    name: 'testTwo',
-    component: TestTwo
   },
   {
     path: '/profile',
@@ -102,6 +95,16 @@ const routes = [{
     }
   },
   {
+    path: '/timeLimitChatLogin/:uid',
+    name: 'timeLimitChatLogin',
+    component: TimeLimitChatLogin,
+  },
+  {
+    path: '/timeLimitChat/:uid',
+    name: 'timeLimitChat',
+    component: TimeLimitChat,
+  },
+  {
     path: '/bulletinBoard',
     name: 'bulletinBoard',
     component: BulletinBoard,
@@ -134,14 +137,23 @@ const routes = [{
     }
   },
   {
-    path: '/testChat',
-    name: 'testChat',
-    component: TestChat,
+    path: '/shareToke',
+    name: 'shareToke',
+    component: ShareToke,
     meta: {
       requiresAuth: true
     }
   },
-
+  {
+    path: '/privacyPolicy',
+    name: 'privacyPolicy',
+    component: PrivacyPolicy,
+  },
+  {
+    path: '/notFound',
+    name: 'notFound',
+    component: NotFound,
+  },
 ]
 
 const router = new VueRouter({
@@ -151,7 +163,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  // firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   if (requiresAuth) {
     // このルートはログインされているかどうか認証が必要です。

@@ -94,7 +94,7 @@
 </template>
 <script>
 import { db } from "@/plugins/firebase";
-import { iosAuthorizationOfNotification } from "@/plugins/firebase";
+import { authorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 export default {
@@ -186,7 +186,7 @@ export default {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${iosAuthorizationOfNotification}`
+          Authorization: "key=" + `${authorizationOfNotification}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);

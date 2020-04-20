@@ -18,10 +18,7 @@
   </div>
 </template>
 <script>
-import {
-  iosAuthorizationOfNotification,
-  androidAuthorizationOfNotification
-} from "@/plugins/firebase";
+import { authorizationOfNotification } from "@/plugins/firebase";
 
 export default {
   data() {
@@ -56,17 +53,11 @@ export default {
             badge: "1"
           }
         };
-        var key;
-        if (ua.indexOf("Android") > 0) {
-          key = androidAuthorizationOfNotification;
-        } else if (window.innerWidth <= 1024) {
-          key = iosAuthorizationOfNotification;
-        }
         let optionObj = {
           //送信者のサーバーキー
           headers: {
             "Content-Type": "application/json",
-            Authorization: "key=" + `${key}`
+            Authorization: "key=" + `${authorizationOfNotification}`
           }
         };
         this.axios.post(

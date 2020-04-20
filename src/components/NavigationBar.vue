@@ -190,10 +190,7 @@
 <script>
 import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
-import {
-  iosAuthorizationOfNotification,
-  androidAuthorizationOfNotification
-} from "@/plugins/firebase";
+import { authorizationOfNotification } from "@/plugins/firebase";
 import "@firebase/firestore";
 
 export default {
@@ -284,18 +281,11 @@ export default {
           badge: "1"
         }
       };
-      var ua = navigator.userAgent;
-      var key;
-      if (ua.indexOf("Android") > 0) {
-        key = androidAuthorizationOfNotification;
-      } else if (window.innerWidth <= 1024) {
-        key = iosAuthorizationOfNotification;
-      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${key}`
+          Authorization: "key=" + `${authorizationOfNotification}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);

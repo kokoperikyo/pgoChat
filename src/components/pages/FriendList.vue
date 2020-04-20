@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" tile>
+  <v-card class="mx-auto" tile flat>
     <v-dialog v-model="deleteFriendDialog" max-width="320">
       <v-card>
         <v-card-title class="pb-0">フレンドを削除しますか？</v-card-title>

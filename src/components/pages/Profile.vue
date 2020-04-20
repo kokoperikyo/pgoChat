@@ -110,7 +110,7 @@
         </div>
         <div v-else>
           <v-row v-if="showHeaderLoader" align="center" justify="center" style="height: 220px;">
-            <v-progress-circular indeterminate color="primary" :size="80" width="10"></v-progress-circular>
+            <v-progress-circular indeterminate color="#8ac32b" :size="80" width="10"></v-progress-circular>
           </v-row>
           <div v-else>
             <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
@@ -276,6 +276,7 @@
           ></v-textarea>
         </v-card-text>
         <div v-else class="mt-5">
+          <v-btn @click="test"></v-btn>
           <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
           <v-card-text
             v-else
@@ -288,10 +289,7 @@
 </template>
 <script>
 import { db } from "@/plugins/firebase";
-import {
-  iosAuthorizationOfNotification,
-  androidAuthorizationOfNotification
-} from "@/plugins/firebase";
+import { authorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import "firebase/storage";
@@ -381,6 +379,8 @@ export default {
               sendFriendRequestList: [],
               friendIdList: [],
               nicknameList: [],
+              myTimeLimitChat: "none",
+              canLoginTimeLimitChat: false,
               //初期アバターのDB登録
               avatarUrl:
                 "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0"
@@ -403,6 +403,11 @@ export default {
     // }, 3000);
   },
   methods: {
+    test() {
+      window.webkit.messageHandlers.callbackHandler.postMessage(
+        this.$store.getters.user.uid
+      );
+    },
     sendAcceptFriendRequestNotification() {
       let argObj = {
         // 受信者のトークンIDと通知内容
@@ -414,18 +419,11 @@ export default {
           badge: "1"
         }
       };
-      var ua = navigator.userAgent;
-      var key;
-      if (ua.indexOf("Android") > 0) {
-        key = androidAuthorizationOfNotification;
-      } else if (window.innerWidth <= 1024) {
-        key = iosAuthorizationOfNotification;
-      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${key}`
+          Authorization: "key=" + `${authorizationOfNotification}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
@@ -441,18 +439,11 @@ export default {
           badge: "1"
         }
       };
-      var ua = navigator.userAgent;
-      var key;
-      if (ua.indexOf("Android") > 0) {
-        key = androidAuthorizationOfNotification;
-      } else if (window.innerWidth <= 1024) {
-        key = iosAuthorizationOfNotification;
-      }
       let optionObj = {
         //送信者のサーバーキー
         headers: {
           "Content-Type": "application/json",
-          Authorization: "key=" + `${key}`
+          Authorization: "key=" + `${authorizationOfNotification}`
         }
       };
       this.axios.post("https://fcm.googleapis.com/fcm/send", argObj, optionObj);
