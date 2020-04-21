@@ -16,6 +16,11 @@
           <v-icon color="#004D40" small class="mr-1">mdi-chat-processing-outline</v-icon>トーク作成
         </v-btn>
       </v-col>
+      <v-col :cols="isMobile" align="center" class="mt-5">
+        <v-btn small rounded outlined color="#004D40" to="privacyPolicy" width="120">
+          <v-icon color="#004D40" small class="mr-1">mdi-account-lock-outline</v-icon>プライバシー
+        </v-btn>
+      </v-col>
     </v-row>
   </div>
 </template>

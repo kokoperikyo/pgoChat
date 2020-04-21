@@ -276,7 +276,7 @@
           ></v-textarea>
         </v-card-text>
         <div v-else class="mt-5">
-          <v-btn @click="test"></v-btn>
+          <!-- <v-btn @click="test"></v-btn> -->
           <v-card-text v-if="isMypage" style="white-space:pre-wrap; ">{{displaySelfIntroduction}}</v-card-text>
           <v-card-text
             v-else
@@ -403,11 +403,11 @@ export default {
     // }, 3000);
   },
   methods: {
-    test() {
-      window.webkit.messageHandlers.callbackHandler.postMessage(
-        this.$store.getters.user.uid
-      );
-    },
+    // test() {
+    //   window.webkit.messageHandlers.callbackHandler.postMessage(
+    //     this.$store.getters.user.uid
+    //   );
+    // },
     sendAcceptFriendRequestNotification() {
       let argObj = {
         // 受信者のトークンIDと通知内容

@@ -343,6 +343,7 @@ export default {
             canLoginTimeLimitChat: true
           });
         window.sessionStorage.setItem(["roomId"], [`${roomId}`]);
+        this.sendNotification("Twitterに投稿したチャットにログインしました");
       } else {
         this.$router.push("/notFound");
       }
@@ -373,7 +374,7 @@ export default {
   methods: {
     //６−３を投げる
     startSixToThree(st) {
-      // this.sendNotification("６−３が申し込まれました");
+      this.sendNotification("６−３が申し込まれました");
       this.selectLeagueDialog = false;
       this.judgeLeague(st);
       var str = this.$route.params["uid"];
@@ -573,7 +574,7 @@ export default {
       }
     },
     regMessage() {
-      // this.sendNotification(this.inputMessage);
+      this.sendNotification(this.inputMessage);
       // 空文字入力を防ぐ
       if (this.inputMessage == "") {
         return;
