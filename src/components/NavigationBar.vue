@@ -68,13 +68,13 @@
           <v-btn icon :to="item.link">
             <v-icon>{{item.icon}}</v-icon>
             <v-icon
-              v-if="index == 1 && chatIcon"
+              v-if="index == 0 && chatIcon"
               class="chatNotion"
               small
               color="#8ac32b"
             >mdi-checkbox-blank-circle</v-icon>
             <v-icon
-              v-if="index == 5 && limitChatIcon"
+              v-if="index == 4 && limitChatIcon"
               class="chatNotion"
               small
               color="#8ac32b"
@@ -185,7 +185,25 @@
         </v-list>
       </v-menu>
       <v-toolbar-items v-if="userStatus">
-        <v-btn @click="doLogout" text class="pr-0">ログアウト</v-btn>
+        <v-menu offset-y>
+          <template v-slot:activator="{ on }">
+            <v-btn icon dark v-on="on">
+              <v-icon>mdi-account-circle-outline</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-btn color="#004D40" to="profile" text class="p-0">
+                <v-icon class="mr-1">mdi-account-circle-outline</v-icon>プロフィール
+              </v-btn>
+            </v-list-item>
+            <v-list-item>
+              <v-btn color="#004D40" @click="doLogout" text class="p-0">
+                <v-icon class="mr-1">mdi-exit-run</v-icon>ログアウト
+              </v-btn>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <iconNotion v-on:friendRequestNotion="getFriendRequestNotion"></iconNotion>
         <iconNotion v-on:chatNotificationOn="getChatNotificationOn"></iconNotion>
         <iconNotion v-on:chatNotificationOff="getChatNotificationOff"></iconNotion>
@@ -237,11 +255,6 @@ export default {
       drawer: true,
       items: [
         {
-          icon: "mdi-account-circle-outline",
-          text: "プロフ",
-          link: { name: "profile" }
-        },
-        {
           icon: "mdi-chat-processing-outline",
           text: "チャット",
           link: { name: "chatRoom" }
@@ -260,6 +273,11 @@ export default {
           icon: "mdi-tooltip-text-outline",
           text: "掲示板",
           link: { name: "bulletinBoard" }
+        },
+        {
+          icon: "mdi-twitter",
+          text: "Twitter",
+          link: { name: "shareToke" }
         },
         {
           icon: "mdi-dots-horizontal-circle-outline",
