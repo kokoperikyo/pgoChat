@@ -67,6 +67,18 @@
         <v-col align="center" v-for="(item, index) in items" :key="index">
           <v-btn icon :to="item.link">
             <v-icon>{{item.icon}}</v-icon>
+            <v-icon
+              v-if="index == 1 && chatIcon"
+              class="chatNotion"
+              small
+              color="#8ac32b"
+            >mdi-checkbox-blank-circle</v-icon>
+            <v-icon
+              v-if="index == 5 && limitChatIcon"
+              class="chatNotion"
+              small
+              color="#8ac32b"
+            >mdi-checkbox-blank-circle</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -174,6 +186,11 @@
       </v-menu>
       <v-toolbar-items v-if="userStatus">
         <v-btn @click="doLogout" text class="pr-0">ログアウト</v-btn>
+        <iconNotion v-on:friendRequestNotion="getFriendRequestNotion"></iconNotion>
+        <iconNotion v-on:chatNotificationOn="getChatNotificationOn"></iconNotion>
+        <iconNotion v-on:chatNotificationOff="getChatNotificationOff"></iconNotion>
+        <iconNotion v-on:limitChatNotificationOn="getLimitChatNotificationOn"></iconNotion>
+        <iconNotion v-on:limitChatNotificationOff="getLimitChatNotificationOff"></iconNotion>
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
@@ -192,8 +209,12 @@ import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
 import { authorizationOfNotification } from "@/plugins/firebase";
 import "@firebase/firestore";
+import IconNotion from "@/components/pages/IconNotion.vue";
 
 export default {
+  components: {
+    IconNotion
+  },
   computed: {
     userStatus() {
       // ログインするとtrue
@@ -257,10 +278,28 @@ export default {
       rejectFriendRequestModal: false,
       requestAcceptDialog: false,
       requestRejectDialog: false,
-      modalStatus: null
+      modalStatus: null,
+      neww: "false",
+      chatIcon: false,
+      limitChatIcon: false
     };
   },
   methods: {
+    getFriendRequestNotion() {
+      this.neww = "true";
+    },
+    getChatNotificationOn() {
+      this.chatIcon = true;
+    },
+    getChatNotificationOff() {
+      this.chatIcon = false;
+    },
+    getLimitChatNotificationOn() {
+      this.limitChatIcon = true;
+    },
+    getLimitChatNotificationOff() {
+      this.limitChatIcon = false;
+    },
     back() {
       history.back();
     },
@@ -497,4 +536,9 @@ export default {
 };
 </script>
 <style>
+.chatNotion {
+  position: absolute;
+  bottom: 8px;
+  left: 14px;
+}
 </style>

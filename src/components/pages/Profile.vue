@@ -368,6 +368,8 @@ export default {
           //初期アバターのセット
           this.displayAvatar =
             "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0";
+          this.displayHeaderImg =
+            "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSmapleImg%2FheaderSample2.png?alt=media&token=72d811b6-7b24-49a1-8285-8261842734b5";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
@@ -383,7 +385,9 @@ export default {
               canLoginTimeLimitChat: false,
               //初期アバターのDB登録
               avatarUrl:
-                "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0"
+                "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0",
+              imageHeaderUrl:
+                "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSmapleImg%2FheaderSample2.png?alt=media&token=72d811b6-7b24-49a1-8285-8261842734b5"
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる

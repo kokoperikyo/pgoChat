@@ -337,6 +337,11 @@ export default {
           .update({
             st: false
           });
+        db.collection("timeLimitChat")
+          .doc(this.$route.params["uid"])
+          .update({
+            isNotionIcon: true
+          });
         db.collection("users")
           .doc(userId)
           .update({

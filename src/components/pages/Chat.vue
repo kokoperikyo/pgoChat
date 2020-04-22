@@ -537,7 +537,8 @@ export default {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           uid: result,
           whoesMes: this.$store.getters.user.uid,
-          stanpSt: 0
+          stanpSt: 0,
+          toWho: this.$route.params["uid"]
         });
       this.inputMessage = "";
       setTimeout(() => {
@@ -606,7 +607,8 @@ export default {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           stanpSt: 1,
           whoesMes: this.$store.getters.user.uid,
-          league: st
+          league: st,
+          toWho: this.$route.params["uid"]
         });
       this.inputMessage = "";
       setTimeout(() => {
@@ -695,7 +697,8 @@ export default {
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
             stanpSt: 2,
             whoesMes: this.$store.getters.user.uid,
-            partyListDis: this.partyList
+            partyListDis: this.partyList,
+            toWho: this.$route.params["uid"]
           });
       }, 500);
 
@@ -750,7 +753,8 @@ export default {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           stanpSt: 2,
           whoesMes: this.$store.getters.user.uid,
-          partyListDis: this.partyList
+          partyListDis: this.partyList,
+          toWho: this.$route.params["uid"]
         });
       this.showParty = true;
     },

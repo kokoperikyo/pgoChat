@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <v-btn @click="test">aa</v-btn>
-    <v-btn @click="test2">sakuzyo</v-btn>
-    <v-btn @click="test3">add</v-btn>
-  </div>
+  <div>{{LimitChatLogin}}</div>
 </template>
 
 <script>
@@ -12,39 +8,43 @@ import { db } from "@/plugins/firebase";
 
 export default {
   data() {
-    return {};
+    return {
+      LimitChatLogin: null,
+      userInfo: null
+    };
   },
   methods: {
-    test() {
-      var a = "aaaa";
-      window.sessionStorage.setItem(["tesst"], [`${a}`]);
-    },
-    test2() {
-      var a = window.sessionStorage.getItem(["tesst"]);
-      // eslint-disable-next-line no-console
-      console.log(a);
-    },
-    test3() {
-      const isOpenChat = db
-        .collection("timeLimitChat")
-        .doc("result + this.$store.getters.user.uid")
-        .collection("isOpenChat");
-      isOpenChat.add({
-        st: true
-      });
-    }
+    test() {},
+    test2() {},
+    test3() {}
   },
   mounted() {
-    var st = "twiwdvhlzeexjevjebxkqsewgCljlwOUGBKsKk0jWnncdNN2";
-    var userId = st.substr(20, 48);
-
-    // eslint-disable-next-line no-console
-    console.log(userId);
+    setTimeout(() => {
+      var docForChat =
+        this.userInfo.myTimeLimitChat + this.$store.getters.user.uid;
+      // eslint-disable-next-line no-console
+      console.log(this.userInfo.myTimeLimitChat);
+      db.collection("timeLimitChat")
+        .doc(docForChat)
+        .collection("isOpenChat")
+        .doc(docForChat)
+        .get()
+        .then(doc2 => {
+          // eslint-disable-next-line no-console
+          console.log(doc2.data().st);
+        });
+    }, 2000);
   },
   computed: {},
   created() {},
   beforeDestroy() {},
   beforeUpdate() {},
-  firestore() {}
+  firestore() {
+    return {
+      userInfo: db.collection("users").doc(this.$store.getters.user.uid),
+
+      LimitChatLogin: db.collection("timeLimitChat")
+    };
+  }
 };
 </script>
