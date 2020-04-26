@@ -407,11 +407,6 @@ export default {
     // }, 3000);
   },
   methods: {
-    // test() {
-    //   window.webkit.messageHandlers.callbackHandler.postMessage(
-    //     this.$store.getters.user.uid
-    //   );
-    // },
     sendAcceptFriendRequestNotification() {
       let argObj = {
         // 受信者のトークンIDと通知内容

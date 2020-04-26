@@ -255,6 +255,11 @@ export default {
       drawer: true,
       items: [
         {
+          icon: "mdi-account-circle-outline",
+          text: "プロフィール",
+          link: { name: "profile" }
+        },
+        {
           icon: "mdi-chat-processing-outline",
           text: "チャット",
           link: { name: "chatRoom" }
@@ -269,16 +274,16 @@ export default {
           text: "検索",
           link: { name: "friendSearch" }
         },
-        {
-          icon: "mdi-tooltip-text-outline",
-          text: "掲示板",
-          link: { name: "bulletinBoard" }
-        },
-        {
-          icon: "mdi-twitter",
-          text: "Twitter",
-          link: { name: "shareToke" }
-        },
+        // {
+        //   icon: "mdi-tooltip-text-outline",
+        //   text: "掲示板",
+        //   link: { name: "bulletinBoard" }
+        // },
+        // {
+        //   icon: "mdi-twitter",
+        //   text: "Twitter",
+        //   link: { name: "shareToke" }
+        // },
         {
           icon: "mdi-dots-horizontal-circle-outline",
           text: "メニュー",
@@ -541,13 +546,9 @@ export default {
       if (startX > moveX && startX > moveX + distForward) {
         // 右から左の時の処理
         history.forward();
-        startX = 0;
-        moveX = 0;
       } else if (startX < moveX && startX + distBack < moveX) {
         // 左から右の時の処理
         history.back();
-        startX = 0;
-        moveX = 0;
       }
     });
   }
