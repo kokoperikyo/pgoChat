@@ -1,14 +1,22 @@
 <template>
   <v-card class="mx-auto" tile flat>
     <v-dialog v-model="deleteFriendDialog" max-width="320">
-      <v-card>
-        <v-card-title class="pb-0">フレンドを削除しますか？</v-card-title>
+      <v-card class="pa-3">
+        <div class="ml-4">フレンドを削除しますか？</div>
+        <div class="ml-4">ブロックしますか？</div>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded dark depressed color="#004D40" @click="deleteFriend" class="mr-5">削除</v-btn>
+          <v-btn rounded dark depressed color="#004D40" @click="deleteFriend">削除</v-btn>
+          <v-btn rounded dark depressed color="#004D40" @click="blockFriend">ブロック</v-btn>
           <v-btn rounded outlined color="#004D40" @click="deleteFriendDialog = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2 mt-2"
+          color="red"
+          type="info"
+        >ブロックするとその人からはフレンド通知が届かなくなります</v-alert>
       </v-card>
     </v-dialog>
     <v-dialog v-model="addNicknameModal" max-width="350">
@@ -47,10 +55,33 @@
         </v-card-title>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="blockAccountDialog" max-width="420">
+      <v-card class>
+        <v-list>
+          <v-list-item v-for="blockList in friendLists.blockListDis" :key="blockList.id">
+            <v-list-item-avatar size="40" class="mr-3">
+              <v-img :src="blockList.avatarUrl"></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-subtitle v-text="blockList.userName"></v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action class>
+              <v-btn x-small color="#004D40" outlined rounded @click="removeBlock(blockList)">
+                <v-icon small>mdi-account-key-outline</v-icon>ブロック解除
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-dialog>
+
     <v-toolbar height="40px" color="#8ac32b" dark>
       <v-spacer></v-spacer>
       <v-toolbar-title>フレンドリスト</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon @click="blockAccountDialog = true">
+        <v-icon>mdi-account-cancel</v-icon>
+      </v-btn>
       <!-- <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
       </v-btn>-->
@@ -138,7 +169,7 @@
               <v-icon>mdi-chat-processing</v-icon>
             </v-btn>
             <v-btn
-              @click="deleteFriendByDialog(friendList.id)"
+              @click="deleteFriendByDialog(friendList.avatarUrl,friendList.id,friendList.name)"
               class="mr-2"
               small
               dark
@@ -181,7 +212,7 @@
                 <v-icon>mdi-chat-processing</v-icon>
               </v-btn>
               <v-btn
-                @click="deleteFriendByDialog(friendList.id)"
+                @click="deleteFriendByDialog(friendList.avatarUrl,friendList.id,friendList.name)"
                 class="#004D40 mr-2"
                 x-small
                 dark
@@ -216,8 +247,11 @@ export default {
     inputNickname: null,
     inputEditNickname: null,
     beforeNickname: null,
+    deleteFriendAvatar: null,
     deleteFriendId: null,
+    deleteFriendName: null,
     deleteFriendDialog: false,
+    blockAccountDialog: false,
     screenHeight: 0
   }),
   mounted() {
@@ -291,6 +325,33 @@ export default {
         )
       });
       this.deleteFriendDialog = false;
+    },
+    blockFriend() {
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        blockList: firebase.firestore.FieldValue.arrayUnion(this.deleteFriendId)
+      });
+      users.doc(this.$store.getters.user.uid).update({
+        blockListDis: firebase.firestore.FieldValue.arrayUnion({
+          avatarUrl: this.deleteFriendAvatar,
+          id: this.deleteFriendId,
+          userName: this.deleteFriendName
+        })
+      });
+      this.deleteFriend();
+    },
+    removeBlock(blockInfo) {
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        blockList: firebase.firestore.FieldValue.arrayRemove(blockInfo.id)
+      });
+      users.doc(this.$store.getters.user.uid).update({
+        blockListDis: firebase.firestore.FieldValue.arrayRemove({
+          avatarUrl: blockInfo.avatarUrl,
+          id: blockInfo.id,
+          userName: blockInfo.userName
+        })
+      });
     },
     addNicknameModalDis(friendId) {
       this.addNicknameModal = true;
@@ -381,9 +442,11 @@ export default {
 
       this.editNickname();
     },
-    deleteFriendByDialog(friendId) {
+    deleteFriendByDialog(friendAvatar, friendId, friendName) {
       this.deleteFriendDialog = true;
+      this.deleteFriendAvatar = friendAvatar;
       this.deleteFriendId = friendId;
+      this.deleteFriendName = friendName;
     }
   },
   computed: {

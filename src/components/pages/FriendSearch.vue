@@ -179,7 +179,8 @@ export default {
         content_available: true,
         notification: {
           title: `${this.user.name}からフレンド申請がきています`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {

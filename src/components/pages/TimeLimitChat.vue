@@ -621,7 +621,8 @@ export default {
         notification: {
           title: `${this.userInfo.name}`,
           body: `${body}`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {

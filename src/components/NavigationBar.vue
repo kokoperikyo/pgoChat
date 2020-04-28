@@ -13,15 +13,21 @@
       </v-card>
     </v-dialog>
     <!-- フレンド申請拒否 -->
-    <v-dialog v-model="requestRejectDialog" max-width="290">
-      <v-card>
-        <v-card-title class="pb-0">お断りしますか？</v-card-title>
+    <v-dialog v-model="requestRejectDialog" max-width="300">
+      <v-card class="pa-3">
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn rounded color="#004D40" dark @click="rejectFriendRequest" class="mr-5">断る</v-btn>
+          <v-btn rounded color="#004D40" dark @click="rejectFriendRequest">断る</v-btn>
+          <v-btn rounded color="#004D40" dark @click="blockAccount">ブロック</v-btn>
           <v-btn rounded color="#004D40" outlined @click="requestRejectDialog = false">閉じる</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2 mt-2"
+          color="red"
+          type="info"
+        >ブロックするとその人からはフレンド通知が届かなくなります</v-alert>
       </v-card>
     </v-dialog>
     <v-dialog v-model="acceptFriendRequestModal" max-width="350">
@@ -256,7 +262,7 @@ export default {
       items: [
         {
           icon: "mdi-account-circle-outline",
-          text: "プロフィール",
+          text: "プロフ",
           link: { name: "profile" }
         },
         {
@@ -340,7 +346,8 @@ export default {
         content_available: true,
         notification: {
           title: `${this.userName}とフレンドになりました`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {
@@ -421,7 +428,10 @@ export default {
               // window.location.reload();
             } else {
               doc.data().friendRequestList.forEach(item => {
-                this.getFriendRequestLists.push(item);
+                //ブロックアカウントをはじく
+                if (!doc.data().blockList.some(v => v == item.id)) {
+                  this.getFriendRequestLists.push(item);
+                }
               });
             }
           });
@@ -440,6 +450,20 @@ export default {
           this.rejectFriendRequestModal = false;
         }
       }, 1500);
+    },
+    blockAccount() {
+      const users = db.collection("users");
+      users.doc(this.$store.getters.user.uid).update({
+        blockList: firebase.firestore.FieldValue.arrayUnion(this.friendId)
+      });
+      users.doc(this.$store.getters.user.uid).update({
+        blockListDis: firebase.firestore.FieldValue.arrayUnion({
+          avatarUrl: this.friendAvatarUrl,
+          id: this.friendId,
+          userName: this.friendName
+        })
+      });
+      this.rejectFriendRequest();
     },
     acceptFriendRequestByDialog(avatarUrl, friendId, name, status) {
       this.friendAvatarUrl = avatarUrl;
@@ -520,7 +544,10 @@ export default {
           //Cannot read property 'forEach' させないため
           if (doc.data().friendRequestList != undefined) {
             doc.data().friendRequestList.forEach(item => {
-              this.getFriendRequestLists.push(item);
+              //ブロックアカウントをはじく
+              if (!doc.data().blockList.some(v => v == item.id)) {
+                this.getFriendRequestLists.push(item);
+              }
             });
           }
         });

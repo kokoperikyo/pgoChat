@@ -1,5 +1,28 @@
 <template>
   <div>
+    <v-dialog v-model="reportDialog" class="mx-auto" max-width="500">
+      <v-card class="mx-auto pa-3" color="#FCE4EC">
+        <v-row justify="center">
+          <v-card-title>通報フォーム</v-card-title>
+        </v-row>
+        <div>等チャットで不快な思いをされた場合は通報ください</div>
+
+        <v-textarea
+          rows="1"
+          auto-grow
+          clearable
+          clear-icon="cancel"
+          v-model="reportMes"
+          row-height="10"
+          class="mx-5"
+          color="#8ac32b"
+          background-color="white"
+        ></v-textarea>
+        <v-row justify="center">
+          <v-btn @click="sendReport" depressed dark color="#8ac32b">通報する</v-btn>
+        </v-row>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="editingModal" class="mx-auto" max-width="500">
       <v-card class="mx-auto" max-width="500" color="#FCE4EC">
         <v-container>
@@ -162,11 +185,14 @@
       <v-toolbar height="40px" color="#8AC32B">
         <v-toolbar-title>{{chatUser.name}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn class="mr-1" v-if="editStatus" @click="editStatus = false" icon small dark>
-          <v-icon>mdi-comment-edit-outline</v-icon>
+        <v-btn class="mr-2" @click="reportDialog = true" icon small dark>
+          <v-icon>mdi-email-edit</v-icon>
         </v-btn>
-        <v-btn class="mr-1" v-else @click="editStatus = true,editingModal = false" icon small dark>
-          <v-icon>mdi-content-save-edit-outline</v-icon>
+        <v-btn class v-if="editStatus" @click="editStatus = false" icon small dark>
+          <v-icon>mdi-comment-edit</v-icon>
+        </v-btn>
+        <v-btn class v-else @click="editStatus = true,editingModal = false" icon small dark>
+          <v-icon>mdi-content-save-edit</v-icon>
         </v-btn>
       </v-toolbar>
       <v-card flat class="overflow-y-auto scroll" :height="getChatCardHeight">
@@ -410,7 +436,9 @@ export default {
       showParty: false,
       items: pokemonList,
       partyValue: null,
-      partyList: []
+      partyList: [],
+      reportDialog: false,
+      reportMes: null
     };
   },
   computed: {
@@ -484,7 +512,8 @@ export default {
         notification: {
           title: `${this.userInfo.name}`,
           body: `${body}`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {
@@ -911,6 +940,15 @@ export default {
     },
     removeArray(index) {
       this.partyList.splice(index, 1);
+    },
+    sendReport() {
+      db.collection("report").add({
+        sendUserId: this.$store.getters.user.uid,
+        toWhoId: this.$route.params["uid"],
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        reportMes: this.reportMes
+      });
+      this.reportDialog = false;
     }
   },
   mounted() {

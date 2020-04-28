@@ -50,7 +50,8 @@ export default {
           content_available: true,
           notification: {
             title: "通知設定完了",
-            badge: "1"
+            badge: "1",
+            sound: "default"
           }
         };
         let optionObj = {

@@ -381,6 +381,8 @@ export default {
               sendFriendRequestList: [],
               friendIdList: [],
               nicknameList: [],
+              blockList: [],
+              blockListDis: [],
               myTimeLimitChat: "none",
               canLoginTimeLimitChat: false,
               //初期アバターのDB登録
@@ -415,7 +417,8 @@ export default {
         content_available: true,
         notification: {
           title: `${this.displayUserName}とフレンドになりました`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {
@@ -435,7 +438,8 @@ export default {
         content_available: true,
         notification: {
           title: `${this.displayUserName}からフレンド申請がきています`,
-          badge: "1"
+          badge: "1",
+          sound: "default"
         }
       };
       let optionObj = {
