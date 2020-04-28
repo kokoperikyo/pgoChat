@@ -280,6 +280,11 @@ export default {
           text: "検索",
           link: { name: "friendSearch" }
         },
+        {
+          icon: "mdi-exit-run",
+          text: "退会",
+          link: { name: "deleteAccount" }
+        },
         // {
         //   icon: "mdi-tooltip-text-outline",
         //   text: "掲示板",
