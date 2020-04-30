@@ -93,19 +93,72 @@
           </v-row>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="headerSelectDialog" max-width="400">
+        <v-card max-width="400" color="black" class="px-2 pt-2">
+          <v-alert style="font-size:11px;" class="mb-1" color="red" type="info">
+            申し訳ございません。
+            <br />カメラロールからの選択が未実装のため以下からお選びください
+          </v-alert>
+          <v-row align="center" no-gutters>
+            <v-col
+              align="center"
+              v-for="item in headerSmapleListItems"
+              :key="item.index"
+              class="my-1"
+            >
+              <v-img :src="item.img" @click="decideHeaderSample(item.img)"></v-img>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="avatarSelectDialog" max-width="400">
+        <v-card max-width="400">
+          <v-alert style="font-size:11px;" color="red" type="info">
+            申し訳ございません。
+            <br />カメラロールからの選択が未実装のため以下からお選びください
+          </v-alert>
+          <v-row align="center" no-gutters>
+            <v-col
+              align="center"
+              cols="3"
+              v-for="item in getPokemonItems"
+              :key="item.index"
+              style="background:#FCE4EC;"
+            >
+              <v-list class>
+                <v-list-item-avatar>
+                  <v-img class="ml-7" :src="item.img" @click="decideAvatar(item.img)"></v-img>
+                </v-list-item-avatar>
+              </v-list>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-dialog>
       <!-- こっから本体 -->
       <v-card :height="getChatCardHeifht" flat>
         <div v-if="isEdit" class="headerImg">
           <div v-if="displayDemoHeaderImg">
-            <v-img :src="displayDemoHeaderImg" :aspect-ratio="4"></v-img>
+            <v-img :src="displayDemoHeaderImg" :aspect-ratio="15/5"></v-img>
             <input class="headerInput" type="file" v-on:change="desplayImg" />
             <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
           </div>
           <!-- 編集押してすぐの時 -->
           <div v-else>
-            <v-img :src="displayHeaderImg" style="opacity:0.6;" :aspect-ratio="4"></v-img>
-            <input class="headerInput" type="file" v-on:change="desplayImg" />
-            <v-icon class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
+            <v-img
+              v-if="isAndroid"
+              :src="displayHeaderImg"
+              style="opacity:0.6;"
+              :aspect-ratio="15/5"
+              class="headerImgAn"
+            ></v-img>
+            <v-img v-else :src="displayHeaderImg" style="opacity:0.6;" :aspect-ratio="15/5"></v-img>
+            <div v-if="isAndroid" class="headerBtnForAn">
+              <v-btn icon @click="headerSelectDialog = true">
+                <v-icon size="40">mdi-camera</v-icon>
+              </v-btn>
+            </div>
+            <input v-else class="headerInput" type="file" v-on:change="desplayImg" />
+            <v-icon v-if="!isAndroid" class="headerInputCameraIcon" size="40">mdi-camera</v-icon>
           </div>
         </div>
         <div v-else>
@@ -113,8 +166,8 @@
             <v-progress-circular indeterminate color="#8ac32b" :size="80" width="10"></v-progress-circular>
           </v-row>
           <div v-else>
-            <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="4"></v-img>
-            <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="4"></v-img>
+            <v-img v-if="isMypage" :src="displayHeaderImg" :aspect-ratio="15/5"></v-img>
+            <v-img v-else :src="displayFriendUserInfo.imageHeaderUrl" :aspect-ratio="15/5"></v-img>
           </div>
         </div>
         <v-list-item class="mt-5">
@@ -128,10 +181,24 @@
               <!-- 編集押してすぐの時 -->
               <div v-else>
                 <v-avatar size="60">
-                  <v-img style="background-color:white; opacity:0.6;" :src="displayAvatar"></v-img>
+                  <v-img
+                    v-if="isAndroid"
+                    class="avatarAn"
+                    style="background-color:white; opacity:0.6;"
+                    :src="displayAvatar"
+                  ></v-img>
+                  <v-img v-else style="background-color:white; opacity:0.6;" :src="displayAvatar"></v-img>
                 </v-avatar>
-                <v-file-input accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
-                <v-icon class="displayCameraIconOnAvatar" size="40">mdi-camera</v-icon>
+                <v-btn
+                  icon
+                  v-if="isAndroid"
+                  class="avatarBtnForAn"
+                  @click="avatarSelectDialog = true"
+                >
+                  <v-icon size="40">mdi-camera</v-icon>
+                </v-btn>
+                <v-file-input v-else accept="image/*" @change="desplayAvatar" class="avatarInput"></v-file-input>
+                <v-icon v-if="!isAndroid" class="displayCameraIconOnAvatar" size="40">mdi-camera</v-icon>
               </div>
             </div>
             <div v-else>
@@ -293,6 +360,8 @@ import { authorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import "firebase/storage";
+import { pokemonList } from "@/js/pokemonList";
+import { headerSmapleList } from "@/js/headerSmapleList";
 
 export default {
   data() {
@@ -331,7 +400,12 @@ export default {
       inputEditNickname: null,
       requestAcceptDialog: false,
       requestRejectDialog: false,
-      screenHeight: 0
+      screenHeight: 0,
+      avatarSelectDialog: false,
+      headerSelectDialog: false,
+      pokemonItems: pokemonList,
+      headerSmapleListItems: headerSmapleList,
+      avatarUlrForan: null
     };
   },
   mounted() {
@@ -369,7 +443,7 @@ export default {
           this.displayAvatar =
             "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0";
           this.displayHeaderImg =
-            "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSmapleImg%2FheaderSample2.png?alt=media&token=72d811b6-7b24-49a1-8285-8261842734b5";
+            "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSelectImg%2F%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC.jpg?alt=media&token=f0bc27d2-e8c5-44ac-b480-9c7439f83eae";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
@@ -389,7 +463,7 @@ export default {
               avatarUrl:
                 "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0",
               imageHeaderUrl:
-                "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSmapleImg%2FheaderSample2.png?alt=media&token=72d811b6-7b24-49a1-8285-8261842734b5"
+                "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSelectImg%2F%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC.jpg?alt=media&token=f0bc27d2-e8c5-44ac-b480-9c7439f83eae"
             });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
@@ -501,10 +575,37 @@ export default {
         this.showAvatarLoader = true;
         setTimeout(() => {
           this.showAvatarLoader = false;
-        }, 5000);
+        }, 7000);
         this.displayAvatar = "";
         this.avatarFile = "";
       }
+      if (this.headerUlrForan) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .update({
+            imageHeaderUrl: this.headerUlrForan
+          });
+        this.showHeaderLoader = true;
+        setTimeout(() => {
+          this.showHeaderLoader = false;
+        }, 10000);
+        this.displayHeaderImg = "";
+        this.headerUlrForan = "";
+      }
+      if (this.avatarUlrForan) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .update({
+            avatarUrl: this.avatarUlrForan
+          });
+        this.showAvatarLoader = true;
+        setTimeout(() => {
+          this.showAvatarLoader = false;
+        }, 7000);
+        this.displayAvatar = "";
+        this.avatarUlrForan = "";
+      }
+
       this.isEdit = false;
       this.displayDemoHeaderImg = "";
       this.displayDemoAvatar = "";
@@ -752,6 +853,16 @@ export default {
       let files = file.target.files;
       this.createImage(files[0]);
     },
+    decideHeaderSample(imgUrl) {
+      this.displayHeaderImg = imgUrl;
+      this.headerUlrForan = imgUrl;
+      this.headerSelectDialog = false;
+    },
+    decideAvatar(imgUrl) {
+      this.displayDemoAvatar = imgUrl;
+      this.avatarUlrForan = imgUrl;
+      this.avatarSelectDialog = false;
+    },
     // アップロードしたheader画像を表示
     createImage(file) {
       var blobUrl = window.URL.createObjectURL(file);
@@ -764,6 +875,8 @@ export default {
 
       this.displayDemoAvatar = blobUrl;
       this.avatarFile = file;
+      // eslint-disable-next-line no-console
+      console.log(this.avatarFile);
     }
   },
   computed: {
@@ -837,6 +950,21 @@ export default {
       } else {
         return false;
       }
+    },
+    isAndroid() {
+      var ua = navigator.userAgent;
+      if (ua.indexOf("Android") > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    getPokemonItems() {
+      var result = this.pokemonItems.filter(function(value) {
+        //5よりも小さい数値だけを抽出
+        return value.index < 20000;
+      });
+      return result;
     }
   },
   firestore() {
@@ -880,16 +1008,32 @@ export default {
   margin-left: 15px;
 }
 
-/* .avatarImg {
-  position: relative;
-} */
-
 .avatarInput {
   position: absolute;
   left: 10px;
   bottom: 0px;
   opacity: 0;
   z-index: 2;
+}
+
+.avatarAn {
+  position: absolute;
+  top: 20px;
+}
+
+.headerBtnForAn {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  top: 30px;
+  text-align: center;
+  z-index: 1;
+}
+
+.avatarBtnForAn {
+  position: relative;
+  bottom: 30px;
+  /* opacity: ; */
 }
 
 .displayCameraIconOnAvatar {

@@ -57,7 +57,8 @@
     </v-dialog>
     <v-dialog v-model="blockAccountDialog" max-width="420">
       <v-card class>
-        <v-list>
+        <div v-if="friendLists.blockListDis.length == 0" class="pa-2">ブロックしているユーザーはいません</div>
+        <v-list v-else>
           <v-list-item v-for="blockList in friendLists.blockListDis" :key="blockList.id">
             <v-list-item-avatar size="40" class="mr-3">
               <v-img :src="blockList.avatarUrl"></v-img>

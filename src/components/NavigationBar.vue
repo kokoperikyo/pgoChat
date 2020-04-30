@@ -73,18 +73,18 @@
         <v-col align="center" v-for="(item, index) in items" :key="index">
           <v-btn icon :to="item.link">
             <v-icon>{{item.icon}}</v-icon>
-            <!-- <v-icon
+            <v-icon
               v-if="index == 0 && chatIcon"
               class="chatNotion"
               small
               color="#8ac32b"
-            >mdi-checkbox-blank-circle</v-icon>-->
-            <!-- <v-icon
+            >mdi-checkbox-blank-circle</v-icon>
+            <v-icon
               v-if="index == 4 && limitChatIcon"
               class="chatNotion"
               small
               color="#8ac32b"
-            >mdi-checkbox-blank-circle</v-icon>-->
+            >mdi-checkbox-blank-circle</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -261,11 +261,6 @@ export default {
       drawer: true,
       items: [
         {
-          icon: "mdi-account-circle-outline",
-          text: "プロフィ",
-          link: { name: "profile" }
-        },
-        {
           icon: "mdi-chat-processing-outline",
           text: "チャット",
           link: { name: "chatRoom" }
@@ -281,20 +276,15 @@ export default {
           link: { name: "friendSearch" }
         },
         {
-          icon: "mdi-exit-run",
-          text: "退会",
-          link: { name: "deleteAccount" }
+          icon: "mdi-clipboard-text-outline",
+          text: "掲示板",
+          link: { name: "bulletinBoard" }
         },
-        // {
-        //   icon: "mdi-tooltip-text-outline",
-        //   text: "掲示板",
-        //   link: { name: "bulletinBoard" }
-        // },
-        // {
-        //   icon: "mdi-twitter",
-        //   text: "Twitter",
-        //   link: { name: "shareToke" }
-        // },
+        {
+          icon: "mdi-twitter",
+          text: "Twitter",
+          link: { name: "shareToke" }
+        },
         {
           icon: "mdi-dots-horizontal-circle-outline",
           text: "メニュー",
