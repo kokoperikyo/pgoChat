@@ -619,8 +619,7 @@ export default {
         priority: "high",
         content_available: true,
         notification: {
-          title: `${this.userInfo.name}`,
-          body: `${body}`,
+          title: `${body}`,
           badge: "1",
           sound: "default"
         }

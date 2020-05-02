@@ -453,6 +453,7 @@ export default {
               friends: [],
               sendFriendRequestNameList: [],
               sendFriendRequestList: [],
+              friendRequestList: [],
               friendIdList: [],
               nicknameList: [],
               blockList: [],

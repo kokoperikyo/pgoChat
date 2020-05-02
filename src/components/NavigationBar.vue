@@ -80,6 +80,12 @@
               color="#8ac32b"
             >mdi-checkbox-blank-circle</v-icon>
             <v-icon
+              v-if="index == 1 && friendLiquestIcon"
+              class="chatNotion"
+              small
+              color="#8ac32b"
+            >mdi-checkbox-blank-circle</v-icon>
+            <v-icon
               v-if="index == 4 && limitChatIcon"
               class="chatNotion"
               small
@@ -108,88 +114,6 @@
         </v-btn>
       </div>
       <v-spacer />
-      <v-menu offset-y v-if="userStatus" :close-on-content-click="false">
-        <template v-slot:activator="{ on }">
-          <v-btn
-            v-if="isRequest(getFriendRequestLists.length)"
-            x-small
-            depressed
-            color="#8ac32b"
-            min-height="28"
-            v-on="on"
-            class="mb-1"
-          >{{getFriendRequestLists.length}}</v-btn>
-          <v-btn
-            v-else
-            outlined
-            dark
-            x-small
-            min-height="28"
-            v-on="on"
-          >{{getFriendRequestLists.length}}</v-btn>
-        </template>
-        <v-list v-if="lastReject" class="py-0">
-          <v-subheader v-if="isRequest(getFriendRequestLists.length)">フレンド申請が届いています</v-subheader>
-          <v-subheader v-else>フレンド申請はありません</v-subheader>
-          <v-list-group
-            v-for="(friendRequest, i) in getFriendRequestLists"
-            :key="i"
-            @click="() => {}"
-          >
-            <template v-slot:activator>
-              <v-list-item-content>
-                <v-list-item-title>
-                  <v-list-item-avatar class="ml-0">
-                    <v-img :src="friendRequest.avatarUrl"></v-img>
-                  </v-list-item-avatar>
-                  <v-text style="font-size:14px;" class="indigo--text">{{ friendRequest.userName }}</v-text>
-                </v-list-item-title>
-              </v-list-item-content>
-            </template>
-            <v-row class="mx-3">
-              <v-col>
-                <v-btn
-                  block
-                  @click="acceptFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,0)"
-                  dark
-                  color="#8ac32b"
-                  small
-                  fab
-                  depressed
-                >
-                  <v-icon>mdi-handshake</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col>
-                <v-btn
-                  block
-                  @click="goProfile(friendRequest.id)"
-                  color="#8ac32b"
-                  small
-                  fab
-                  dark
-                  depressed
-                >
-                  <v-icon>mdi-shield-account</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col>
-                <v-btn
-                  block
-                  @click="rejectFriendRequestByDialog(friendRequest.avatarUrl,friendRequest.id,friendRequest.userName,1)"
-                  color="#004D40"
-                  small
-                  fab
-                  dark
-                  depressed
-                >
-                  <v-icon>mdi-account-cancel</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-list-group>
-        </v-list>
-      </v-menu>
       <v-toolbar-items v-if="userStatus">
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
@@ -210,7 +134,8 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <iconNotion v-on:friendRequestNotion="getFriendRequestNotion"></iconNotion>
+        <iconNotion v-on:friendRequestNotionOn="getFriendRequestNotionOn"></iconNotion>
+        <iconNotion v-on:friendRequestNotionOff="getFriendRequestNotionOff"></iconNotion>
         <iconNotion v-on:chatNotificationOn="getChatNotificationOn"></iconNotion>
         <iconNotion v-on:chatNotificationOff="getChatNotificationOff"></iconNotion>
         <iconNotion v-on:limitChatNotificationOn="getLimitChatNotificationOn"></iconNotion>
@@ -304,13 +229,17 @@ export default {
       requestRejectDialog: false,
       modalStatus: null,
       neww: "false",
+      friendLiquestIcon: false,
       chatIcon: false,
       limitChatIcon: false
     };
   },
   methods: {
-    getFriendRequestNotion() {
-      this.neww = "true";
+    getFriendRequestNotionOn() {
+      this.friendLiquestIcon = true;
+    },
+    getFriendRequestNotionOff() {
+      this.friendLiquestIcon = false;
     },
     getChatNotificationOn() {
       this.chatIcon = true;

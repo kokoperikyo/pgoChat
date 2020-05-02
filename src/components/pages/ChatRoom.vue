@@ -56,6 +56,7 @@ export default {
     },
     makeMesList() {
       this.userInfo.friends.forEach(friend => {
+        this.latestMesUid = [];
         db.collection("users")
           .doc(this.$store.getters.user.uid)
           .collection("messages")
@@ -127,7 +128,7 @@ export default {
 
     setTimeout(() => {
       this.makeMesList();
-    }, 1500);
+    }, 2000);
   },
   computed: {
     getChatCardHeifht: function() {

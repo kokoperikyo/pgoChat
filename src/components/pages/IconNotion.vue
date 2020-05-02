@@ -8,6 +8,7 @@ export default {
   data() {
     return {
       userInfo: null,
+      friendRequest: null,
       message: null,
       lastChatOpen: null,
       LimitChatLogin: null
@@ -15,8 +16,11 @@ export default {
   },
   mounted() {},
   methods: {
-    friendRequest() {
-      this.$emit("friendRequestNotion");
+    friendRequestOn() {
+      this.$emit("friendRequestNotionOn");
+    },
+    friendRequestOff() {
+      this.$emit("friendRequestNotionOff");
     },
     chatOn() {
       const now = new Date();
@@ -47,6 +51,13 @@ export default {
     }
   },
   watch: {
+    friendRequest() {
+      if (this.friendRequest.friendRequestList.length == 0) {
+        this.friendRequestOff();
+      } else {
+        this.friendRequestOn();
+      }
+    },
     message() {
       this.chatOn();
     },
@@ -60,6 +71,7 @@ export default {
   firestore() {
     return {
       userInfo: db.collection("users").doc(this.$store.getters.user.uid),
+      friendRequest: db.collection("users").doc(this.$store.getters.user.uid),
       message: db
         .collection("users")
         .doc(this.$store.getters.user.uid)
