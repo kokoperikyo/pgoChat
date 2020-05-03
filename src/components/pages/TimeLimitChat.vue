@@ -59,25 +59,31 @@
           label="ポケモンを検索"
           dark
         ></v-autocomplete>
-        <v-card :color="leagueRowColor" class="mx-1 mb-3">
+        <v-card :color="leagueRowColor" class="mx-1 mb-3" height="180px">
           <v-row no-gutters>
-            <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
+            <v-col
+              class="mt-5"
+              align="center"
+              cols="4"
+              v-for="(item, index) in partyList"
+              :key="index"
+            >
+              <v-img width="60" :src="getImg(item)" class="limitPokemonImg"></v-img>
               <div v-if="isShadow(item)">
-                <v-avatar size="30" class="shadowIcon">
+                <v-avatar size="30" class="limitShadowIcon">
                   <v-img
                     src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
                   ></v-img>
                 </v-avatar>
-                <v-btn small icon fab @click="removeArray(index)" class="closeBtnSub">
+                <v-btn small icon fab @click="removeArray(index)" class="limitCloseBtnSub">
                   <v-icon color="black">mdi-close-circle</v-icon>
                 </v-btn>
               </div>
               <div v-else>
-                <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
+                <v-btn small icon fab @click="removeArray(index)" class="limitCloseBtn">
                   <v-icon color="black">mdi-close-circle</v-icon>
                 </v-btn>
               </div>
-              <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
             </v-col>
           </v-row>
         </v-card>
@@ -115,25 +121,31 @@
             label="ポケモンを検索"
             dark
           ></v-autocomplete>
-          <v-card :color="leagueRowColor" class="mx-1 mb-3">
+          <v-card :color="leagueRowColor" class="mx-1 mb-3" height="180px">
             <v-row no-gutters>
-              <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList"
+                :key="index"
+              >
+                <v-img width="60" :src="getImg(item)" class="limitPokemonImg"></v-img>
                 <div v-if="isShadow(item)">
-                  <v-avatar size="30" class="shadowIcon">
+                  <v-avatar size="30" class="limitShadowIcon">
                     <v-img
                       src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
                     ></v-img>
                   </v-avatar>
-                  <v-btn small icon fab @click="removeArray(index)" class="closeBtnSub">
+                  <v-btn small icon fab @click="removeArray(index)" class="limitCloseBtnSub">
                     <v-icon color="black">mdi-close-circle</v-icon>
                   </v-btn>
                 </div>
                 <div v-else>
-                  <v-btn small icon fab @click="removeArray(index)" class="closeBtn">
+                  <v-btn small icon fab @click="removeArray(index)" class="limitCloseBtn">
                     <v-icon color="black">mdi-close-circle</v-icon>
                   </v-btn>
                 </div>
-                <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
               </v-col>
             </v-row>
           </v-card>
@@ -183,8 +195,8 @@
                     <v-card width="240" color="#9ccc65" class="px-3" flat>
                       <v-row>
                         <v-col cols="4" v-for="(item, index) in message.partyListDis" :key="index">
-                          <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
-                          <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                          <v-img width="60px" :src="getImg(item)" class="limitPokemonImgOnChat"></v-img>
+                          <v-avatar v-show="isShadow(item)" size="30" class="limitShadowIconOnChat">
                             <v-img
                               src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
                             ></v-img>
@@ -229,8 +241,8 @@
                     <v-card width="240" color="#9ccc65" class="px-3" flat>
                       <v-row>
                         <v-col cols="4" v-for="(item, index) in message.partyListDis" :key="index">
-                          <v-img width="60px" :src="getImg(item)" class="pokemonImgOnChat"></v-img>
-                          <v-avatar v-show="isShadow(item)" size="30" class="shadowIconOnChat">
+                          <v-img width="60px" :src="getImg(item)" class="limitPokemonImgOnChat"></v-img>
+                          <v-avatar v-show="isShadow(item)" size="30" class="limitShadowIconOnChat">
                             <v-img
                               src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
                             ></v-img>
@@ -260,7 +272,7 @@
         </v-list>
       </v-card>
       <v-row style="background:#FCE4EC; height:130px;" class="mr-0">
-        <v-col md="10" cols="8" class="ml-3">
+        <v-col md="9" cols="8" class="ml-3">
           <v-textarea
             rows="2"
             color="#8ac32b"
@@ -270,10 +282,33 @@
             @click:append="regMessage"
           ></v-textarea>
         </v-col>
-        <v-col md="1" cols="3" v-if="isHost">
-          <v-row class="mt-5 ml-3" justify="center">
-            <v-btn depressed color="#8ac32b" dark rounded @click="selectLeagueDialog = true">6-3対戦</v-btn>
+        <v-col md="1" cols="2" v-if="isHost">
+          <v-row class="mt-6 ml-1" justify="center">
+            <v-btn
+              small
+              depressed
+              color="#8ac32b"
+              dark
+              rounded
+              @click="selectLeagueDialog = true"
+            >6-3対戦</v-btn>
             <!-- <v-btn rounded disabled>スタンプ</v-btn> -->
+          </v-row>
+        </v-col>
+        <v-col md="2" cols="1">
+          <v-row class="mt-7 ml-3" justify="center">
+            <v-btn
+              depressed
+              color="#8ac32b"
+              dark
+              icon
+              @click="deleteImg"
+              x-small
+              max-height="20px"
+              max-width="20px"
+            >
+              <v-icon>mdi-alert-circle-outline</v-icon>
+            </v-btn>
           </v-row>
         </v-col>
       </v-row>
@@ -306,10 +341,17 @@ export default {
       inputMessage: "",
       isOpenChat: null,
       showParty: false,
-      screenHeight: 0
+      screenHeight: 0,
+      imgMes: null,
+      acceptSixThreeMes: null
     };
   },
   mounted() {
+    setTimeout(() => {
+      // eslint-disable-next-line no-console
+      console.log(this.imgMes);
+    }, 1000);
+
     this.screenHeight = window.parent.screen.height;
 
     var st = this.$route.params["uid"];
@@ -644,6 +686,24 @@ export default {
       } else {
         return false;
       }
+    },
+    deleteImg() {
+      setTimeout(() => {
+        this.imgMes.forEach(doc => {
+          db.collection("timeLimitChat")
+            .doc(this.$route.params["uid"])
+            .collection("messages")
+            .doc(doc.id)
+            .delete();
+        });
+        this.acceptSixThreeMes.forEach(doc => {
+          db.collection("timeLimitChat")
+            .doc(this.$route.params["uid"])
+            .collection("messages")
+            .doc(doc.id)
+            .delete();
+        });
+      }, 1000);
     }
   },
   watch: {
@@ -651,6 +711,29 @@ export default {
       setTimeout(() => {
         this.scrollToEnd();
       }, 1000);
+      const now = new Date();
+      setTimeout(() => {
+        this.imgMes.forEach(doc => {
+          var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
+          if (timeDate / (1000 * 60) > 1) {
+            db.collection("timeLimitChat")
+              .doc(this.$route.params["uid"])
+              .collection("messages")
+              .doc(doc.id)
+              .delete();
+          }
+        });
+        this.acceptSixThreeMes.forEach(doc => {
+          var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
+          if (timeDate / (1000 * 60) > 1) {
+            db.collection("timeLimitChat")
+              .doc(this.$route.params["uid"])
+              .collection("messages")
+              .doc(doc.id)
+              .delete();
+          }
+        });
+      }, 800);
     },
     partyValue() {
       if (this.partyValue != undefined) {
@@ -730,6 +813,16 @@ export default {
         .doc(this.$route.params["uid"])
         .collection("messages")
         .orderBy("createdAt", "asc"),
+      imgMes: db
+        .collection("timeLimitChat")
+        .doc(this.$route.params["uid"])
+        .collection("messages")
+        .where("stanpSt", "==", 2),
+      acceptSixThreeMes: db
+        .collection("timeLimitChat")
+        .doc(this.$route.params["uid"])
+        .collection("messages")
+        .where("stanpSt", "==", 1),
       selectSixThreeDialog: db
         .collection("timeLimitChat")
         .doc(this.$route.params["uid"])
@@ -745,29 +838,29 @@ export default {
 };
 </script>
 <style>
-.shadowIcon {
+.limitShadowIcon {
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: 12px;
+  bottom: 42px;
   background-color: rgb(16, 17, 4);
   z-index: 2;
 }
-.closeBtnSub {
+.limitCloseBtnSub {
   position: absolute;
-  left: 14px;
-  top: 2px;
+  left: 4px;
+  bottom: 37px;
   z-index: 2;
 }
-.closeBtn {
+.limitCloseBtn {
   position: absolute;
-  left: 30px;
-  top: 2px;
+  left: 4px;
+  bottom: 37px;
   z-index: 2;
 }
-.pokemonImg {
+.limitPokemonImg {
   position: relative;
   border-radius: 10px;
-  bottom: 20px;
+  top: 0px;
   z-index: 1;
 }
 .my_six_three {
@@ -780,13 +873,13 @@ export default {
   right: 46px;
   bottom: 20px;
 }
-.pokemonImgOnChat {
+.limitPokemonImgOnChat {
   border-radius: 10px;
 }
-.shadowIconOnChat {
+.limitShadowIconOnChat {
   position: absolute;
-  right: 12px;
-  bottom: 66px;
+  right: 2px;
+  bottom: 52px;
   background-color: rgb(16, 17, 4);
   z-index: 2;
 }

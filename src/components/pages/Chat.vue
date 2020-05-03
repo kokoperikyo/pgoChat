@@ -6,7 +6,6 @@
           <v-card-title>通報フォーム</v-card-title>
         </v-row>
         <div>等チャットで不快な思いをされた場合は通報ください</div>
-
         <v-textarea
           rows="1"
           auto-grow
@@ -84,7 +83,7 @@
       </v-card>
     </v-dialog>
     <!-- パーティー申請したがわ -->
-    <v-dialog v-model="selectSixThreeDialog.sixThreeSelect" max-width="500" persistent>
+    <v-dialog v-model="selectSixThreeDialog.sixThreeSelect" max-width="340" persistent>
       <v-card class="mx-auto px-2 pb-3" :color="leagueBaseColor">
         <v-row class="ml-0">
           <h3 class="font-weight-black mt-2" style="color:white;">６匹選んでください</h3>
@@ -104,9 +103,16 @@
           label="ポケモンを検索"
           dark
         ></v-autocomplete>
-        <v-card :color="leagueRowColor" class="mx-1 mb-3">
+        <v-card :color="leagueRowColor" class="mx-1 mb-3" height="180px">
           <v-row no-gutters>
-            <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
+            <v-col
+              class="mt-5"
+              align="center"
+              cols="4"
+              v-for="(item, index) in partyList"
+              :key="index"
+            >
+              <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
               <div v-if="isShadow(item)">
                 <v-avatar size="30" class="shadowIcon">
                   <v-img
@@ -122,7 +128,6 @@
                   <v-icon color="black">mdi-close-circle</v-icon>
                 </v-btn>
               </div>
-              <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
             </v-col>
           </v-row>
         </v-card>
@@ -133,7 +138,7 @@
       </v-card>
     </v-dialog>
     <!-- パーティー選択申請を受けたがわ -->
-    <v-dialog v-model="selectSixThreeDialogOfOther" max-width="500" persistent>
+    <v-dialog v-model="selectSixThreeDialogOfOther" max-width="340" persistent>
       <v-card class="mx-auto px-2 pb-3" :color="leagueBaseColor">
         <v-row class="ml-0">
           <h3 class="font-weight-black mt-2" style="color:white;">６匹選んでください</h3>
@@ -153,9 +158,16 @@
           label="ポケモンを検索"
           dark
         ></v-autocomplete>
-        <v-card :color="leagueRowColor" class="mx-1 mb-3">
+        <v-card :color="leagueRowColor" class="mx-1 mb-3" height="180px">
           <v-row no-gutters>
-            <v-col align="center" cols="4" v-for="(item, index) in partyList" :key="index">
+            <v-col
+              class="mt-5"
+              align="center"
+              cols="4"
+              v-for="(item, index) in partyList"
+              :key="index"
+            >
+              <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
               <div v-if="isShadow(item)">
                 <v-avatar size="30" class="shadowIcon">
                   <v-img
@@ -171,7 +183,6 @@
                   <v-icon color="black">mdi-close-circle</v-icon>
                 </v-btn>
               </div>
-              <v-img width="60" :src="getImg(item)" class="pokemonImg"></v-img>
             </v-col>
           </v-row>
         </v-card>
@@ -193,6 +204,9 @@
         </v-btn>
         <v-btn class v-else @click="editStatus = true,editingModal = false" icon small dark>
           <v-icon>mdi-content-save-edit</v-icon>
+        </v-btn>
+        <v-btn class="ml-1" icon small dark @click="deleteImg">
+          <v-icon>mdi-alert-circle</v-icon>
         </v-btn>
       </v-toolbar>
       <v-card flat class="overflow-y-auto scroll" :height="getChatCardHeight">
@@ -438,7 +452,9 @@ export default {
       partyValue: null,
       partyList: [],
       reportDialog: false,
-      reportMes: null
+      reportMes: null,
+      imgMes: null,
+      acceptSixThreeMes: null
     };
   },
   computed: {
@@ -949,6 +965,24 @@ export default {
         reportMes: this.reportMes
       });
       this.reportDialog = false;
+    },
+    deleteImg() {
+      setTimeout(() => {
+        this.imgMes.forEach(doc => {
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("messages")
+            .doc(doc.id)
+            .delete();
+        });
+        this.acceptSixThreeMes.forEach(doc => {
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("messages")
+            .doc(doc.id)
+            .delete();
+        });
+      }, 1000);
     }
   },
   mounted() {
@@ -1004,6 +1038,29 @@ export default {
       setTimeout(() => {
         this.scrollToEnd();
       }, 1000);
+      const now = new Date();
+      setTimeout(() => {
+        this.imgMes.forEach(doc => {
+          var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
+          if (timeDate / (1000 * 60) > 1) {
+            db.collection("users")
+              .doc(this.$store.getters.user.uid)
+              .collection("messages")
+              .doc(doc.id)
+              .delete();
+          }
+        });
+        this.acceptSixThreeMes.forEach(doc => {
+          var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
+          if (timeDate / (1000 * 60) > 1) {
+            db.collection("users")
+              .doc(this.$store.getters.user.uid)
+              .collection("messages")
+              .doc(doc.id)
+              .delete();
+          }
+        });
+      }, 800);
     },
     partyValue() {
       if (this.partyValue != undefined) {
@@ -1022,6 +1079,16 @@ export default {
           this.$store.getters.user.uid + this.$route.params["uid"]
         ])
         .orderBy("createdAt", "asc"),
+      imgMes: db
+        .collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("messages")
+        .where("stanpSt", "==", 2),
+      acceptSixThreeMes: db
+        .collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("messages")
+        .where("stanpSt", "==", 1),
       chatUser: db.collection("users").doc(this.$route.params["uid"]),
       userInfo: db.collection("users").doc(this.$store.getters.user.uid),
       partySelectedStatus: db
@@ -1095,7 +1162,7 @@ export default {
 .pokemonImg {
   position: relative;
   border-radius: 10px;
-  bottom: 20px;
+  top: 0px;
   z-index: 1;
 }
 .pokemonImgOnChat {
@@ -1103,27 +1170,27 @@ export default {
 }
 .closeBtn {
   position: absolute;
-  left: 30px;
-  top: 2px;
+  left: 4px;
+  bottom: 37px;
   z-index: 2;
 }
 .closeBtnSub {
   position: absolute;
-  left: 14px;
-  top: 2px;
+  left: 4px;
+  bottom: 37px;
   z-index: 2;
 }
 .shadowIcon {
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: 12px;
+  bottom: 42px;
   background-color: rgb(16, 17, 4);
   z-index: 2;
 }
 .shadowIconOnChat {
   position: absolute;
-  right: 12px;
-  bottom: 66px;
+  right: 2px;
+  bottom: 52px;
   background-color: rgb(16, 17, 4);
   z-index: 2;
 }
