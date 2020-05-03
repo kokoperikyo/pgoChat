@@ -39,7 +39,7 @@
       </v-card>
     </v-dialog>
     <!-- パーティー選択申請を受けたがわ ゲスト -->
-    <v-dialog v-model="selectSixThreeDialogOfGuest" max-width="500" persistent>
+    <v-dialog v-model="selectSixThreeDialogOfGuest" max-width="340" persistent>
       <v-card class="mx-auto px-2 pb-3" :color="leagueBaseColor">
         <v-row class="ml-0">
           <h3 class="font-weight-black mt-2" style="color:white;">６匹選んでください</h3>
@@ -101,7 +101,7 @@
     </v-dialog>
     <!-- パーティー申請したがわ ホスト -->
     <div v-if="isHost">
-      <v-dialog v-model="selectSixThreeDialog.sixThreeSelect " max-width="500" persistent>
+      <v-dialog v-model="selectSixThreeDialog.sixThreeSelect " max-width="340" persistent>
         <v-card class="mx-auto px-2 pb-3" :color="leagueBaseColor">
           <v-row class="ml-0">
             <h3 class="font-weight-black mt-2" style="color:white;">６匹選んでくださいsita</h3>
