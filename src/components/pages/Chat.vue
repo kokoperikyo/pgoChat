@@ -131,6 +131,18 @@
             </v-col>
           </v-row>
         </v-card>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2"
+          color="red"
+          type="info"
+        >相手が選択完了するまでパーティは見られないのでご安心ください</v-alert>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2"
+          color="red"
+          type="info"
+        >パーティ画像は3分後に自動削除されます</v-alert>
         <div>
           <v-btn rounded @click="closeSixThreeDialogOfMy" class="ml-1 mr-2">閉じる</v-btn>
           <v-btn rounded :disabled="!isSixPatry" @click="doneSelectingPartyOfMy">決定</v-btn>
@@ -186,6 +198,18 @@
             </v-col>
           </v-row>
         </v-card>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2"
+          color="red"
+          type="info"
+        >相手が選択完了するまでパーティは見られないのでご安心ください</v-alert>
+        <v-alert
+          style="font-size:11px;"
+          class="py-2 mx-2"
+          color="red"
+          type="info"
+        >パーティ画像は3分後に自動削除されます</v-alert>
         <div>
           <v-btn rounded @click="selectSixThreeDialogOfOther = false" class="ml-1 mr-2">閉じる</v-btn>
           <v-btn rounded :disabled="!isSixPatry" @click="doneSelectingPartyOfOther">決定</v-btn>
@@ -1042,7 +1066,7 @@ export default {
       setTimeout(() => {
         this.imgMes.forEach(doc => {
           var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
-          if (timeDate / (1000 * 60) > 1) {
+          if (timeDate / (1000 * 60) > 3) {
             db.collection("users")
               .doc(this.$store.getters.user.uid)
               .collection("messages")
@@ -1052,7 +1076,7 @@ export default {
         });
         this.acceptSixThreeMes.forEach(doc => {
           var timeDate = now.getTime() - doc.createdAt.toDate().getTime();
-          if (timeDate / (1000 * 60) > 1) {
+          if (timeDate / (1000 * 60) > 3) {
             db.collection("users")
               .doc(this.$store.getters.user.uid)
               .collection("messages")
