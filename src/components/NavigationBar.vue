@@ -123,7 +123,7 @@
           </template>
           <v-list>
             <v-list-item>
-              <v-btn color="#004D40" to="profile" text class="p-0">
+              <v-btn color="#004D40" @click="goMyProfile" text class="p-0">
                 <v-icon class="mr-1">mdi-account-circle-outline</v-icon>プロフィール
               </v-btn>
             </v-list-item>
@@ -134,12 +134,12 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <!-- <iconNotion v-on:friendRequestNotionOn="getFriendRequestNotionOn"></iconNotion>
+        <iconNotion v-on:friendRequestNotionOn="getFriendRequestNotionOn"></iconNotion>
         <iconNotion v-on:friendRequestNotionOff="getFriendRequestNotionOff"></iconNotion>
         <iconNotion v-on:chatNotificationOn="getChatNotificationOn"></iconNotion>
         <iconNotion v-on:chatNotificationOff="getChatNotificationOff"></iconNotion>
         <iconNotion v-on:limitChatNotificationOn="getLimitChatNotificationOn"></iconNotion>
-        <iconNotion v-on:limitChatNotificationOff="getLimitChatNotificationOff"></iconNotion>-->
+        <iconNotion v-on:limitChatNotificationOff="getLimitChatNotificationOff"></iconNotion>
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
@@ -158,11 +158,11 @@ import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
 import { authorizationOfNotification } from "@/plugins/firebase";
 import "@firebase/firestore";
-// import IconNotion from "@/components/pages/IconNotion.vue";
+import IconNotion from "@/components/pages/IconNotion.vue";
 
 export default {
   components: {
-    // IconNotion
+    IconNotion
   },
   computed: {
     userStatus() {
@@ -453,6 +453,9 @@ export default {
           force: true
         });
       }, 500);
+    },
+    goMyProfile() {
+      this.$router.push("/profile");
     }
   },
   mounted() {

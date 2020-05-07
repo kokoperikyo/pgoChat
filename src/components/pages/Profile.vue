@@ -444,11 +444,13 @@ export default {
             "https://firebasestorage.googleapis.com/v0/b/devpgochat-e5d09.appspot.com/o/sampleAvatarImg%2Favatar-default-icon.png?alt=media&token=ba07e33a-c66a-4194-8aa2-c0ef3fe32dd0";
           this.displayHeaderImg =
             "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSelectImg%2F%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC.jpg?alt=media&token=f0bc27d2-e8c5-44ac-b480-9c7439f83eae";
+          this.displaySelfIntroduction = "はじめまして";
           db.collection("users")
             .doc(this.$store.getters.user.uid)
             .set({
               id: this.$store.getters.user.uid,
               lastLogin: firebase.firestore.Timestamp.fromDate(new Date()),
+              selfIntroduction: "はじめまして",
               //リスト系は入れておかないとフレンド検索でエラー吐いちゃう
               friends: [],
               sendFriendRequestNameList: [],
