@@ -1636,9 +1636,7 @@ export default {
       this.partyList3 = this.partyListDb[2].partyList;
       this.partyList4 = this.partyListDb[3].partyList;
       this.partyList5 = this.partyListDb[4].partyList;
-    }, 2000);
 
-    setTimeout(() => {
       this.partyName1 = this.partyListDb[0].partyName;
       this.partyName2 = this.partyListDb[1].partyName;
       this.partyName3 = this.partyListDb[2].partyName;

@@ -1,5 +1,343 @@
 <template>
   <div>
+    <v-dialog v-model="completeSavePartyDialog" class="mx-auto" max-width="320">
+      <v-card>
+        <div style="text-align:center;">保存完了</div>
+        <v-row justify="center">
+          <v-icon color="#8ac32b" size="200" style="center">mdi-checkbox-marked-circle-outline</v-icon>
+        </v-row>
+      </v-card>
+    </v-dialog>
+    <!-- パーティー名の編集 -->
+    <v-dialog v-model="editPartyNameDialog" class="mx-auto" max-width="500">
+      <v-card class="mx-auto" max-width="500" color="#FCE4EC">
+        <v-container>
+          <v-row>
+            <v-textarea
+              rows="1"
+              clearable
+              clear-icon="cancel"
+              v-model="partyName"
+              row-height="10"
+              class="mx-5"
+              color="#8ac32b"
+              background-color="white"
+            ></v-textarea>
+            <v-btn
+              @click="updatePartyName"
+              class="mr-3 mt-3"
+              small
+              fab
+              depressed
+              dark
+              color="#8ac32b"
+            >
+              <v-icon>mdi-autorenew</v-icon>
+            </v-btn>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <!-- パーティ登録機能 -->
+    <v-dialog v-model="partyDialog" max-width="320">
+      <v-card max-height="420" color="#FCE4EC">
+        <v-card color="#FCE4EC" flat class="pb-2 px-2">
+          <!-- 1つ目 -->
+          <v-card-subtitle>
+            <div style="text-align:center; background:#DE4097; color:white; border-radius:20px;">
+              <div v-if="partyName1 == ''">
+                パーティ1
+                <v-btn dark small icon class="mb-1" @click="editPartyName(1)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                {{partyName1}}
+                <v-btn dark small icon class="mb-1" @click="editPartyName(1)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-subtitle>
+          <v-autocomplete
+            v-model="partyValue1"
+            :items="items"
+            :disabled="isSixPatry1"
+            item-text="name"
+            item-value="index"
+            prepend-icon="mdi-database-search"
+            dense
+            clearable
+            label="ポケモンを検索"
+            color="#8ac32b"
+          ></v-autocomplete>
+          <v-card class="mx-1 mb-3" height="180px" color="#8ac32b" flat>
+            <v-row no-gutters>
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList1"
+                :key="index"
+              >
+                <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
+                <div v-if="isShadow(item)">
+                  <v-avatar size="30" class="shadowIcon">
+                    <v-img
+                      src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                    ></v-img>
+                  </v-avatar>
+                  <v-btn small icon fab @click="removeArray1(index)" class="closeBtnSub">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+                <div v-else>
+                  <v-btn small icon fab @click="removeArray1(index)" class="closeBtn">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+          <v-btn outlined rounded color="#004D40" class="ml-2 mb-3" @click="saveparty1">保存</v-btn>
+          <!-- 2つ目 -->
+          <v-card-subtitle class="mt-5">
+            <div style="text-align:center; background:#DE4097; color:white; border-radius:20px;">
+              <div v-if="partyName2 == ''">
+                パーティ2
+                <v-btn dark small icon class="mb-1" @click="editPartyName(2)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                {{partyName2}}
+                <v-btn dark small icon class="mb-1" @click="editPartyName(2)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-subtitle>
+          <v-autocomplete
+            v-model="partyValue2"
+            :items="items"
+            :disabled="isSixPatry2"
+            item-text="name"
+            item-value="index"
+            prepend-icon="mdi-database-search"
+            dense
+            clearable
+            label="ポケモンを検索"
+            color="#8ac32b"
+          ></v-autocomplete>
+          <v-card class="mx-1 mb-3" height="180px" color="#8ac32b" flat>
+            <v-row no-gutters>
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList2"
+                :key="index"
+              >
+                <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
+                <div v-if="isShadow(item)">
+                  <v-avatar size="30" class="shadowIcon">
+                    <v-img
+                      src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                    ></v-img>
+                  </v-avatar>
+                  <v-btn small icon fab @click="removeArray2(index)" class="closeBtnSub">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+                <div v-else>
+                  <v-btn small icon fab @click="removeArray2(index)" class="closeBtn">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+          <v-btn outlined rounded color="#004D40" class="ml-2 mb-3" @click="saveparty2">保存</v-btn>
+
+          <!-- 3つ目 -->
+          <v-card-subtitle class="mt-5">
+            <div style="text-align:center; background:#DE4097; color:white; border-radius:20px;">
+              <div v-if="partyName3 == ''">
+                パーティ3
+                <v-btn dark small icon class="mb-1" @click="editPartyName(3)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                {{partyName3}}
+                <v-btn dark small icon class="mb-1" @click="editPartyName(3)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-subtitle>
+          <v-autocomplete
+            v-model="partyValue3"
+            :items="items"
+            :disabled="isSixPatry3"
+            item-text="name"
+            item-value="index"
+            prepend-icon="mdi-database-search"
+            dense
+            clearable
+            label="ポケモンを検索"
+            color="#8ac32b"
+          ></v-autocomplete>
+          <v-card class="mx-1 mb-3" height="180px" color="#8ac32b" flat>
+            <v-row no-gutters>
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList3"
+                :key="index"
+              >
+                <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
+                <div v-if="isShadow(item)">
+                  <v-avatar size="30" class="shadowIcon">
+                    <v-img
+                      src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                    ></v-img>
+                  </v-avatar>
+                  <v-btn small icon fab @click="removeArray3(index)" class="closeBtnSub">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+                <div v-else>
+                  <v-btn small icon fab @click="removeArray3(index)" class="closeBtn">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+          <v-btn outlined rounded color="#004D40" class="ml-2 mb-3" @click="saveparty3">保存</v-btn>
+
+          <!-- 4つ目 -->
+          <v-card-subtitle class="mt-5">
+            <div style="text-align:center; background:#DE4097; color:white; border-radius:20px;">
+              <div v-if="partyName4 == ''">
+                パーティ4
+                <v-btn dark small icon class="mb-1" @click="editPartyName(4)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                {{partyName4}}
+                <v-btn dark small icon class="mb-1" @click="editPartyName(4)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-subtitle>
+          <v-autocomplete
+            v-model="partyValue4"
+            :items="items"
+            :disabled="isSixPatry4"
+            item-text="name"
+            item-value="index"
+            prepend-icon="mdi-database-search"
+            dense
+            clearable
+            label="ポケモンを検索"
+            color="#8ac32b"
+          ></v-autocomplete>
+          <v-card class="mx-1 mb-3" height="180px" color="#8ac32b" flat>
+            <v-row no-gutters>
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList4"
+                :key="index"
+              >
+                <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
+                <div v-if="isShadow(item)">
+                  <v-avatar size="30" class="shadowIcon">
+                    <v-img
+                      src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                    ></v-img>
+                  </v-avatar>
+                  <v-btn small icon fab @click="removeArray4(index)" class="closeBtnSub">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+                <div v-else>
+                  <v-btn small icon fab @click="removeArray4(index)" class="closeBtn">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+          <v-btn outlined rounded color="#004D40" class="ml-2 mb-3" @click="saveparty4">保存</v-btn>
+
+          <!-- 5つ目 -->
+          <v-card-subtitle class="mt-5">
+            <div style="text-align:center; background:#DE4097; color:white; border-radius:20px;">
+              <div v-if="partyName5 == ''">
+                パーティ5
+                <v-btn dark small icon class="mb-1" @click="editPartyName(5)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+              <div v-else>
+                {{partyName5}}
+                <v-btn dark small icon class="mb-1" @click="editPartyName(5)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-subtitle>
+          <v-autocomplete
+            v-model="partyValue5"
+            :items="items"
+            :disabled="isSixPatry5"
+            item-text="name"
+            item-value="index"
+            prepend-icon="mdi-database-search"
+            dense
+            clearable
+            label="ポケモンを検索"
+            color="#8ac32b"
+          ></v-autocomplete>
+          <v-card class="mx-1 mb-3" height="180px" color="#8ac32b" flat>
+            <v-row no-gutters>
+              <v-col
+                class="mt-5"
+                align="center"
+                cols="4"
+                v-for="(item, index) in partyList5"
+                :key="index"
+              >
+                <v-img class="pokemonImg" width="60" :src="getImg(item)"></v-img>
+                <div v-if="isShadow(item)">
+                  <v-avatar size="30" class="shadowIcon">
+                    <v-img
+                      src="https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/icon%2FIMG_5832_2-removebg-preview.png?alt=media&token=047d6779-fa2a-4781-997b-f3b044861011"
+                    ></v-img>
+                  </v-avatar>
+                  <v-btn small icon fab @click="removeArray5(index)" class="closeBtnSub">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+                <div v-else>
+                  <v-btn small icon fab @click="removeArray5(index)" class="closeBtn">
+                    <v-icon color="black">mdi-close-circle</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+          <v-btn outlined rounded color="#004D40" class="ml-2" @click="saveparty5">保存</v-btn>
+        </v-card>
+      </v-card>
+    </v-dialog>
     <v-card tile flat class="mx-auto" color="#E3F2FD">
       <!-- フレンド許可 -->
       <v-dialog v-model="requestAcceptDialog" max-width="290">
@@ -350,6 +688,35 @@
             style="white-space:pre-wrap; "
           >{{displayFriendUserInfo.selfIntroduction}}</v-card-text>
         </div>
+        <v-divider></v-divider>
+        <v-row v-if="isMypage">
+          <v-col cols="3" align="center">
+            <v-btn text x-small @click="functionSt = 1">レートグラフ</v-btn>
+          </v-col>
+          <v-col cols="3" align="center">
+            <v-btn text x-small @click="functionSt = 2">パーティ登録</v-btn>
+          </v-col>
+          <v-col cols="3" align="center">
+            <!-- <v-btn text x-small @click="functionSt = 3">パーティ登録</v-btn> -->
+          </v-col>
+          <v-col cols="3" align="center">
+            <!-- <v-btn text x-small @click="functionSt = 4">パーティ登録</v-btn> -->
+          </v-col>
+        </v-row>
+        <v-card flat v-if="isMypage">
+          <div v-if="functionSt == 1">グラフ</div>
+          <div v-if="functionSt == 2" style="text-align:center;">
+            <div style="font-size:12px; ">6-3対戦でよく使うパーティを登録しておくことができます</div>
+            <v-btn
+              dark
+              color="#8ac32b"
+              rounded
+              depressed
+              class="mt-3"
+              @click="partyDialog = true"
+            >パーティ登録</v-btn>
+          </div>
+        </v-card>
       </v-card>
     </v-card>
   </div>
@@ -360,14 +727,13 @@ import { authorizationOfNotification } from "@/plugins/firebase";
 import firebase from "@firebase/app";
 import "@firebase/firestore";
 import "firebase/storage";
-import { pokemonList } from "@/js/pokemonList";
 import { headerSmapleList } from "@/js/headerSmapleList";
+import { pokemonList, shadowList } from "@/js/pokemonList";
 
 export default {
   data() {
     return {
-      status: 1,
-      items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15],
+      items: pokemonList,
       rules: [
         value => !!value || "必須",
         value =>
@@ -405,11 +771,64 @@ export default {
       headerSelectDialog: false,
       pokemonItems: pokemonList,
       headerSmapleListItems: headerSmapleList,
-      avatarUlrForan: null
+      avatarUlrForan: null,
+      functionSt: 1,
+      partyValue: null,
+      partyValue1: null,
+      partyValue2: null,
+      partyValue3: null,
+      partyValue4: null,
+      partyValue5: null,
+      partyList: [],
+      partyList1: [],
+      partyList2: [],
+      partyList3: [],
+      partyList4: [],
+      partyList5: [],
+      partyName1: null,
+      partyName2: null,
+      partyName3: null,
+      partyName4: null,
+      partyName5: null,
+      reportDialog: false,
+      partyDialog: false,
+      partyListDb: null,
+      completeSavePartyDialog: false,
+      editPartyNameDialog: false,
+      partyName: null,
+      partyNumber: null
     };
   },
   mounted() {
     this.screenHeight = window.parent.screen.height;
+
+    setTimeout(() => {
+      for (let index = 1; index <= 5; index++) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc(`partyList${index}`)
+          .get()
+          .then(doc => {
+            if (index == 1) {
+              this.partyList1 = doc.data().partyList;
+              this.partyName1 = doc.data().partyName;
+            } else if (index == 2) {
+              this.partyList2 = doc.data().partyList;
+              this.partyName2 = doc.data().partyName;
+            } else if (index == 3) {
+              this.partyList3 = doc.data().partyList;
+              this.partyName3 = doc.data().partyName;
+            } else if (index == 4) {
+              this.partyList4 = doc.data().partyList;
+              this.partyName4 = doc.data().partyName;
+            } else if (index == 5) {
+              this.partyList5 = doc.data().partyList;
+              this.partyName5 = doc.data().partyName;
+            }
+          });
+      }
+    }, 4000);
     //最終ログインを更新
     db.collection("users")
       .doc(this.$store.getters.user.uid)
@@ -905,6 +1324,150 @@ export default {
       this.avatarFile = file;
       // eslint-disable-next-line no-console
       console.log(this.avatarFile);
+    },
+    //パーティ登録機能計
+    editPartyName(partyNum) {
+      this.partyNumber = partyNum;
+      this.editPartyNameDialog = true;
+    },
+    isShadow(sendIndex) {
+      return shadowList.some(v => v === sendIndex);
+    },
+    getImg(sendIndex) {
+      const target = this.items.find(item => {
+        return item.index === sendIndex;
+      });
+      return target.img;
+    },
+    removeArray1(index) {
+      this.partyList1.splice(index, 1);
+    },
+    removeArray2(index) {
+      this.partyList2.splice(index, 1);
+    },
+    removeArray3(index) {
+      this.partyList3.splice(index, 1);
+    },
+    removeArray4(index) {
+      this.partyList4.splice(index, 1);
+    },
+    removeArray5(index) {
+      this.partyList5.splice(index, 1);
+    },
+    saveparty1() {
+      this.completeSavePartyDialog = true;
+      setTimeout(() => {
+        this.completeSavePartyDialog = false;
+      }, 2000);
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
+        .doc("partyList1")
+        .update({
+          partyList: this.partyList1
+        });
+    },
+    saveparty2() {
+      this.completeSavePartyDialog = true;
+      setTimeout(() => {
+        this.completeSavePartyDialog = false;
+      }, 2000);
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
+        .doc("partyList2")
+        .update({
+          partyList: this.partyList2
+        });
+    },
+    saveparty3() {
+      this.completeSavePartyDialog = true;
+      setTimeout(() => {
+        this.completeSavePartyDialog = false;
+      }, 2000);
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
+        .doc("partyList3")
+        .update({
+          partyList: this.partyList3
+        });
+    },
+    saveparty4() {
+      this.completeSavePartyDialog = true;
+      setTimeout(() => {
+        this.completeSavePartyDialog = false;
+      }, 2000);
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
+        .doc("partyList4")
+        .update({
+          partyList: this.partyList4
+        });
+    },
+    saveparty5() {
+      this.completeSavePartyDialog = true;
+      setTimeout(() => {
+        this.completeSavePartyDialog = false;
+      }, 2000);
+      db.collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
+        .doc("partyList5")
+        .update({
+          partyList: this.partyList5
+        });
+    },
+    updatePartyName() {
+      this.editPartyNameDialog = false;
+      if (this.partyNumber == 1) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc("partyList1")
+          .update({
+            partyName: this.partyName
+          });
+        this.partyName1 = this.partyName;
+      } else if (this.partyNumber == 2) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc("partyList2")
+          .update({
+            partyName: this.partyName
+          });
+        this.partyName2 = this.partyName;
+      } else if (this.partyNumber == 3) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc("partyList3")
+          .update({
+            partyName: this.partyName
+          });
+        this.partyName3 = this.partyName;
+      } else if (this.partyNumber == 4) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc("partyList4")
+          .update({
+            partyName: this.partyName
+          });
+        this.partyName4 = this.partyName;
+      } else if (this.partyNumber == 5) {
+        db.collection("users")
+          .doc(this.$store.getters.user.uid)
+          .collection("partyList")
+          .doc("partyList5")
+          .update({
+            partyName: this.partyName
+          });
+        this.partyName5 = this.partyName;
+      }
+      this.partyName = "";
     }
   },
   computed: {
@@ -993,13 +1556,85 @@ export default {
         return value.index < 20000;
       });
       return result;
+    },
+    // パーティ登録計
+    isSixPatry1() {
+      // return true;
+      if (this.partyList1.length == 6) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isSixPatry2() {
+      // return true;
+      if (this.partyList2.length == 6) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isSixPatry3() {
+      // return true;
+      if (this.partyList3.length == 6) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isSixPatry4() {
+      // return true;
+      if (this.partyList4.length == 6) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isSixPatry5() {
+      // return true;
+      if (this.partyList5.length == 6) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+  watch: {
+    partyValue1() {
+      if (this.partyValue1 != undefined) {
+        this.partyList1.push(this.partyValue1);
+      }
+    },
+    partyValue2() {
+      if (this.partyValue2 != undefined) {
+        this.partyList2.push(this.partyValue2);
+      }
+    },
+    partyValue3() {
+      if (this.partyValue3 != undefined) {
+        this.partyList3.push(this.partyValue3);
+      }
+    },
+    partyValue4() {
+      if (this.partyValue4 != undefined) {
+        this.partyList4.push(this.partyValue4);
+      }
+    },
+    partyValue5() {
+      if (this.partyValue5 != undefined) {
+        this.partyList5.push(this.partyValue5);
+      }
     }
   },
   firestore() {
     return {
       displayFriendUserInfo: db
         .collection("users")
-        .doc(this.$route.params["uid"])
+        .doc(this.$route.params["uid"]),
+      partyListDb: db
+        .collection("users")
+        .doc(this.$store.getters.user.uid)
+        .collection("partyList")
     };
   }
 };
