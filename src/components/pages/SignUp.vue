@@ -103,7 +103,7 @@
                 v-model="email"
                 :error-messages="emailErrors"
                 prepend-inner-icon="mail"
-                placeholder="E-mail"
+                placeholder="メールアドレス"
                 solo
                 required
                 color="#8ac32b"
@@ -116,7 +116,7 @@
                 v-model="password"
                 :error-messages="passwordErrors"
                 prepend-inner-icon="lock"
-                placeholder="password"
+                placeholder="パスワード"
                 solo
                 required
                 color="#8ac32b"
