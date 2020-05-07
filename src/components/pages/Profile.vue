@@ -466,6 +466,31 @@ export default {
               imageHeaderUrl:
                 "https://firebasestorage.googleapis.com/v0/b/pgochat-91c46.appspot.com/o/headerSelectImg%2F%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC.jpg?alt=media&token=f0bc27d2-e8c5-44ac-b480-9c7439f83eae"
             });
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("partyList")
+            .doc("partyList1")
+            .set({ partyList: [], partyName: "" });
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("partyList")
+            .doc("partyList2")
+            .set({ partyList: [], partyName: "" });
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("partyList")
+            .doc("partyList3")
+            .set({ partyList: [], partyName: "" });
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("partyList")
+            .doc("partyList4")
+            .set({ partyList: [], partyName: "" });
+          db.collection("users")
+            .doc(this.$store.getters.user.uid)
+            .collection("partyList")
+            .doc("partyList5")
+            .set({ partyList: [], partyName: "" });
         } else {
           // ニックネームが半角英数字以外ならばから文字を入れる
           if (!doc.data().name.match(/[0-9A-Za-z]/g)) {

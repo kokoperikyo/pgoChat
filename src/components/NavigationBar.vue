@@ -134,12 +134,12 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <iconNotion v-on:friendRequestNotionOn="getFriendRequestNotionOn"></iconNotion>
+        <!-- <iconNotion v-on:friendRequestNotionOn="getFriendRequestNotionOn"></iconNotion>
         <iconNotion v-on:friendRequestNotionOff="getFriendRequestNotionOff"></iconNotion>
         <iconNotion v-on:chatNotificationOn="getChatNotificationOn"></iconNotion>
         <iconNotion v-on:chatNotificationOff="getChatNotificationOff"></iconNotion>
         <iconNotion v-on:limitChatNotificationOn="getLimitChatNotificationOn"></iconNotion>
-        <iconNotion v-on:limitChatNotificationOff="getLimitChatNotificationOff"></iconNotion>
+        <iconNotion v-on:limitChatNotificationOff="getLimitChatNotificationOff"></iconNotion>-->
       </v-toolbar-items>
       <v-toolbar-items v-else>
         <v-btn text to="/signIn">ログイン</v-btn>
@@ -158,11 +158,11 @@ import firebase from "@firebase/app";
 import { db } from "@/plugins/firebase";
 import { authorizationOfNotification } from "@/plugins/firebase";
 import "@firebase/firestore";
-import IconNotion from "@/components/pages/IconNotion.vue";
+// import IconNotion from "@/components/pages/IconNotion.vue";
 
 export default {
   components: {
-    IconNotion
+    // IconNotion
   },
   computed: {
     userStatus() {
